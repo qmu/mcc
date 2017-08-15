@@ -1,0 +1,6 @@
+#! /bin/sh
+
+cd `dirname $0`/../
+
+pwd
+go run *.go menu -c mcc.yml

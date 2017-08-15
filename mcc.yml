@@ -1,0 +1,238 @@
+---
+active: menu
+timezone: Asia/Tokyo
+rows:
+  - section: row
+    height: 20%
+    cols:
+      - section: col
+        stacks:
+          - type: note
+            title: ROW1 COL1
+            height: 100%
+            content: |
+              text text text
+              text text text
+              text text text
+
+      - section: col
+        stacks:
+          - type: note
+            title: ROW1 COL2
+            height: 100%
+            content: |
+              text text text
+              text text text
+              text text text
+
+      - section: col
+        stacks:
+          - type: note
+            title: ROW1 COL3
+            height: 100%
+            content: |
+              text text text
+              text text text
+              text text text
+
+  - section: row
+    height: 80%
+    cols:
+      - section: col
+        stacks:
+          - type: menu
+            title: MENU1
+            height: 25%
+            content:
+            - category: Category1
+              name: Menu1
+              description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+              command: echo "hogeeeeeeeeeeeee"
+            - category: Category1
+              name: Menu2
+              description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+              command: echo "hogeeeeeeeeeeeee"
+            - category: Category1
+              name: Menu3
+              description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+              command: echo "hogeeeeeeeeeeeee"
+            - category: Category1
+              name: Menu4
+              description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+              command: echo "hogeeeeeeeeeeeee"
+            - category: Category1
+              name: Menu5
+              description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+              command: echo "hogeeeeeeeeeeeee"
+            - category: Category1
+              name: Menu6
+              description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+              command: echo "hogeeeeeeeeeeeee"
+            - category: Category1
+              name: Menu7
+              description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+              command: echo "hogeeeeeeeeeeeee"
+            - category: Category2
+              name: Menu8
+              description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+              command: echo "hogeeeeeeeeeeeee"
+            - category: Category2
+              name: Menu9
+              description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+              command: echo "hogeeeeeeeeeeeee"
+            - category: Category2
+              name: Menu10
+              description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+              command: echo "hogeeeeeeeeeeeee"
+            - category: Category2
+              name: Menu11
+              description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+              command: echo "hogeeeeeeeeeeeee"
+            - category: Category2
+              name: Menu12
+              description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+              command: echo "hogeeeeeeeeeeeee"
+
+          - type: menu
+            title: MENU2
+            height: 15%
+            content:
+            - category: Category3
+              name: Menu1
+              description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+              command: echo "hogeeeeeeeeeeeee"
+            - category: Category3
+              name: Menu2
+              description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+              command: echo "hogeeeeeeeeeeeee"
+            - category: Category3
+              name: Menu3
+              description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+              command: echo "hogeeeeeeeeeeeee"
+            - category: Category3
+              name: Menu4
+              description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+              command: echo "hogeeeeeeeeeeeee"
+            - category: Category3
+              name: Menu5
+              description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+              command: echo "hogeeeeeeeeeeeee"
+            - category: Category3
+              name: Menu6
+              description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+              command: echo "hogeeeeeeeeeeeee"
+
+          - type: menu
+            title: MENU3
+            height: 25%
+            content:
+            - category: Category4
+              name: Menu1
+              description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+              command: echo "hogeeeeeeeeeeeee"
+            - category: Category4
+              name: Menu2
+              description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+              command: echo "hogeeeeeeeeeeeee"
+            - category: Category4
+              name: Menu3
+              description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+              command: echo "hogeeeeeeeeeeeee"
+            - category: Category4
+              name: Menu4
+              description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+              command: echo "hogeeeeeeeeeeeee"
+            - category: Category5
+              name: Menu5
+              description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+              command: echo "hogeeeeeeeeeeeee"
+            - category: Category5
+              name: Menu6
+              description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+              command: echo "hogeeeeeeeeeeeee"
+            - category: Category5
+              name: Menu7
+              description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+              command: echo "hogeeeeeeeeeeeee"
+            - category: Category5
+              name: Menu8
+              description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+              command: echo "hogeeeeeeeeeeeee"
+            - category: Category5
+              name: Menu9
+              description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+              command: echo "hogeeeeeeeeeeeee"
+
+          - type: menu
+            title: MENU4
+            height: 25%
+            content:
+            - category: Category6
+              name: Menu1
+              description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+              command: echo "hogeeeeeeeeeeeee"
+            - category: Category6
+              name: Menu2
+              description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+              command: echo "hogeeeeeeeeeeeee"
+            - category: Category6
+              name: Menu3
+              description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+              command: echo "hogeeeeeeeeeeeee"
+            - category: Category6
+              name: Menu4
+              description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+              command: echo "hogeeeeeeeeeeeee"
+            - category: Category6
+              name: Menu5
+              description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+              command: echo "hogeeeeeeeeeeeee"
+            - category: Category7
+              name: Menu6
+              description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+              command: echo "hogeeeeeeeeeeeee"
+            - category: Category7
+              name: Menu7
+              description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+              command: echo "hogeeeeeeeeeeeee"
+            - category: Category7
+              name: Menu8
+              description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+              command: echo "hogeeeeeeeeeeeee"
+            - category: Category7
+              name: Menu9
+              description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+              command: echo "hogeeeeeeeeeeeee"
+            - category: Category7
+              name: Menu10
+              description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+              command: echo "hogeeeeeeeeeeeee"
+
+          - type: menu
+            title: MENU5
+            height: 10%
+            content:
+            - category: Category8
+              name: Menu1
+              description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+              command: echo "hogeeeeeeeeeeeee"
+            - category: Category8
+              name: Menu2
+              description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+              command: echo "hogeeeeeeeeeeeee"
+
+      - section: col
+        stacks:
+          - type: github_issue
+            title: CURRENT ISSUE
+            height: 80%
+            issue_regex: "i([0-9]*).*"
+
+          - type: note
+            title: INFORMATION
+            height: 20%
+            content: |
+              text text text
+              text text text
+              text text text
+              text text text

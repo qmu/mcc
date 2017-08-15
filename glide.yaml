@@ -1,0 +1,27 @@
+package: github.com/qmu/mcc
+import:
+- package: github.com/github/hub
+  subpackages:
+  - ui
+  - utils
+- package: github.com/gizak/termui
+- package: github.com/google/go-github
+  subpackages:
+  - github
+- package: github.com/k0kubun/pp
+- package: github.com/kr/pty
+- package: github.com/mattn/go-shellwords
+- package: github.com/mitchellh/go-homedir
+- package: github.com/mitchellh/mapstructure
+- package: golang.org/x/crypto
+  subpackages:
+  - ssh/terminal
+- package: golang.org/x/oauth2
+- package: golang.org/x/text
+  subpackages:
+  - width
+- package: gopkg.in/src-d/go-git.v4
+- package: gopkg.in/yaml.v1
+- package: github.com/spf13/cobra
+  subpackages:
+  - cobra

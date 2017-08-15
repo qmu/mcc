@@ -1,0 +1,165 @@
+hash: 60c9c3cc988fd50f3511c38add243a997ee58b4159946ee7acafdd2880f19ae6
+updated: 2017-08-08T20:14:26.824510619+09:00
+imports:
+- name: github.com/github/hub
+  version: e3cf4914ae1a29863e0b891fae22a49c78d78a3f
+  subpackages:
+  - ui
+  - utils
+- name: github.com/gizak/termui
+  version: 72304ddb9b4e9838426a021aad64a5a860e98324
+- name: github.com/golang/protobuf
+  version: 1909bc2f63dc92bb931deace8b8312c4db72d12f
+  subpackages:
+  - proto
+- name: github.com/google/go-github
+  version: 44e0413e5b74655281275e8c90cff2b27d9673a1
+  subpackages:
+  - github
+- name: github.com/google/go-querystring
+  version: 53e6ce116135b80d037921a7fdd5138cf32d7a8a
+  subpackages:
+  - query
+- name: github.com/inconshreveable/mousetrap
+  version: 76626ae9c91c4f2a10f34cad8ce83ea42c93bb75
+- name: github.com/jbenet/go-context
+  version: d14ea06fba99483203c19d92cfcd13ebe73135f4
+  subpackages:
+  - io
+- name: github.com/k0kubun/pp
+  version: d1532fc5d94ecdf2da29e24d7b99721f3287de4a
+- name: github.com/kr/pty
+  version: 2c10821df3c3cf905230d078702dfbe9404c9b23
+- name: github.com/maruel/panicparse
+  version: 868abbf1ebac0fb2760cd9a410a5bd2f5afb2f76
+  subpackages:
+  - stack
+- name: github.com/mattn/go-colorable
+  version: 6c0fd4aa6ec5818d5e3ea9e03ae436972a6c5a9a
+- name: github.com/mattn/go-isatty
+  version: fc9e8d8ef48496124e79ae0df75490096eccf6fe
+- name: github.com/mattn/go-runewidth
+  version: 97311d9f7767e3d6f422ea06661bc2c7a19e8a5d
+- name: github.com/mattn/go-shellwords
+  version: 9858af9cca4c73576f0b8c6609a396eb0878023c
+- name: github.com/mitchellh/go-homedir
+  version: b8bc1bf767474819792c23f32d8286a45736f1c6
+- name: github.com/mitchellh/go-wordwrap
+  version: ad45545899c7b13c020ea92b2072220eefad42b8
+- name: github.com/mitchellh/mapstructure
+  version: d0303fe809921458f417bcf828397a65db30a7e4
+- name: github.com/nsf/termbox-go
+  version: 4ed959e0540971545eddb8c75514973d670cf739
+- name: github.com/sergi/go-diff
+  version: feef008d51ad2b3778f85d387ccf91735543008d
+  subpackages:
+  - diffmatchpatch
+- name: github.com/spf13/cobra
+  version: b26b538f693051ac6518e65672de3144ce3fbedc
+  subpackages:
+  - cobra
+- name: github.com/spf13/pflag
+  version: e57e3eeb33f795204c1ca35f56c44f83227c6e66
+- name: github.com/src-d/gcfg
+  version: f187355171c936ac84a82793659ebb4936bc1c23
+  subpackages:
+  - scanner
+  - token
+  - types
+- name: github.com/xanzy/ssh-agent
+  version: ba9c9e33906f58169366275e3450db66139a31a9
+- name: golang.org/x/crypto
+  version: 81db3efc71b576a04b145ca576c0bb9c0fb74d4f
+  subpackages:
+  - curve25519
+  - ed25519
+  - ed25519/internal/edwards25519
+  - ssh
+  - ssh/agent
+  - ssh/knownhosts
+  - ssh/terminal
+- name: golang.org/x/net
+  version: 090ebbdfc2aff44cc6674372b72e02e731f7f0ef
+  subpackages:
+  - context
+  - context/ctxhttp
+- name: golang.org/x/oauth2
+  version: 9a379c6b3e95a790ffc43293c2a78dee0d7b6e20
+  subpackages:
+  - internal
+- name: golang.org/x/sys
+  version: d8f5ea21b9295e315e612b4bcf4bedea93454d4d
+  subpackages:
+  - unix
+  - windows
+- name: golang.org/x/text
+  version: 3bd178b88a8180be2df394a1fbb81313916f0e7b
+  subpackages:
+  - transform
+  - width
+- name: google.golang.org/appengine
+  version: c5a90ac045b779001847fec87403f5cba090deae
+  subpackages:
+  - internal
+  - internal/app_identity
+  - internal/base
+  - internal/datastore
+  - internal/log
+  - internal/modules
+  - internal/remote_api
+  - internal/urlfetch
+  - urlfetch
+- name: gopkg.in/src-d/go-billy.v3
+  version: c329b7bc7b9d24905d2bc1b85bfa29f7ae266314
+  subpackages:
+  - helper/chroot
+  - helper/polyfill
+  - osfs
+  - util
+- name: gopkg.in/src-d/go-git.v4
+  version: 8ddbecf782c2e340fd85bb4ba4d00dc73d749f87
+  subpackages:
+  - config
+  - internal/revision
+  - plumbing
+  - plumbing/cache
+  - plumbing/filemode
+  - plumbing/format/config
+  - plumbing/format/diff
+  - plumbing/format/gitignore
+  - plumbing/format/idxfile
+  - plumbing/format/index
+  - plumbing/format/objfile
+  - plumbing/format/packfile
+  - plumbing/format/pktline
+  - plumbing/object
+  - plumbing/protocol/packp
+  - plumbing/protocol/packp/capability
+  - plumbing/protocol/packp/sideband
+  - plumbing/revlist
+  - plumbing/storer
+  - plumbing/transport
+  - plumbing/transport/client
+  - plumbing/transport/file
+  - plumbing/transport/git
+  - plumbing/transport/http
+  - plumbing/transport/internal/common
+  - plumbing/transport/server
+  - plumbing/transport/ssh
+  - storage
+  - storage/filesystem
+  - storage/filesystem/internal/dotgit
+  - storage/memory
+  - utils/binary
+  - utils/diff
+  - utils/ioutil
+  - utils/merkletrie
+  - utils/merkletrie/filesystem
+  - utils/merkletrie/index
+  - utils/merkletrie/internal/frame
+  - utils/merkletrie/noder
+- name: gopkg.in/warnings.v0
+  version: 8a331561fe74dadba6edfc59f3be66c22c3b065d
+- name: gopkg.in/yaml.v1
+  version: 9f9df34309c04878acc86042b16630b0f696e1de
+testImports: []

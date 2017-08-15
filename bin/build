@@ -1,0 +1,13 @@
+#! /bin/sh
+
+cd `dirname $0`/../
+
+# gox -osarch="linux/amd64 darwin/amd64 windows/amd64 linux/386 darwin/386 windows/386" -output="tmp/{{.OS}}_{{.Arch}}_{{.Dir}}"
+gox -osarch="linux/amd64 darwin/amd64 linux/386 darwin/386" -output="tmp/{{.OS}}_{{.Arch}}_{{.Dir}}"
+
+scp tmp/darwin_386_mcc q:/var/www/html/qmu-jp-wp/mcc/darwin_386_mcc
+scp tmp/darwin_amd64_mcc q:/var/www/html/qmu-jp-wp/mcc/darwin_amd64_mcc
+scp tmp/linux_386_mcc q:/var/www/html/qmu-jp-wp/mcc/linux_386_mcc
+scp tmp/linux_amd64_mcc q:/var/www/html/qmu-jp-wp/mcc/linux_amd64_mcc
+# scp tmp/windows_386_mcc.exe q:/var/www/html/qmu-jp-wp/mcc/windows_386_mcc.exe
+# scp tmp/windows_amd64_mcc.exe q:/var/www/html/qmu-jp-wp/mcc/windows_amd64_mcc.exe

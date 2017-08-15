@@ -1,0 +1,49 @@
+#!/bin/sh
+cd `dirname $0`/../
+
+# absolute path of this repo's root
+projectPath=$(git rev-parse --show-toplevel)
+# get a prefix of container up by docker-compose
+project=$(basename $projectPath |  sed 's/[_|-]//g')
+
+mkdir -p bin/lib/mcc
+
+PATH_TO_BINARY=bin/lib/mcc/mcc
+BINARY=""
+
+if [ "$1" == "--self-update" ]; then
+    rm $PATH_TO_BINARY
+fi
+
+if [ ! -e $PATH_TO_BINARY ]; then
+    arc=$(uname -m)
+    if [ "$(uname)" == 'Darwin' ]; then
+        if [ "$arc" == "x86_64" ]; then
+            BINARY=darwin_amd64_mcc
+        else
+            BINARY=darwin_386_mcc
+        fi
+    elif [ "$(expr substr $(uname -s) 1 5)" == 'Linux' ]; then
+        if [ "$arc" == "x86_64" ]; then
+            BINARY=linux_amd64_mcc
+        else
+            BINARY=linux_386_mcc
+        fi
+    elif [ "$(expr substr $(uname -s) 1 10)" == 'MINGW64_NT' ]; then
+        BINARY=windows_amd64_mcc
+    elif [ "$(expr substr $(uname -s) 1 10)" == 'MINGW32_NT' ]; then                                                                                           
+        BINARY=windows_386_mcc
+    else
+        echo "Your platform ($(uname -a)) is not supported."
+        exit 1
+    fi
+    curl -L -O https://qmu.jp/mcc/$BINARY && mv $BINARY $PATH_TO_BINARY
+    chmod +x $PATH_TO_BINARY
+fi
+
+if [ "$1" != "--self-update" ]; then
+
+    $PATH_TO_BINARY menu -c env/mcc.yml
+else
+    echo "Updated"
+fi
