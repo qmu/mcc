@@ -35,3 +35,7 @@ tmp/
 
 # mcc
 bin/lib/mcc/*
+
+# dirs for build process
+_build/
+release
