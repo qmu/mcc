@@ -27,7 +27,7 @@ sudo chmod +x /usr/local/bin/mcc
 ## Usage
 
 ```bash
-# if you are in the directory within mcc.yml
+# if ./mcc.yml exists, just
 mcc
 
 # or give its path
@@ -36,7 +36,16 @@ mcc -c path/to/mcc.yml
 
 ## Config
 
+See the [_examples](https://github.com/qmu/mcc/tree/master/_examples)
 
+## Key Bindings
+
+KeyBinding          | Description
+--------------------|---------------------------------------------------------
+<kbd>Ctrl + j,k,h,l</kbd> | Switch widgets
+<kbd>j, k, ↑, ↓</kbd> | Move cursor in the active widget
+<kbd>Enter</kbd> in the Menu widget | Execute a command
+<kbd>Ctrl-c, q</kbd> | quit
 
 ## License 
 
