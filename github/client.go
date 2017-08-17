@@ -66,9 +66,6 @@ func NewClient(execPath string) (g *Client, err error) {
 // Init initialize Client
 func (g *Client) Init() (err error) {
 	g.client, err = g.auth.InitClient()
-	if err != nil {
-		return
-	}
 	return
 }
 

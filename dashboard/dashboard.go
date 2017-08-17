@@ -44,6 +44,18 @@ func NewDashboard(configPath string) (err error) {
 	d.execPath = filepath.Dir(configPath)
 	d.configPath = configPath
 
+	c, err := github.NewClient(d.execPath)
+	if err != nil {
+		for _, w := range d.githubWidgets {
+			w.Disable()
+		}
+	} else {
+		if err = c.Init(); err != nil {
+			return
+		}
+		d.client = c
+	}
+
 	if err := ui.Init(); err != nil {
 		panic(err)
 	}
@@ -68,18 +80,6 @@ func (d *Dashboard) prepareUI() (err error) {
 		d.deactivateWidget(w.widgetItem)
 	}
 	d.activateWidget(d.widgetPositions[0].widgetItem)
-
-	r, err := github.NewClient(d.execPath)
-	if err != nil {
-		for _, w := range d.githubWidgets {
-			w.Disable()
-		}
-	} else {
-		if err = r.Init(); err != nil {
-			return
-		}
-		d.client = r
-	}
 
 	if d.hasGithubIssueWidget() {
 		go func() {
