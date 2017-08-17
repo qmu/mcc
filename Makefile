@@ -1,5 +1,5 @@
-NAME=mcc
-VERSION=$(cat VERSION)
+NAME = mcc
+VERSION = $(shell cat VERSION)
 
 clean:
 	rm -rf _build/ release/
@@ -14,3 +14,5 @@ release:
 	go get github.com/progrium/gh-release/...
 	cp _build/* release
 	gh-release create qmu/$(NAME) $(VERSION)
+
+.PHONY: build
