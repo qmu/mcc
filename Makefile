@@ -1,5 +1,13 @@
-NAME = mcc
-VERSION = $(shell cat VERSION)
+NAME := mcc
+VERSION := v0.9.2
+SRCS      := $(shell find . -name '*.go' -type f)
+LDFLAGS   := -ldflags "-X main.Version=$(VERSION)"
+
+run:
+	go run $(LDFLAGS) *.go -c mcc.yml
+
+version:
+	go run $(LDFLAGS) *.go --version
 
 clean:
 	rm -rf _build/ release/
@@ -7,7 +15,7 @@ clean:
 build:
 	glide install
 	mkdir -p _build
-	gox -osarch="linux/amd64 darwin/amd64 linux/386 darwin/386" -output="_build/{{.OS}}_{{.Arch}}_{{.Dir}}"
+	gox $(LDFLAGS) -osarch="linux/amd64 darwin/amd64 linux/386 darwin/386" -output="_build/{{.OS}}_{{.Arch}}_{{.Dir}}"
 
 release:
 	mkdir release
