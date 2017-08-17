@@ -108,21 +108,6 @@ func (g *GithubIssueWidget) buildBody() (body []string, err error) {
 	}
 	desc := g.overflow(issue.GetBody())
 	desc = g.putIndent(desc)
-	commentText := ""
-	for i, c := range comments {
-		t := c.GetCreatedAt()
-		loc, err := time.LoadLocation(g.timezone)
-		if err != nil {
-			return body, nil
-		}
-		if i > 0 {
-			commentText += "[" + strings.Repeat(". ", 150) + "](fg-blue) \n\n"
-		}
-		commentText += "[COMMENTED BY ](fg-blue)" + c.User.GetLogin() + " [ON " + fmt.Sprint(t.In(loc)) + "](fg-blue)" + "\n"
-		b := c.GetBody()
-		commentText += g.overflow(b) + "\n"
-		commentText += "\n"
-	}
 
 	// labels
 	lbls := ""
@@ -132,7 +117,6 @@ func (g *GithubIssueWidget) buildBody() (body []string, err error) {
 	// milestone
 	milestone := issue.Milestone.GetTitle()
 
-	commentText = g.putIndent(commentText)
 	text := " [TITLE :](fg-blue) " + issue.GetTitle() + "\n"
 	text += " [NO    :](fg-blue) " + "#" + fmt.Sprint(issue.GetNumber()) + "\n"
 	text += " [BY    :](fg-blue) " + issue.User.GetLogin() + "\n"
@@ -146,8 +130,28 @@ func (g *GithubIssueWidget) buildBody() (body []string, err error) {
 	text += " [" + strings.Repeat("-", 300) + "](fg-blue) \n"
 	text += " [DESC  :](fg-blue) " + desc
 	text += " [" + strings.Repeat("-", 300) + "](fg-blue) \n"
-	text += " [      :](fg-blue) " + commentText
-	text += " [" + strings.Repeat("-", 300) + "](fg-blue)"
+
+	if len(comments) > 0 {
+		commentText := ""
+		for i, c := range comments {
+			t := c.GetCreatedAt()
+			loc, err := time.LoadLocation(g.timezone)
+			if err != nil {
+				return body, nil
+			}
+			if i > 0 {
+				commentText += "[" + strings.Repeat(". ", 150) + "](fg-blue) \n\n"
+			}
+			commentText += "[COMMENTED BY ](fg-blue)" + c.User.GetLogin() + " [ON " + fmt.Sprint(t.In(loc)) + "](fg-blue)" + "\n"
+			b := c.GetBody()
+			commentText += g.overflow(b) + "\n"
+			commentText += "\n"
+		}
+
+		commentText = g.putIndent(commentText)
+		text += " [      :](fg-blue) " + commentText
+		text += " [" + strings.Repeat("-", 300) + "](fg-blue)"
+	}
 
 	body = strings.Split(text, "\n")
 
