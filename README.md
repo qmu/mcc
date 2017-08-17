@@ -2,7 +2,7 @@
 
 #
 
-![release][release]
+[![GitHub release](https://img.shields.io/github/release/qmu/mcc.svg)](https://github.com/qmu/mcc/releases)
 
 mcc is a terminal dashboard easily configured by yaml. 
 
@@ -43,5 +43,3 @@ mcc -c path/to/mcc.yml
 **MIT License**
 
 Copyright (c) qmu Co., Inc.
-
-[release]: https://img.shields.io/github/release/qmu/mcc.svg "mcc"
