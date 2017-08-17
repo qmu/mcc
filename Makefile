@@ -6,8 +6,11 @@ LDFLAGS   := -ldflags "-X main.Version=$(VERSION)"
 run:
 	go run $(LDFLAGS) *.go -c mcc.yml
 
-version:
-	go run $(LDFLAGS) *.go --version
+erd:
+	go-erd -path ./dashboard/ |dot -Tsvg > ./tmp/dashboard_erd.svg
+
+fmt:
+	gofmt -s -w ./
 
 clean:
 	rm -rf _build/ release/

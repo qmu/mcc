@@ -1,6 +1,0 @@
-#! /bin/sh
-
-cd `dirname $0`/../
-
-cd ../../../../ # = $GOPATH
-go install github.com/qmu/mcc
