@@ -4,7 +4,7 @@ SRCS      := $(shell find . -name '*.go' -type f)
 LDFLAGS   := -ldflags "-X main.Version=$(VERSION)"
 
 run:
-	go run $(LDFLAGS) *.go -c mcc.yml
+	go run $(LDFLAGS) *.go -c _example/example1.yml
 
 erd:
 	go-erd -path ./dashboard/ |dot -Tsvg > ./tmp/dashboard_erd.svg
