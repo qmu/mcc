@@ -1,8 +1,6 @@
 ---
-active: menu
+schema_version: v1.0.0
 timezone: Asia/Tokyo
-widgets:
-
 rows:
   - section: row
     height: 100%

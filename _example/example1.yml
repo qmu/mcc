@@ -1,5 +1,5 @@
 ---
-active: menu
+schema_version: v1.0.0
 timezone: Asia/Tokyo
 rows:
   - section: row

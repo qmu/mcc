@@ -20,6 +20,9 @@ func main() {
 // Version defined in Makefile
 var Version string
 
+// ConfigSchemaVersion defined in Makefile
+var ConfigSchemaVersion string
+
 var config string
 
 // RootCmd is the cobra's root command
@@ -31,7 +34,7 @@ var RootCmd = &cobra.Command{
 			fmt.Println("mcc version " + Version)
 			os.Exit(0)
 		}
-		if err := dashboard.NewDashboard(config); err != nil {
+		if err := dashboard.NewDashboard(Version, ConfigSchemaVersion, config); err != nil {
 			return
 		}
 	},

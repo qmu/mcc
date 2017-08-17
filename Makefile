@@ -1,7 +1,8 @@
 NAME := mcc
 VERSION := v0.9.2
+CONFIG_SCHEMA_VERSION := v1.0.0
 SRCS      := $(shell find . -name '*.go' -type f)
-LDFLAGS   := -ldflags "-X main.Version=$(VERSION)"
+LDFLAGS   := -ldflags "-X main.Version=$(VERSION) -X main.ConfigSchemaVersion=$(CONFIG_SCHEMA_VERSION)"
 
 run:
 	go run $(LDFLAGS) *.go -c _example/example1.yml

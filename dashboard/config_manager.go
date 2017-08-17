@@ -15,9 +15,9 @@ type ConfigManager struct {
 
 // Config is the root schema of config file
 type Config struct {
-	Active   string
-	Timezone string
-	Rows     []Row
+	SchemaVersion string `yaml:"schema_version"`
+	Timezone      string
+	Rows          []Row
 }
 
 // Row is the schema implements Config.Widgets.Section
