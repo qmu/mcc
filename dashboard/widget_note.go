@@ -1,6 +1,7 @@
 package dashboard
 
 import (
+	"regexp"
 	"strings"
 
 	ui "github.com/gizak/termui"
@@ -27,6 +28,8 @@ func NewNoteWidget(wi Widget) (n *NoteWidget, err error) {
 	items := strings.Split(note, "\n")
 	var body []string
 	for _, item := range items {
+		rep := regexp.MustCompile(`(^#.*)`)
+		item = rep.ReplaceAllString(item, "[$1](fg-blue)")
 		body = append(body, " "+item)
 	}
 	opt := &ListWrapperOption{

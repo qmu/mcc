@@ -232,7 +232,14 @@ rows:
             title: INFORMATION
             height: 20%
             content: |
+              # text text text
+              
               text text text
-              text text text
-              text text text
+              
+              # text text text
+              
+              text #hogehoge text text
+              
+              ## text text text
+              
               text text text
