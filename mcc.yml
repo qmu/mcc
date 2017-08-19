@@ -6,7 +6,7 @@ rows:
     height: 100%
     cols:
       - section: col
-        stacks:
+        widgets:
           - type: menu
             title: DEVELOPMENT
             height: 100%
@@ -37,7 +37,7 @@ rows:
               command: bin/mcc --self-update
 
       - section: col
-        stacks:
+        widgets:
           - type: github_issue
             title: CURRENT ISSUE
             height: 70%

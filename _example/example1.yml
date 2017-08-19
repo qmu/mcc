@@ -6,7 +6,7 @@ rows:
     height: 20%
     cols:
       - section: col
-        stacks:
+        widgets:
           - type: note
             title: ROW1 COL1
             height: 100%
@@ -16,7 +16,7 @@ rows:
               text text text
 
       - section: col
-        stacks:
+        widgets:
           - type: note
             title: ROW1 COL2
             height: 100%
@@ -26,7 +26,7 @@ rows:
               text text text
 
       - section: col
-        stacks:
+        widgets:
           - type: note
             title: ROW1 COL3
             height: 100%
@@ -39,7 +39,7 @@ rows:
     height: 80%
     cols:
       - section: col
-        stacks:
+        widgets:
           - type: menu
             title: MENU1
             height: 25%
@@ -222,7 +222,7 @@ rows:
               command: echo "hogeeeeeeeeeeeee"
 
       - section: col
-        stacks:
+        widgets:
           - type: github_issue
             title: CURRENT ISSUE
             height: 80%

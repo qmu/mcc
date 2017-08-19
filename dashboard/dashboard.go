@@ -128,7 +128,7 @@ func (d *Dashboard) hasGithubIssueWidget() bool {
 	result := false
 	for _, row := range d.config.Rows {
 		for _, col := range row.Cols {
-			for _, w := range col.Stacks {
+			for _, w := range col.Widgets {
 				if w.Type == "github_issue" {
 					result = true
 				}
@@ -296,7 +296,7 @@ func (d *Dashboard) layoutWidgets() (err error) {
 			var cols []ui.GridBufferer
 			var wi WidgetItem
 			offset := 1
-			for j, w := range col.Stacks {
+			for j, w := range col.Widgets {
 				switch w.Type {
 				case "menu":
 					wi, err = NewMenuWidget(w)

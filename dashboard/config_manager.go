@@ -30,7 +30,7 @@ type Row struct {
 // Col is the schema implements Config.Widgets.Section
 type Col struct {
 	Section string
-	Stacks  []Widget
+	Widgets []Widget
 }
 
 // Widget is the schema implements Config.Widgets
@@ -67,12 +67,12 @@ func NewConfigManager(path string) (c *ConfigManager, err error) {
 		rowH := utils.Percentalize(windowH, row.Height)
 		for i2, col := range row.Cols {
 			cntH := 0
-			for i3, w := range col.Stacks {
-				if len(col.Stacks)-1 == i3 {
-					c.LoadedData.Rows[i1].Cols[i2].Stacks[i3].RealHeight = rowH - cntH
+			for i3, w := range col.Widgets {
+				if len(col.Widgets)-1 == i3 {
+					c.LoadedData.Rows[i1].Cols[i2].Widgets[i3].RealHeight = rowH - cntH
 				} else {
 					widgetH := utils.Percentalize(rowH, w.Height)
-					c.LoadedData.Rows[i1].Cols[i2].Stacks[i3].RealHeight = widgetH
+					c.LoadedData.Rows[i1].Cols[i2].Widgets[i3].RealHeight = widgetH
 					cntH += widgetH
 				}
 			}
