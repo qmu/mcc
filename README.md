@@ -13,8 +13,7 @@ Availabe on Mac and Linux. Fetch the [latest release](https://github.com/qmu/mcc
 #### macOS
 
 ```bash
-brew tap qmu/mcc
-brew install mcc
+brew install qmu/mcc/mcc
 ```
 
 #### Linux
@@ -42,10 +41,12 @@ See the [_examples](https://github.com/qmu/mcc/tree/master/_examples)
 
 KeyBinding          | Description
 --------------------|---------------------------------------------------------
-<kbd>Ctrl + j,k,h,l</kbd> | Switch widgets
-<kbd>j, k, ↑, ↓</kbd> | Move cursor in the active widget
-<kbd>Enter</kbd> in the Menu widget | Execute a command
-<kbd>Ctrl-c, q</kbd> | quit
+<kbd>Ctrl + j,k,h,l</kbd>   | Switch widgets
+<kbd>j, k, ↑, ↓</kbd>       | Move cursor in the active widget
+<kbd>Ctrl + j,k</kbd>       | Jump cursor in the active widget
+<kbd>gg, G</kbd>            | Jump cursor top(bottom) in the active widget
+<kbd>Enter</kbd>            | (in the Menu widget) Execute a command
+<kbd>Ctrl-c, q</kbd>        | quit
 
 ## License 
 
