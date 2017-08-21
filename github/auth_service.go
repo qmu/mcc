@@ -15,6 +15,7 @@ import (
 
 	"github.com/github/hub/ui"
 	"github.com/github/hub/utils"
+	"github.com/gizak/termui"
 	go_github "github.com/google/go-github/github"
 	"github.com/mitchellh/go-homedir"
 	"golang.org/x/crypto/ssh/terminal"
@@ -93,6 +94,12 @@ func (a *AuthService) login() (err error) {
 }
 
 func (a *AuthService) authorizeClient(host string) (err error) {
+	termui.Close()
+	ui.Println("-----------------------------------------------------------------------")
+	ui.Println("GitHub widget is configured in the yaml")
+	ui.Println("Please authenticate your GitHub account first (generating access token)")
+	ui.Println("-----------------------------------------------------------------------")
+
 	user := a.promptForUser(host)
 	pass := a.promptForPassword(host, user)
 
@@ -117,8 +124,13 @@ func (a *AuthService) authorizeClient(host string) (err error) {
 	if token == "" {
 		ui.Errorln("error: invalid username or password")
 		os.Exit(1)
+	} else {
+		a.saveConfig()
+		ui.Println("-----------------------------------------------------------------------")
+		ui.Println("Authentication succeeded! (access token has been stored ~/.config/mcc)")
+		ui.Println("Please restart mcc again")
+		os.Exit(0)
 	}
-	a.saveConfig()
 
 	return
 }
