@@ -3,6 +3,7 @@ VERSION := v0.9.2
 CONFIG_SCHEMA_VERSION := v1.0.0
 SRCS      := $(shell find . -name '*.go' -type f)
 LDFLAGS   := -ldflags "-X main.Version=$(VERSION) -X main.ConfigSchemaVersion=$(CONFIG_SCHEMA_VERSION)"
+GH_UPLOAD := github-release upload --user qmu --repo $(NAME) --tag $(VERSION)
 
 run:
 	go run $(LDFLAGS) *.go -c _example/example1.yml
@@ -23,8 +24,18 @@ build:
 
 release:
 	mkdir release
-	go get github.com/progrium/gh-release/...
+	go get github.com/aktau/github-release/...
 	cp _build/* release
-	gh-release create qmu/$(NAME) $(VERSION)
+	github-release release \
+		--user qmu \
+		--repo $(NAME) \
+		--tag $(VERSION) \
+		--name $(VERSION)
+
+	cd release/ \
+		&& $(GH_UPLOAD) --name darwin_386_mcc --file darwin_386_mcc \
+		&& $(GH_UPLOAD) --name darwin_amd64_mcc --file darwin_amd64_mcc \
+		&& $(GH_UPLOAD) --name linux_386_mcc --file linux_386_mcc \
+		&& $(GH_UPLOAD) --name linux_amd64_mcc --file linux_amd64_mcc
 
 .PHONY: build
