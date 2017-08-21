@@ -68,7 +68,9 @@ func (a *AuthService) InitClient() (client *go_github.Client, err error) {
 	}
 
 	if err = a.login(); err != nil {
-		return
+		if err = a.authorizeClient(a.host); err != nil {
+			return
+		}
 	}
 	client = a.client
 
@@ -82,6 +84,11 @@ func (a *AuthService) login() (err error) {
 	)
 	tc := oauth2.NewClient(ctx, ts)
 	a.client = go_github.NewClient(tc)
+
+	// make sure a.client(token) is available
+	opt := &go_github.RepositoryListByOrgOptions{Type: "public"}
+	_, _, err = a.client.Repositories.ListByOrg(ctx, "github", opt)
+
 	return
 }
 

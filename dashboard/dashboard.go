@@ -1,9 +1,12 @@
 package dashboard
 
 import (
+	"fmt"
+	"os"
 	"path/filepath"
 
 	ui "github.com/gizak/termui"
+	version "github.com/hashicorp/go-version"
 	"github.com/qmu/mcc/github"
 	// "github.com/k0kubun/pp"
 )
@@ -39,16 +42,50 @@ type widgetPosition struct {
 }
 
 // NewDashboard constructs a new Dashboard
-func NewDashboard(configPath string) (err error) {
+func NewDashboard(appVersion string, configSchemaVersion string, configPath string) (err error) {
 	d := new(Dashboard)
 	d.execPath = filepath.Dir(configPath)
 	d.configPath = configPath
 
+	// initialize GitHub Client
+	c, err := github.NewClient(d.execPath)
+	if err != nil {
+		for _, w := range d.githubWidgets {
+			w.Disable()
+		}
+	} else {
+		if err = c.Init(); err != nil {
+			return
+		}
+		d.client = c
+	}
+
+	// initialize termui
 	if err := ui.Init(); err != nil {
 		panic(err)
 	}
 	defer ui.Close()
 
+	// load config file
+	configManager, err := NewConfigManager(d.configPath)
+	if err != nil {
+		return
+	}
+	d.config = configManager.LoadedData
+
+	// check the ConfigSchemaVersion
+	vApp, err := version.NewVersion(configSchemaVersion)
+	vConfig, err := version.NewVersion(d.config.SchemaVersion)
+	if err != nil {
+		return
+	}
+	if vConfig.LessThan(vApp) {
+		fmt.Printf("mcc %s supports schema_version %s but ths schema_version in %s seems to be %s\n", appVersion, vApp, configPath, vConfig)
+		fmt.Printf("please upgrade mcc or %s first\n", configPath)
+		os.Exit(1)
+	}
+
+	// initialize interface
 	if err = d.prepareUI(); err != nil {
 		return
 	}
@@ -56,30 +93,12 @@ func NewDashboard(configPath string) (err error) {
 }
 
 func (d *Dashboard) prepareUI() (err error) {
-	configManager, err := NewConfigManager(d.configPath)
-	if err != nil {
-		return
-	}
-	d.config = configManager.LoadedData
-
 	d.layoutHeader()
 	d.layoutWidgets()
 	for _, w := range d.widgetPositions {
 		d.deactivateWidget(w.widgetItem)
 	}
 	d.activateWidget(d.widgetPositions[0].widgetItem)
-
-	r, err := github.NewClient(d.execPath)
-	if err != nil {
-		for _, w := range d.githubWidgets {
-			w.Disable()
-		}
-	} else {
-		if err = r.Init(); err != nil {
-			return
-		}
-		d.client = r
-	}
 
 	if d.hasGithubIssueWidget() {
 		go func() {
@@ -109,7 +128,7 @@ func (d *Dashboard) hasGithubIssueWidget() bool {
 	result := false
 	for _, row := range d.config.Rows {
 		for _, col := range row.Cols {
-			for _, w := range col.Stacks {
+			for _, w := range col.Widgets {
 				if w.Type == "github_issue" {
 					result = true
 				}
@@ -277,7 +296,7 @@ func (d *Dashboard) layoutWidgets() (err error) {
 			var cols []ui.GridBufferer
 			var wi WidgetItem
 			offset := 1
-			for j, w := range col.Stacks {
+			for j, w := range col.Widgets {
 				switch w.Type {
 				case "menu":
 					wi, err = NewMenuWidget(w)
