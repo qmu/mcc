@@ -129,10 +129,10 @@ func (g *GithubIssueWidget) buildBody() (body []string, err error) {
 	}
 	text += " [" + strings.Repeat("-", 300) + "](fg-blue) \n"
 	text += " [DESC  :](fg-blue) " + desc
-	text += " [" + strings.Repeat("-", 300) + "](fg-blue) \n"
+	text += " [" + strings.Repeat("-", 300) + "](fg-blue)"
 
 	if len(comments) > 0 {
-		commentText := ""
+		commentText := "\n"
 		for i, c := range comments {
 			t := c.GetCreatedAt()
 			loc, err := time.LoadLocation(g.timezone)
@@ -150,7 +150,6 @@ func (g *GithubIssueWidget) buildBody() (body []string, err error) {
 
 		commentText = g.putIndent(commentText)
 		text += " [      :](fg-blue) " + commentText
-		text += " [" + strings.Repeat("-", 300) + "](fg-blue)"
 	}
 
 	body = strings.Split(text, "\n")
