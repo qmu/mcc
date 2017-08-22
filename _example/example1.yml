@@ -55,7 +55,10 @@ rows:
               - category: Category1
                 name: Menu1
                 description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-                command: echo $HOGE1 $HOGE2 $HOGE3
+                command: |
+                  echo $HOGE1
+                  echo $HOGE2
+                  echo $HOGE3
               - category: Category1
                 name: Menu2
                 description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa

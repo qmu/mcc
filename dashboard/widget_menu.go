@@ -86,13 +86,21 @@ func (m *MenuWidget) setKeyBindings() error {
 		ui.Close()
 
 		cursor := m.renderer.GetCursor()
-		c := m.menus[cursor].Command
+		// straighten multi line commands
+		cmds := strings.Split(m.menus[cursor].Command, "\n")
+		cmdStr := ""
+		for _, c := range cmds {
+			if c != "" {
+				cmdStr = cmdStr + c + "; "
+			}
+		}
+
 		fmt.Println("---------- executing --------------")
-		fmt.Println(c)
+		fmt.Println(cmdStr)
 		fmt.Println("-----------------------------------")
 		fmt.Println("")
 
-		cmd := exec.Command("sh", "-c", c)
+		cmd := exec.Command("sh", "-c", cmdStr)
 
 		// load env vars
 		cmd.Env = os.Environ()
