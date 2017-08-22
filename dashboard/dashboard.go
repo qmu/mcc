@@ -87,21 +87,22 @@ func (d *Dashboard) prepareUI() (err error) {
 	}
 	d.activateWidget(d.widgetPositions[0].widgetItem)
 
-	// initialize GitHub Client
-	c, err := github.NewClient(d.execPath)
-	if err != nil {
-		for _, w := range d.githubWidgets {
-			w.Disable()
-		}
-	} else {
-		if err = c.Init(); err != nil {
-			return
-		}
-		d.client = c
-	}
-
 	if d.hasGithubIssueWidget() {
 		go func() {
+
+			// initialize GitHub Client
+			c, err := github.NewClient(d.execPath)
+			if err != nil {
+				for _, w := range d.githubWidgets {
+					w.Disable()
+				}
+			} else {
+				if err = c.Init(); err != nil {
+					return
+				}
+				d.client = c
+			}
+
 			for _, w := range d.githubWidgets {
 				if !w.IsDisabled() {
 					w.Render(d.client)

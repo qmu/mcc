@@ -122,6 +122,7 @@ func (a *AuthService) authorizeClient(host string) (err error) {
 		return
 	}
 	if token == "" {
+		ui.Println("-----------------------------------------------------------------------")
 		ui.Errorln("error: invalid username or password")
 		os.Exit(1)
 	} else {
