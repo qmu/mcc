@@ -299,7 +299,7 @@ func (d *Dashboard) layoutWidgets() (err error) {
 			for j, w := range col.Widgets {
 				switch w.Type {
 				case "menu":
-					wi, err = NewMenuWidget(w)
+					wi, err = NewMenuWidget(w, d.config.Envs)
 					if err != nil {
 						return err
 					}

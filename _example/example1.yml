@@ -1,6 +1,14 @@
 ---
 schema_version: v1.0.0
 timezone: Asia/Tokyo
+envs:
+  - name: HOGE1
+    value: env val 1
+  - name: HOGE2
+    value: env val 2
+  - name: HOGE3
+    value: env val 3
+
 rows:
   - section: row
     height: 20%
@@ -44,182 +52,182 @@ rows:
             title: MENU1
             height: 25%
             content:
-            - category: Category1
-              name: Menu1
-              description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-              command: echo "hogeeeeeeeeeeeee"
-            - category: Category1
-              name: Menu2
-              description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-              command: echo "hogeeeeeeeeeeeee"
-            - category: Category1
-              name: Menu3
-              description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-              command: echo "hogeeeeeeeeeeeee"
-            - category: Category1
-              name: Menu4
-              description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-              command: echo "hogeeeeeeeeeeeee"
-            - category: Category1
-              name: Menu5
-              description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-              command: echo "hogeeeeeeeeeeeee"
-            - category: Category1
-              name: Menu6
-              description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-              command: echo "hogeeeeeeeeeeeee"
-            - category: Category1
-              name: Menu7
-              description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-              command: echo "hogeeeeeeeeeeeee"
-            - category: Category2
-              name: Menu8
-              description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-              command: echo "hogeeeeeeeeeeeee"
-            - category: Category2
-              name: Menu9
-              description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-              command: echo "hogeeeeeeeeeeeee"
-            - category: Category2
-              name: Menu10
-              description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-              command: echo "hogeeeeeeeeeeeee"
-            - category: Category2
-              name: Menu11
-              description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-              command: echo "hogeeeeeeeeeeeee"
-            - category: Category2
-              name: Menu12
-              description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-              command: echo "hogeeeeeeeeeeeee"
+              - category: Category1
+                name: Menu1
+                description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+                command: echo $HOGE1 $HOGE2 $HOGE3
+              - category: Category1
+                name: Menu2
+                description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+                command: echo "hogeeeeeeeeeeeee"
+              - category: Category1
+                name: Menu3
+                description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+                command: echo "hogeeeeeeeeeeeee"
+              - category: Category1
+                name: Menu4
+                description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+                command: echo "hogeeeeeeeeeeeee"
+              - category: Category1
+                name: Menu5
+                description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+                command: echo "hogeeeeeeeeeeeee"
+              - category: Category1
+                name: Menu6
+                description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+                command: echo "hogeeeeeeeeeeeee"
+              - category: Category1
+                name: Menu7
+                description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+                command: echo "hogeeeeeeeeeeeee"
+              - category: Category2
+                name: Menu8
+                description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+                command: echo "hogeeeeeeeeeeeee"
+              - category: Category2
+                name: Menu9
+                description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+                command: echo "hogeeeeeeeeeeeee"
+              - category: Category2
+                name: Menu10
+                description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+                command: echo "hogeeeeeeeeeeeee"
+              - category: Category2
+                name: Menu11
+                description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+                command: echo "hogeeeeeeeeeeeee"
+              - category: Category2
+                name: Menu12
+                description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+                command: echo "hogeeeeeeeeeeeee"
 
           - type: menu
             title: MENU2
             height: 15%
             content:
-            - category: Category3
-              name: Menu1
-              description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-              command: echo "hogeeeeeeeeeeeee"
-            - category: Category3
-              name: Menu2
-              description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-              command: echo "hogeeeeeeeeeeeee"
-            - category: Category3
-              name: Menu3
-              description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-              command: echo "hogeeeeeeeeeeeee"
-            - category: Category3
-              name: Menu4
-              description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-              command: echo "hogeeeeeeeeeeeee"
-            - category: Category3
-              name: Menu5
-              description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-              command: echo "hogeeeeeeeeeeeee"
-            - category: Category3
-              name: Menu6
-              description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-              command: echo "hogeeeeeeeeeeeee"
+              - category: Category3
+                name: Menu1
+                description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+                command: echo "hogeeeeeeeeeeeee"
+              - category: Category3
+                name: Menu2
+                description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+                command: echo "hogeeeeeeeeeeeee"
+              - category: Category3
+                name: Menu3
+                description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+                command: echo "hogeeeeeeeeeeeee"
+              - category: Category3
+                name: Menu4
+                description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+                command: echo "hogeeeeeeeeeeeee"
+              - category: Category3
+                name: Menu5
+                description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+                command: echo "hogeeeeeeeeeeeee"
+              - category: Category3
+                name: Menu6
+                description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+                command: echo "hogeeeeeeeeeeeee"
 
           - type: menu
             title: MENU3
             height: 25%
             content:
-            - category: Category4
-              name: Menu1
-              description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-              command: echo "hogeeeeeeeeeeeee"
-            - category: Category4
-              name: Menu2
-              description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-              command: echo "hogeeeeeeeeeeeee"
-            - category: Category4
-              name: Menu3
-              description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-              command: echo "hogeeeeeeeeeeeee"
-            - category: Category4
-              name: Menu4
-              description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-              command: echo "hogeeeeeeeeeeeee"
-            - category: Category5
-              name: Menu5
-              description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-              command: echo "hogeeeeeeeeeeeee"
-            - category: Category5
-              name: Menu6
-              description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-              command: echo "hogeeeeeeeeeeeee"
-            - category: Category5
-              name: Menu7
-              description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-              command: echo "hogeeeeeeeeeeeee"
-            - category: Category5
-              name: Menu8
-              description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-              command: echo "hogeeeeeeeeeeeee"
-            - category: Category5
-              name: Menu9
-              description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-              command: echo "hogeeeeeeeeeeeee"
+              - category: Category4
+                name: Menu1
+                description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+                command: echo "hogeeeeeeeeeeeee"
+              - category: Category4
+                name: Menu2
+                description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+                command: echo "hogeeeeeeeeeeeee"
+              - category: Category4
+                name: Menu3
+                description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+                command: echo "hogeeeeeeeeeeeee"
+              - category: Category4
+                name: Menu4
+                description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+                command: echo "hogeeeeeeeeeeeee"
+              - category: Category5
+                name: Menu5
+                description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+                command: echo "hogeeeeeeeeeeeee"
+              - category: Category5
+                name: Menu6
+                description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+                command: echo "hogeeeeeeeeeeeee"
+              - category: Category5
+                name: Menu7
+                description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+                command: echo "hogeeeeeeeeeeeee"
+              - category: Category5
+                name: Menu8
+                description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+                command: echo "hogeeeeeeeeeeeee"
+              - category: Category5
+                name: Menu9
+                description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+                command: echo "hogeeeeeeeeeeeee"
 
           - type: menu
             title: MENU4
             height: 25%
             content:
-            - category: Category6
-              name: Menu1
-              description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-              command: echo "hogeeeeeeeeeeeee"
-            - category: Category6
-              name: Menu2
-              description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-              command: echo "hogeeeeeeeeeeeee"
-            - category: Category6
-              name: Menu3
-              description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-              command: echo "hogeeeeeeeeeeeee"
-            - category: Category6
-              name: Menu4
-              description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-              command: echo "hogeeeeeeeeeeeee"
-            - category: Category6
-              name: Menu5
-              description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-              command: echo "hogeeeeeeeeeeeee"
-            - category: Category7
-              name: Menu6
-              description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-              command: echo "hogeeeeeeeeeeeee"
-            - category: Category7
-              name: Menu7
-              description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-              command: echo "hogeeeeeeeeeeeee"
-            - category: Category7
-              name: Menu8
-              description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-              command: echo "hogeeeeeeeeeeeee"
-            - category: Category7
-              name: Menu9
-              description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-              command: echo "hogeeeeeeeeeeeee"
-            - category: Category7
-              name: Menu10
-              description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-              command: echo "hogeeeeeeeeeeeee"
+              - category: Category6
+                name: Menu1
+                description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+                command: echo "hogeeeeeeeeeeeee"
+              - category: Category6
+                name: Menu2
+                description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+                command: echo "hogeeeeeeeeeeeee"
+              - category: Category6
+                name: Menu3
+                description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+                command: echo "hogeeeeeeeeeeeee"
+              - category: Category6
+                name: Menu4
+                description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+                command: echo "hogeeeeeeeeeeeee"
+              - category: Category6
+                name: Menu5
+                description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+                command: echo "hogeeeeeeeeeeeee"
+              - category: Category7
+                name: Menu6
+                description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+                command: echo "hogeeeeeeeeeeeee"
+              - category: Category7
+                name: Menu7
+                description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+                command: echo "hogeeeeeeeeeeeee"
+              - category: Category7
+                name: Menu8
+                description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+                command: echo "hogeeeeeeeeeeeee"
+              - category: Category7
+                name: Menu9
+                description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+                command: echo "hogeeeeeeeeeeeee"
+              - category: Category7
+                name: Menu10
+                description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+                command: echo "hogeeeeeeeeeeeee"
 
           - type: menu
             title: MENU5
             height: 10%
             content:
-            - category: Category8
-              name: Menu1
-              description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-              command: echo "hogeeeeeeeeeeeee"
-            - category: Category8
-              name: Menu2
-              description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-              command: echo "hogeeeeeeeeeeeee"
+              - category: Category8
+                name: Menu1
+                description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+                command: echo "hogeeeeeeeeeeeee"
+              - category: Category8
+                name: Menu2
+                description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+                command: echo "hogeeeeeeeeeeeee"
 
       - section: col
         widgets:

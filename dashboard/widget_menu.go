@@ -12,7 +12,6 @@ import (
 
 	ui "github.com/gizak/termui"
 	"github.com/kr/pty"
-	"github.com/mattn/go-shellwords"
 	m2s "github.com/mitchellh/mapstructure"
 	// "github.com/k0kubun/pp"
 )
@@ -24,16 +23,18 @@ type MenuWidget struct {
 	headerHeight int
 	isReady      bool
 	disabled     bool
+	envs         []map[string]string
 }
 
 // NewMenuWidget constructs a New MenuWidget
-func NewMenuWidget(wi Widget) (m *MenuWidget, err error) {
+func NewMenuWidget(wi Widget, envs []map[string]string) (m *MenuWidget, err error) {
 	m = new(MenuWidget)
 	if err := m2s.Decode(wi.Content, &m.menus); err != nil {
 		return nil, err
 	}
 	h := m.buildHeader()
 	m.headerHeight = len(h)
+	m.envs = envs
 	opt := &ListWrapperOption{
 		Title:         wi.Title,
 		RealHeight:    wi.RealHeight,
@@ -86,15 +87,19 @@ func (m *MenuWidget) setKeyBindings() error {
 
 		cursor := m.renderer.GetCursor()
 		c := m.menus[cursor].Command
-		cargs, err := shellwords.Parse(c)
-		if err != nil {
-			return
-		}
 		fmt.Println("---------- executing --------------")
-		fmt.Println(strings.Join(cargs, " "))
+		fmt.Println(c)
 		fmt.Println("-----------------------------------")
 		fmt.Println("")
-		cmd := exec.Command(cargs[0], cargs[1:]...)
+
+		cmd := exec.Command("sh", "-c", c)
+
+		// load env vars
+		cmd.Env = os.Environ()
+		for _, env := range m.envs {
+			cmd.Env = append(cmd.Env, env["name"]+"="+env["value"])
+		}
+
 		tty, err := pty.Start(cmd)
 		if err != nil {
 			fmt.Printf("%s", err)
