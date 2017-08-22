@@ -26,10 +26,10 @@ sudo chmod +x /usr/local/bin/mcc
 ## Usage
 
 ```bash
-# if ./mcc.yml exists, just
+# if ./mcc.yml exists, just,
 mcc
 
-# or give its path
+# or with the path
 mcc -c path/to/mcc.yml
 ```
 
