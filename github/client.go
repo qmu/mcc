@@ -14,6 +14,7 @@ import (
 // Client is a GitHub OAuth API wrapper
 type Client struct {
 	client     *go_github.Client
+	host       string
 	dotGitPath string
 	repoOwner  string
 	repoName   string
@@ -23,9 +24,10 @@ type Client struct {
 }
 
 // NewClient constructs a new Client
-func NewClient(execPath string) (g *Client, err error) {
+func NewClient(execPath string, host string) (g *Client, err error) {
 	g = new(Client)
 	g.dotGitPath, err = utils.GetDotGitPath(execPath)
+	g.host = host
 	if err != nil {
 		return
 	}
@@ -66,7 +68,7 @@ func (g *Client) Init() (err error) {
 	_, _, err = g.client.Repositories.Get(ctx, g.repoOwner, g.repoName)
 	// if it's private, authenticate first
 	if err != nil {
-		g.auth, err = NewAuthService()
+		g.auth, err = NewAuthService(g.host)
 		if err != nil {
 			return
 		}

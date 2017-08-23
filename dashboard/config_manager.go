@@ -17,6 +17,7 @@ type ConfigManager struct {
 type Config struct {
 	SchemaVersion string `yaml:"schema_version"`
 	Timezone      string
+	GitHubHost    string `yaml:"github_url"`
 	Envs          []map[string]string
 	Rows          []Row
 }

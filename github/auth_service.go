@@ -42,14 +42,14 @@ type yamlHost struct {
 type yamlConfig map[string][]yamlHost
 
 // NewAuthService constructs a new AuthService
-func NewAuthService() (a *AuthService, err error) {
+func NewAuthService(host string) (a *AuthService, err error) {
 	a = new(AuthService)
 	homeDir, err := homedir.Dir()
 	if err != nil {
 		return
 	}
 	a.defaultConfigFile = filepath.Join(homeDir, ".config", "mcc")
-	a.host = "github.com"
+	a.host = host
 	a.protocol = "https"
 	return
 }

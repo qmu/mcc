@@ -91,7 +91,11 @@ func (d *Dashboard) prepareUI() (err error) {
 		go func() {
 
 			// initialize GitHub Client
-			c, err := github.NewClient(d.execPath)
+			host := d.config.GitHubHost
+			if d.config.GitHubHost == "" {
+				host = "github.com"
+			}
+			c, err := github.NewClient(d.execPath, host)
 			if err != nil {
 				for _, w := range d.githubWidgets {
 					w.Disable()
