@@ -15,6 +15,7 @@ import (
 
 	"github.com/github/hub/ui"
 	"github.com/github/hub/utils"
+	"github.com/gizak/termui"
 	go_github "github.com/google/go-github/github"
 	"github.com/mitchellh/go-homedir"
 	"golang.org/x/crypto/ssh/terminal"
@@ -41,14 +42,14 @@ type yamlHost struct {
 type yamlConfig map[string][]yamlHost
 
 // NewAuthService constructs a new AuthService
-func NewAuthService() (a *AuthService, err error) {
+func NewAuthService(host string) (a *AuthService, err error) {
 	a = new(AuthService)
 	homeDir, err := homedir.Dir()
 	if err != nil {
 		return
 	}
 	a.defaultConfigFile = filepath.Join(homeDir, ".config", "mcc")
-	a.host = "github.com"
+	a.host = host
 	a.protocol = "https"
 	return
 }
@@ -93,6 +94,12 @@ func (a *AuthService) login() (err error) {
 }
 
 func (a *AuthService) authorizeClient(host string) (err error) {
+	termui.Close()
+	ui.Println("-----------------------------------------------------------------------")
+	ui.Println("GitHub widget is configured in the yaml")
+	ui.Println("Please authenticate your GitHub account first (generating access token)")
+	ui.Println("-----------------------------------------------------------------------")
+
 	user := a.promptForUser(host)
 	pass := a.promptForPassword(host, user)
 
@@ -115,10 +122,16 @@ func (a *AuthService) authorizeClient(host string) (err error) {
 		return
 	}
 	if token == "" {
+		ui.Println("-----------------------------------------------------------------------")
 		ui.Errorln("error: invalid username or password")
 		os.Exit(1)
+	} else {
+		a.saveConfig()
+		ui.Println("-----------------------------------------------------------------------")
+		ui.Println("Authentication succeeded! (access token has been stored ~/.config/mcc)")
+		ui.Println("Please restart mcc again")
+		os.Exit(0)
 	}
-	a.saveConfig()
 
 	return
 }

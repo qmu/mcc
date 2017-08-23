@@ -1,5 +1,5 @@
-hash: a6120821536939bd8a924b49e2ced0dae01134b875d7027a1a3ca9b56f499802
-updated: 2017-08-17T21:56:10.521733746+09:00
+hash: 0e6a3d8708998c7da1ffbb161e8d6c3846e3e667b14f5deae88c3711667090ae
+updated: 2017-08-22T20:25:22.772216737+09:00
 imports:
 - name: github.com/github/hub
   version: e3cf4914ae1a29863e0b891fae22a49c78d78a3f
@@ -42,8 +42,6 @@ imports:
   version: fc9e8d8ef48496124e79ae0df75490096eccf6fe
 - name: github.com/mattn/go-runewidth
   version: 97311d9f7767e3d6f422ea06661bc2c7a19e8a5d
-- name: github.com/mattn/go-shellwords
-  version: 9858af9cca4c73576f0b8c6609a396eb0878023c
 - name: github.com/mitchellh/go-homedir
   version: b8bc1bf767474819792c23f32d8286a45736f1c6
 - name: github.com/mitchellh/go-wordwrap

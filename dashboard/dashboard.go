@@ -47,19 +47,6 @@ func NewDashboard(appVersion string, configSchemaVersion string, configPath stri
 	d.execPath = filepath.Dir(configPath)
 	d.configPath = configPath
 
-	// initialize GitHub Client
-	c, err := github.NewClient(d.execPath)
-	if err != nil {
-		for _, w := range d.githubWidgets {
-			w.Disable()
-		}
-	} else {
-		if err = c.Init(); err != nil {
-			return
-		}
-		d.client = c
-	}
-
 	// initialize termui
 	if err := ui.Init(); err != nil {
 		panic(err)
@@ -102,6 +89,24 @@ func (d *Dashboard) prepareUI() (err error) {
 
 	if d.hasGithubIssueWidget() {
 		go func() {
+
+			// initialize GitHub Client
+			host := d.config.GitHubHost
+			if d.config.GitHubHost == "" {
+				host = "github.com"
+			}
+			c, err := github.NewClient(d.execPath, host)
+			if err != nil {
+				for _, w := range d.githubWidgets {
+					w.Disable()
+				}
+			} else {
+				if err = c.Init(); err != nil {
+					return
+				}
+				d.client = c
+			}
+
 			for _, w := range d.githubWidgets {
 				if !w.IsDisabled() {
 					w.Render(d.client)
@@ -299,7 +304,7 @@ func (d *Dashboard) layoutWidgets() (err error) {
 			for j, w := range col.Widgets {
 				switch w.Type {
 				case "menu":
-					wi, err = NewMenuWidget(w)
+					wi, err = NewMenuWidget(w, d.config.Envs)
 					if err != nil {
 						return err
 					}

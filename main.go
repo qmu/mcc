@@ -30,6 +30,10 @@ var RootCmd = &cobra.Command{
 	Use: "mcc",
 	Run: func(cmd *cobra.Command, args []string) {
 		version, err := cmd.Flags().GetBool("version")
+		if err == nil && version {
+			fmt.Println("mcc version " + Version)
+			os.Exit(0)
+		}
 		if config == "" {
 			if _, err := os.Stat("./mcc.yml"); err == nil {
 				config = "./mcc.yml"
@@ -37,10 +41,6 @@ var RootCmd = &cobra.Command{
 				fmt.Println("Error: check \"mcc.yml\" exists in the current directory, or use -c to set its path")
 				os.Exit(1)
 			}
-		}
-		if err == nil && version {
-			fmt.Println("mcc version " + Version)
-			os.Exit(0)
 		}
 		if err := dashboard.NewDashboard(Version, ConfigSchemaVersion, config); err != nil {
 			return
