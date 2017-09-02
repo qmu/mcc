@@ -25,13 +25,10 @@ rows:
 
       - section: col
         widgets:
-          - type: note
-            title: ROW1 COL2
+          - type: text_file
+            title: TEXT FILE
             height: 100%
-            content: |
-              text text text
-              text text text
-              text text text
+            path: ./example.md
 
       - section: col
         widgets:

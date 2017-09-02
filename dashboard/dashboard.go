@@ -8,7 +8,6 @@ import (
 	ui "github.com/gizak/termui"
 	version "github.com/hashicorp/go-version"
 	"github.com/qmu/mcc/github"
-	// "github.com/k0kubun/pp"
 )
 
 // WidgetItem define common interface for each widgets
@@ -81,7 +80,9 @@ func NewDashboard(appVersion string, configSchemaVersion string, configPath stri
 
 func (d *Dashboard) prepareUI() (err error) {
 	d.layoutHeader()
-	d.layoutWidgets()
+	if err = d.layoutWidgets(); err != nil {
+		return
+	}
 	for _, w := range d.widgetPositions {
 		d.deactivateWidget(w.widgetItem)
 	}
@@ -309,7 +310,7 @@ func (d *Dashboard) layoutWidgets() (err error) {
 						return err
 					}
 				case "note":
-					wi, err = NewNoteWidget(w)
+					wi, err = NewNoteWidget(w, d.execPath)
 					if err != nil {
 						return err
 					}
@@ -321,6 +322,11 @@ func (d *Dashboard) layoutWidgets() (err error) {
 					}
 					wi = giw
 					d.githubWidgets = append(d.githubWidgets, giw)
+				case "text_file":
+					wi, err = NewNoteWidget(w, d.execPath)
+					if err != nil {
+						return err
+					}
 				}
 				gw := wi.GetWidget()
 				cols = append(cols, gw)
