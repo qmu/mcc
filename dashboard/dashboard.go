@@ -1,6 +1,7 @@
 package dashboard
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -327,6 +328,9 @@ func (d *Dashboard) layoutWidgets() (err error) {
 					if err != nil {
 						return err
 					}
+				}
+				if wi == nil {
+					return errors.New("Widget type \"" + w.Type + "\" is not supported")
 				}
 				gw := wi.GetWidget()
 				cols = append(cols, gw)
