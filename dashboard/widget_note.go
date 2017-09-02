@@ -22,15 +22,15 @@ func NewNoteWidget(wi Widget, execPath string) (n *NoteWidget, err error) {
 	n = new(NoteWidget)
 
 	var note string
-	// TextFile Widget
 	if wi.Type == "text_file" {
+		// for TextFile Widget
 		b, err := ioutil.ReadFile("./" + execPath + "/" + wi.Path)
 		if err != nil {
 			return n, err
 		}
 		note = string(b)
-		// Note Widget
 	} else {
+		// for Note Widget
 		if err := m2s.Decode(wi.Content, &note); err != nil {
 			return nil, err
 		}
