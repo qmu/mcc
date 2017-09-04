@@ -159,7 +159,7 @@ func (m *MenuWidget) buildBody() (body []string) {
 		ct := m.fillSpaces(v.Category, n1)
 		name := m.fillSpaces(v.Name, n2)
 		desc := v.Description + strings.Repeat(" ", 200)
-		r := "[" + no + " |](fg-blue) " + ct + " | " + name + " | " + desc + "\n"
+		r := "[" + no + " |](fg-blue) " + ct + " [|](fg-blue) " + name + " [|](fg-blue) " + desc + "\n"
 		body = append(body, r)
 	}
 

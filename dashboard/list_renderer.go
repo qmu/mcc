@@ -58,8 +58,8 @@ func (l *ListRenderer) RenderActually() []string {
 		}
 		if k == l.cursor {
 			if l.lineHighLight {
-				rep := regexp.MustCompile(`\[([^\[\]\(\)]*)\]\([^\[\]\(\)]*\)(.*)`)
-				v = rep.ReplaceAllString(v, "$1$2")
+				rep := regexp.MustCompile(`\[([^\[\]\(\)]*)\]\([^\[\]\(\)]*\)`)
+				v = rep.ReplaceAllString(v, "$1")
 				v = "[" + v + "](fg-black,bg-green)"
 			} else {
 				v2 := ""

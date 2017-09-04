@@ -328,6 +328,11 @@ func (d *Dashboard) layoutWidgets() (err error) {
 					if err != nil {
 						return err
 					}
+				case "git_status":
+					wi, err = NewGitStatusWidget(w, d.execPath)
+					if err != nil {
+						return err
+					}
 				}
 				if wi == nil {
 					return errors.New("Widget type \"" + w.Type + "\" is not supported")

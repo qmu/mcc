@@ -32,8 +32,8 @@ rows:
 
       - section: col
         widgets:
-          - type: note
-            title: ROW1 COL3
+          - type: git_status
+            title: GIT STATUS
             height: 100%
             content: |
               text text text
