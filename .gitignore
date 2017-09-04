@@ -8,10 +8,6 @@ Thumbs.db
 *.sw?
 *~
 ._*
-.vimundo/*
-.vimbakcup/*
-!.vimundo/empty
-!.vimbakcup/empty
 
 # Compiled Object files, Static and Dynamic libs (Shared Objects)
 *.o
