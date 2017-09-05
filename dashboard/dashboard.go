@@ -333,6 +333,11 @@ func (d *Dashboard) layoutWidgets() (err error) {
 					if err != nil {
 						return err
 					}
+				case "tail_file":
+					wi, err = NewTailFileWidget(w, d.execPath)
+					if err != nil {
+						return err
+					}
 				}
 				if wi == nil {
 					return errors.New("Widget type \"" + w.Type + "\" is not supported")

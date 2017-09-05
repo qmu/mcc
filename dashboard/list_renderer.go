@@ -143,3 +143,8 @@ func (l *ListRenderer) GetCursor() int {
 func (l *ListRenderer) SetBody(items []string) {
 	l.body = items
 }
+
+// AddBody add an another line of text to ListWrapper.body
+func (l *ListRenderer) AddBody(line string) {
+	l.body = append(l.body, line)
+}

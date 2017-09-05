@@ -25,3 +25,6 @@ import:
   subpackages:
   - cobra
 - package: github.com/hashicorp/go-version
+- package: github.com/hpcloud/tail
+  subpackages:
+  - '...'

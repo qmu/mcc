@@ -131,6 +131,11 @@ func (l *ListWrapper) SetBody(items []string) {
 	l.widget.Items = items
 }
 
+// AddBody add an another line of textto ListWrapper.body
+func (l *ListWrapper) AddBody(line string) {
+	l.listRenderer.AddBody(line)
+	l.widget.Items = append(l.widget.Items, line)
+}
 func (l *ListWrapper) moveAndRender(direction string) {
 	l.gPressed = false // cancel gg to top
 	l.widget.Items = l.listRenderer.Move(direction)

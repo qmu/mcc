@@ -24,7 +24,14 @@ func NewNoteWidget(wi Widget, execPath string) (n *NoteWidget, err error) {
 	var note string
 	if wi.Type == "text_file" {
 		// for TextFile Widget
-		b, err := ioutil.ReadFile("./" + execPath + "/" + wi.Path)
+		var path string
+		if wi.Path[0:1] == "/" {
+			path = wi.Path
+		} else {
+			path = "./" + execPath + "/" + wi.Path
+		}
+		b, err := ioutil.ReadFile(path)
+
 		if err != nil {
 			return n, err
 		}

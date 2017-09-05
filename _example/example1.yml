@@ -41,7 +41,7 @@ rows:
               text text text
 
   - section: row
-    height: 80%
+    height: 60%
     cols:
       - section: col
         widgets:
@@ -132,7 +132,7 @@ rows:
 
           - type: menu
             title: MENU3
-            height: 25%
+            height: 60%
             content:
               - category: Category4
                 name: Menu1
@@ -168,64 +168,6 @@ rows:
                 command: echo "hogeeeeeeeeeeeee"
               - category: Category5
                 name: Menu9
-                description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-                command: echo "hogeeeeeeeeeeeee"
-
-          - type: menu
-            title: MENU4
-            height: 25%
-            content:
-              - category: Category6
-                name: Menu1
-                description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-                command: echo "hogeeeeeeeeeeeee"
-              - category: Category6
-                name: Menu2
-                description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-                command: echo "hogeeeeeeeeeeeee"
-              - category: Category6
-                name: Menu3
-                description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-                command: echo "hogeeeeeeeeeeeee"
-              - category: Category6
-                name: Menu4
-                description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-                command: echo "hogeeeeeeeeeeeee"
-              - category: Category6
-                name: Menu5
-                description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-                command: echo "hogeeeeeeeeeeeee"
-              - category: Category7
-                name: Menu6
-                description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-                command: echo "hogeeeeeeeeeeeee"
-              - category: Category7
-                name: Menu7
-                description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-                command: echo "hogeeeeeeeeeeeee"
-              - category: Category7
-                name: Menu8
-                description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-                command: echo "hogeeeeeeeeeeeee"
-              - category: Category7
-                name: Menu9
-                description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-                command: echo "hogeeeeeeeeeeeee"
-              - category: Category7
-                name: Menu10
-                description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-                command: echo "hogeeeeeeeeeeeee"
-
-          - type: menu
-            title: MENU5
-            height: 10%
-            content:
-              - category: Category8
-                name: Menu1
-                description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-                command: echo "hogeeeeeeeeeeeee"
-              - category: Category8
-                name: Menu2
                 description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                 command: echo "hogeeeeeeeeeeeee"
 
@@ -251,3 +193,14 @@ rows:
               ## text text text
               
               text text text
+
+  - section: row
+    height: 20%
+    cols:
+      - section: col
+        widgets:
+          - type: tail_file
+            title: TAIL FILE
+            height: 100%
+            path: ./example.log
+            

@@ -65,10 +65,10 @@ func (b ByPath) Less(i, j int) bool {
 }
 
 // NewGitStatusWidget constructs a New GitStatusWidget
-func NewGitStatusWidget(wi Widget, execPath string) (n *GitStatusWidget, err error) {
-	n = new(GitStatusWidget)
+func NewGitStatusWidget(wi Widget, execPath string) (g *GitStatusWidget, err error) {
+	g = new(GitStatusWidget)
 
-	body, err := n.buildBody(execPath)
+	body, err := g.buildBody(execPath)
 	if err != nil {
 		return
 	}
@@ -78,10 +78,10 @@ func NewGitStatusWidget(wi Widget, execPath string) (n *GitStatusWidget, err err
 			"Worktree is clean",
 		}
 	} else {
-		n1, n2, n3 := n.getLongest()
-		c1 := n.fillSpaces("STAGE ", n1)
-		c2 := n.fillSpaces("STATUS ", n2)
-		c3 := n.fillSpaces("PATH ", n3)
+		n1, n2, n3 := g.getLongest()
+		c1 := g.fillSpaces("STAGE ", n1)
+		c2 := g.fillSpaces("STATUS ", n2)
+		c3 := g.fillSpaces("PATH ", n3)
 		header = []string{
 			" [" + c1 + " | " + c2 + " | " + c3 + "](fg-blue)\n",
 			" [" + strings.Repeat("-", 500) + "](fg-blue)\n"}
@@ -94,13 +94,13 @@ func NewGitStatusWidget(wi Widget, execPath string) (n *GitStatusWidget, err err
 		Body:          body,
 		LineHighLight: true,
 	}
-	n.renderer = NewListWrapper(opt)
-	n.isReady = true
+	g.renderer = NewListWrapper(opt)
+	g.isReady = true
 
 	return
 }
 
-func (n *GitStatusWidget) getStatus(execPath string) (status git.Status, err error) {
+func (g *GitStatusWidget) getStatus(execPath string) (status git.Status, err error) {
 	// Load worktree status
 	dotGitPath, err := utils.GetDotGitPath(execPath)
 	r, err := git.PlainOpen(dotGitPath)
@@ -118,8 +118,8 @@ func (n *GitStatusWidget) getStatus(execPath string) (status git.Status, err err
 	return
 }
 
-func (n *GitStatusWidget) buildBody(execPath string) (result []string, err error) {
-	status, err := n.getStatus(execPath)
+func (g *GitStatusWidget) buildBody(execPath string) (result []string, err error) {
+	status, err := g.getStatus(execPath)
 	if err != nil {
 		return
 	}
@@ -168,7 +168,7 @@ func (n *GitStatusWidget) buildBody(execPath string) (result []string, err error
 			statusStr = "UpdatedButUnmerged"
 			statusNo = 7
 		}
-		n.statusItems = append(n.statusItems, StatusItem{
+		g.statusItems = append(g.statusItems, StatusItem{
 			Staged:   s.Staging != git.Unmodified,
 			Stage:    stage,
 			Status:   statusStr,
@@ -177,14 +177,14 @@ func (n *GitStatusWidget) buildBody(execPath string) (result []string, err error
 		})
 	}
 	// sort
-	sort.Sort(ByPath{n.statusItems})
-	sort.Sort(ByStage{n.statusItems})
+	sort.Sort(ByPath{g.statusItems})
+	sort.Sort(ByStage{g.statusItems})
 
 	// build body
-	n1, n2, _ := n.getLongest()
-	for _, statusItem := range n.statusItems {
-		s1 := n.fillSpaces(statusItem.Stage, n1)
-		s2 := n.fillSpaces(statusItem.Status, n2)
+	n1, n2, _ := g.getLongest()
+	for _, statusItem := range g.statusItems {
+		s1 := g.fillSpaces(statusItem.Stage, n1)
+		s2 := g.fillSpaces(statusItem.Status, n2)
 		s3 := statusItem.Path + strings.Repeat(" ", 200)
 		var st string
 		if statusItem.Staged {
@@ -198,7 +198,7 @@ func (n *GitStatusWidget) buildBody(execPath string) (result []string, err error
 	return
 }
 
-func (n *GitStatusWidget) fillSpaces(s string, longest int) string {
+func (g *GitStatusWidget) fillSpaces(s string, longest int) string {
 	var l = longest - utf8.RuneCountInString(s)
 	for i := 0; i < l; i++ {
 		s += " "
@@ -206,11 +206,11 @@ func (n *GitStatusWidget) fillSpaces(s string, longest int) string {
 	return s
 }
 
-func (n *GitStatusWidget) getLongest() (n1 int, n2 int, n3 int) {
+func (g *GitStatusWidget) getLongest() (n1 int, n2 int, n3 int) {
 	n1 = utf8.RuneCountInString("STAGE") + 1
 	n2 = utf8.RuneCountInString("STATUS") + 1
 	n3 = utf8.RuneCountInString("PATH") + 1
-	for _, statusItem := range n.statusItems {
+	for _, statusItem := range g.statusItems {
 		c := utf8.RuneCountInString(statusItem.Stage)
 		nm := utf8.RuneCountInString(statusItem.Status)
 		d := utf8.RuneCountInString(statusItem.Path)
@@ -228,45 +228,45 @@ func (n *GitStatusWidget) getLongest() (n1 int, n2 int, n3 int) {
 }
 
 // Activate is the implementation of Widget.Activate
-func (n *GitStatusWidget) Activate() {
-	n.setKeyBindings()
-	n.renderer.Render()
+func (g *GitStatusWidget) Activate() {
+	g.setKeyBindings()
+	g.renderer.Render()
 }
 
 // Deactivate is the implementation of Widget.Activate
-func (n *GitStatusWidget) Deactivate() {
-	n.renderer.ResetRender()
+func (g *GitStatusWidget) Deactivate() {
+	g.renderer.ResetRender()
 }
 
 // IsDisabled is the implementation of Widget.IsDisabled
-func (n *GitStatusWidget) IsDisabled() bool {
-	return n.disabled
+func (g *GitStatusWidget) IsDisabled() bool {
+	return g.disabled
 }
 
 // IsReady is the implementation of Widget.IsReady
-func (n *GitStatusWidget) IsReady() bool {
-	return n.isReady
+func (g *GitStatusWidget) IsReady() bool {
+	return g.isReady
 }
 
 // GetHighlightenPos is the implementation of Widget.GetHighlightenPos
-func (n *GitStatusWidget) GetHighlightenPos() int {
-	return n.renderer.GetCursor()
+func (g *GitStatusWidget) GetHighlightenPos() int {
+	return g.renderer.GetCursor()
 }
 
 // GetWidget is the implementation of widget.Activate
-func (n *GitStatusWidget) GetWidget() *ui.List {
-	return n.renderer.GetWidget()
+func (g *GitStatusWidget) GetWidget() *ui.List {
+	return g.renderer.GetWidget()
 }
 
-func (n *GitStatusWidget) setKeyBindings() error {
+func (g *GitStatusWidget) setKeyBindings() error {
 	// exec command by Enter
 	ui.Handle("/sys/kbd/<enter>", func(ui.Event) {
 		ui.StopLoop()
 		ui.Close()
 
-		cursor := n.renderer.GetCursor()
+		cursor := g.renderer.GetCursor()
 		// straighten multi line commands
-		cmd := exec.Command("vim", n.statusItems[cursor].Path)
+		cmd := exec.Command("vim", g.statusItems[cursor].Path)
 		cmd.Stdin = os.Stdin
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr

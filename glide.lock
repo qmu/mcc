@@ -1,5 +1,5 @@
-hash: 0e6a3d8708998c7da1ffbb161e8d6c3846e3e667b14f5deae88c3711667090ae
-updated: 2017-08-22T20:25:22.772216737+09:00
+hash: 3aa7d1512f6914c697634872882c692806976b04ba1ec2e55024e70620a03c47
+updated: 2017-09-05T14:38:14.416575593+09:00
 imports:
 - name: github.com/github/hub
   version: e3cf4914ae1a29863e0b891fae22a49c78d78a3f
@@ -22,6 +22,10 @@ imports:
   - query
 - name: github.com/hashicorp/go-version
   version: 03c5bf6be031b6dd45afec16b1cf94fc8938bc77
+- name: github.com/hpcloud/tail
+  version: 37f4271387456dd1bf82ab1ad9229f060cc45386
+  subpackages:
+  - '...'
 - name: github.com/inconshreveable/mousetrap
   version: 76626ae9c91c4f2a10f34cad8ce83ea42c93bb75
 - name: github.com/jbenet/go-context
