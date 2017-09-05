@@ -30,6 +30,7 @@ type Dashboard struct {
 	githubWidgets   []*GithubIssueWidget
 	active          int // active widget index of Dashboard.widgetPositions
 	client          *github.Client
+	header          *ui.Par // for debug
 }
 
 type widgetPosition struct {
@@ -39,6 +40,8 @@ type widgetPosition struct {
 	vOffset    int
 	height     int
 	widgetItem WidgetItem
+	widthFrom  int
+	widthTo    int
 }
 
 // NewDashboard constructs a new Dashboard
@@ -185,10 +188,13 @@ func (d *Dashboard) setKeyBindings() error {
 func (d *Dashboard) downerRowWidget() {
 	c := d.widgetPositions[d.active]
 	num := d.active + 1
-	for i := 0; i < len(d.widgetPositions)-1; i++ {
+	for i := 0; i < len(d.widgetPositions); i++ {
 		w := d.widgetPositions[i]
-		if c.row < w.row && w.stack == 0 && w.col <= c.col {
+		cond1 := c.row == w.row && c.col == w.col && w.stack == c.stack+1
+		cond2 := c.row < w.row && w.stack == 0 && w.widthFrom <= c.widthFrom && c.widthFrom <= w.widthTo
+		if cond1 || cond2 {
 			num = i
+			break
 		}
 	}
 	d.moveWidget(num)
@@ -196,21 +202,21 @@ func (d *Dashboard) downerRowWidget() {
 
 func (d *Dashboard) upperRowWidget() {
 	c := d.widgetPositions[d.active]
-	if c.row > 0 && c.stack == 0 {
-		for i := len(d.widgetPositions) - 1; i >= 0; i-- {
-			var row int
-			if i < d.active && d.widgetPositions[i].row <= row {
-				if d.widgetPositions[i].col <= c.col {
-					d.moveWidget(i)
-					break
-				}
-			} else {
-				row = d.widgetPositions[i].row
-			}
-		}
-	} else {
+	if c.row == 0 && c.stack == 0 {
 		d.moveWidget(d.active - 1)
 	}
+	for i := len(d.widgetPositions) - 1; i >= 0; i-- {
+		w := d.widgetPositions[i]
+		if i < d.active {
+			cond1 := w.row == c.row && w.col == c.col && w.stack == c.stack-1
+			cond2 := w.row < c.row && w.widthFrom <= c.widthFrom && c.widthFrom <= w.widthTo
+			if cond1 || cond2 {
+				d.moveWidget(i)
+				break
+			}
+		}
+	}
+
 }
 
 func (d *Dashboard) rightColWidget() {
@@ -236,14 +242,14 @@ func (d *Dashboard) leftColWidget() {
 	cursor := c.widgetItem.GetHighlightenPos()
 	myPosition := c.vOffset + cursor
 	for i := len(d.widgetPositions) - 1; i >= 0; i-- {
-		wp := d.widgetPositions[i]
-		if i < d.active && col > wp.col {
-			if myPosition >= wp.vOffset && myPosition <= wp.vOffset+wp.height {
+		w := d.widgetPositions[i]
+		if i < d.active && col > w.col && c.row == w.row {
+			if myPosition >= w.vOffset && myPosition <= w.vOffset+w.height {
 				d.moveWidget(i)
 				break
 			}
 		} else {
-			col = wp.col
+			col = w.col
 		}
 	}
 }
@@ -290,6 +296,7 @@ func (d *Dashboard) layoutHeader() {
 	ui.Body.AddRows(
 		ui.NewRow(
 			ui.NewCol(12, 0, header)))
+	d.header = header
 }
 
 func (d *Dashboard) layoutWidgets() (err error) {
@@ -351,6 +358,8 @@ func (d *Dashboard) layoutWidgets() (err error) {
 					vOffset:    offset,
 					height:     gw.Height,
 					widgetItem: wi,
+					widthFrom:  100 / len(row.Cols) * i,
+					widthTo:    100 / len(row.Cols) * (i + 1),
 				})
 				offset += gw.Height
 			}

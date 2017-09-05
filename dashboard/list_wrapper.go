@@ -45,34 +45,34 @@ func NewListWrapper(opt *ListWrapperOption) (l *ListWrapper) {
 func (l *ListWrapper) setKeyBindings() error {
 	// move down cursor by j
 	ui.Handle("/sys/kbd/j", func(ui.Event) {
-		l.moveAndRender("down")
+		l.MmoveCursorWithFocus("down")
 	})
 	// move down cursor by down key
 	ui.Handle("/sys/kbd/<down>", func(ui.Event) {
-		l.moveAndRender("down")
+		l.MmoveCursorWithFocus("down")
 	})
 	// move up cursor by k
 	ui.Handle("/sys/kbd/k", func(ui.Event) {
-		l.moveAndRender("up")
+		l.MmoveCursorWithFocus("up")
 	})
 	// move up cursor by up key
 	ui.Handle("/sys/kbd/<up>", func(ui.Event) {
-		l.moveAndRender("up")
+		l.MmoveCursorWithFocus("up")
 	})
 	// skip up cursor by Ctrl + u
 	ui.Handle("/sys/kbd/C-u", func(ui.Event) {
 		for i := 0; i < l.stepsByJump; i++ {
-			l.listRenderer.Move("up")
+			l.listRenderer.MoveCursorWithFocus("up")
 		}
-		l.moveAndRender("up")
+		l.MmoveCursorWithFocus("up")
 	})
 	// skip down cursor by Ctrl + d
 	ui.Handle("/sys/kbd/C-d", func(ui.Event) {
 		l.gPressed = false // cancel gg to top
 		for i := 0; i < l.stepsByJump; i++ {
-			l.listRenderer.Move("down")
+			l.listRenderer.MoveCursorWithFocus("down")
 		}
-		l.moveAndRender("down")
+		l.MmoveCursorWithFocus("down")
 	})
 	// cancel pressed g for moving top by gg
 	ui.Handle("/sys/kbd", func(e ui.Event) {
@@ -83,16 +83,16 @@ func (l *ListWrapper) setKeyBindings() error {
 	// moving top by gg
 	ui.Handle("/sys/kbd/g", func(ui.Event) {
 		if l.gPressed {
-			l.listRenderer.Move("top")
-			l.moveAndRender("up")
+			l.listRenderer.MoveCursorWithFocus("top")
+			l.MmoveCursorWithFocus("up")
 		} else {
 			l.gPressed = true
 		}
 	})
 	// moving bottom by G
 	ui.Handle("/sys/kbd/G", func(ui.Event) {
-		l.listRenderer.Move("bottom")
-		l.moveAndRender("down")
+		l.listRenderer.MoveCursorWithFocus("bottom")
+		l.MmoveCursorWithFocus("down")
 	})
 
 	return nil
@@ -135,9 +135,19 @@ func (l *ListWrapper) SetBody(items []string) {
 func (l *ListWrapper) AddBody(line string) {
 	l.listRenderer.AddBody(line)
 	l.widget.Items = append(l.widget.Items, line)
+	ui.Render(ui.Body)
 }
-func (l *ListWrapper) moveAndRender(direction string) {
+
+// MoveCursor moves cursor
+func (l *ListWrapper) MoveCursor(direction string) {
 	l.gPressed = false // cancel gg to top
-	l.widget.Items = l.listRenderer.Move(direction)
+	l.widget.Items = l.listRenderer.MoveCursor(direction)
+	ui.Render(ui.Body)
+}
+
+// MmoveCursorWithFocus moves cursor and update ui
+func (l *ListWrapper) MmoveCursorWithFocus(direction string) {
+	l.gPressed = false // cancel gg to top
+	l.widget.Items = l.listRenderer.MoveCursorWithFocus(direction)
 	ui.Render(ui.Body)
 }

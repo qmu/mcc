@@ -12,6 +12,7 @@ type ListRenderer struct {
 	bottom        int
 	lineHighLight bool
 	cursor        int
+	unfocused     bool
 }
 
 // ListRendererOption is the option argument for NewListWrapper
@@ -64,7 +65,7 @@ func (l *ListRenderer) RenderActually() []string {
 			} else {
 				v2 := ""
 				for i, c := range v {
-					if i == 0 {
+					if i == 0 && l.unfocused == false {
 						v2 += "[" + string(c) + "](bg-green)"
 					} else {
 						v2 += string(c)
@@ -92,8 +93,17 @@ func (l *ListRenderer) ResetRender() (items []string) {
 	return
 }
 
-// Move moves cursor position to "direction"
-func (l *ListRenderer) Move(direction string) (items []string) {
+// MoveCursor moves cursor position to "direction" with no focuse
+func (l *ListRenderer) MoveCursor(direction string) (items []string) {
+	l.unfocused = true
+	items = l.MoveCursorWithFocus(direction)
+	l.unfocused = false
+	return
+}
+
+// MoveCursorWithFocus moves cursor position to "direction"
+// with a highlightened focus
+func (l *ListRenderer) MoveCursorWithFocus(direction string) (items []string) {
 	if direction == "up" {
 		items = l.up()
 	} else if direction == "down" {

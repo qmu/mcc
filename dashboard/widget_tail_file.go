@@ -73,8 +73,7 @@ func (n *TailFileWidget) tail() (err error) {
 				continue
 			}
 			n.renderer.AddBody(" " + line.Text)
-			n.renderer.Render()
-			n.renderer.moveAndRender("bottom")
+			n.renderer.MoveCursor("bottom")
 		}
 	}()
 	return
