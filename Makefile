@@ -9,7 +9,7 @@ version:
 	go run $(LDFLAGS) *.go -v
 
 run:
-	go run $(LDFLAGS) *.go -c _example/example1.yml
+	go run $(LDFLAGS) *.go -c _example/example.yml
 
 erd:
 	go-erd -path ./dashboard/ |dot -Tsvg > ./tmp/dashboard_erd.svg
