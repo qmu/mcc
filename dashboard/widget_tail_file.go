@@ -2,6 +2,7 @@ package dashboard
 
 import (
 	"os"
+	"regexp"
 
 	ui "github.com/gizak/termui"
 	"github.com/hpcloud/tail"
@@ -72,7 +73,16 @@ func (n *TailFileWidget) tail() (err error) {
 				first = false
 				continue
 			}
-			n.renderer.AddBody(" " + line.Text)
+
+			l := line.Text
+			rep := regexp.MustCompile(`(error|Error|ERROR)`)
+			l = rep.ReplaceAllString(l, "[$1](fg-red)")
+			rep = regexp.MustCompile(`(\d{4}[/|-]\d{1,2}[/|-]\d{1,2})`)
+			l = rep.ReplaceAllString(l, "[$1](fg-blue)")
+			rep = regexp.MustCompile(`(\d{1,2}:\d{1,2}:\d{1,2})`)
+			l = rep.ReplaceAllString(l, "[$1](fg-blue)")
+
+			n.renderer.AddBody(" " + l)
 			n.renderer.MoveCursor("bottom")
 		}
 	}()
