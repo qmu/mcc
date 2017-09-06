@@ -1,5 +1,5 @@
 NAME := mcc
-VERSION := v0.9.4
+VERSION := v0.9.5
 CONFIG_SCHEMA_VERSION := v1.0.0
 SRCS      := $(shell find . -name '*.go' -type f)
 LDFLAGS   := -ldflags "-X main.Version=$(VERSION) -X main.ConfigSchemaVersion=$(CONFIG_SCHEMA_VERSION)"
@@ -40,5 +40,7 @@ release:
 		&& $(GH_UPLOAD) --name darwin_amd64_mcc --file darwin_amd64_mcc \
 		&& $(GH_UPLOAD) --name linux_386_mcc --file linux_386_mcc \
 		&& $(GH_UPLOAD) --name linux_amd64_mcc --file linux_amd64_mcc
+
+	git fetch --tags
 
 .PHONY: build
