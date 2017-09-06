@@ -14,6 +14,9 @@ Availabe on Mac and Linux. Fetch the [latest release](https://github.com/qmu/mcc
 
 ```bash
 brew install qmu/mcc/mcc
+
+// Upgrade
+brew upgrade mcc
 ```
 
 #### Linux
