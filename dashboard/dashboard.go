@@ -174,6 +174,10 @@ func (d *Dashboard) setKeyBindings() error {
 	ui.Handle("/sys/kbd/C-l", func(ui.Event) {
 		d.rightColWidget()
 	})
+	// press tab to switch widget
+	ui.Handle("/sys/kbd/<tab>", func(ui.Event) {
+		d.nextWidget()
+	})
 
 	ui.Handle("/sys/wnd/resize", func(e ui.Event) {
 		ui.Body.Width = ui.TermWidth()
@@ -183,6 +187,10 @@ func (d *Dashboard) setKeyBindings() error {
 	})
 
 	return nil
+}
+
+func (d *Dashboard) nextWidget() {
+	d.moveWidget(d.active + 1)
 }
 
 func (d *Dashboard) downerRowWidget() {
@@ -289,7 +297,7 @@ func (d *Dashboard) getActiveWidget() (w WidgetItem) {
 }
 
 func (d *Dashboard) layoutHeader() {
-	header := ui.NewPar("Press q to quit, Press C-[j,k,h,l] to switch widget, Press j or k to move cursor")
+	header := ui.NewPar("Press q to quit, Press tab or C-[j,k,h,l] to switch widget, Press j or k to move cursor")
 	header.Height = 1
 	header.Border = false
 	header.TextFgColor = ui.ColorWhite
