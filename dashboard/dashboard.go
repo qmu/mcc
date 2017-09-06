@@ -344,7 +344,7 @@ func (d *Dashboard) layoutWidgets() (err error) {
 						return err
 					}
 				case "git_status":
-					wi, err = NewGitStatusWidget(w, d.execPath)
+					wi, err = NewGitStatusWidget(w, d.execPath, d.config.Envs)
 					if err != nil {
 						return err
 					}

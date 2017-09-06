@@ -2,6 +2,8 @@
 schema_version: v1.0.0
 timezone: Asia/Tokyo
 envs:
+  - name: EDITOR
+    value: vim
   - name: HOGE1
     value: env val 1
   - name: HOGE2

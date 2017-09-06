@@ -2,6 +2,7 @@ package dashboard
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"os/exec"
 	"sort"
@@ -20,6 +21,7 @@ type GitStatusWidget struct {
 	isReady     bool
 	disabled    bool
 	statusItems StatusItems
+	envs        []map[string]string
 }
 
 // StatusItem is a struct which stores each file status of git status
@@ -65,9 +67,10 @@ func (b ByPath) Less(i, j int) bool {
 }
 
 // NewGitStatusWidget constructs a New GitStatusWidget
-func NewGitStatusWidget(wi Widget, execPath string) (g *GitStatusWidget, err error) {
+func NewGitStatusWidget(wi Widget, execPath string, envs []map[string]string) (g *GitStatusWidget, err error) {
 	g = new(GitStatusWidget)
 
+	g.envs = envs
 	body, err := g.buildBody(execPath)
 	if err != nil {
 		return
@@ -265,16 +268,37 @@ func (g *GitStatusWidget) setKeyBindings() error {
 		ui.Close()
 
 		cursor := g.renderer.GetCursor()
-		// straighten multi line commands
-		cmd := exec.Command("vim", g.statusItems[cursor].Path)
-		cmd.Stdin = os.Stdin
-		cmd.Stdout = os.Stdout
-		cmd.Stderr = os.Stderr
-		err := cmd.Run()
-		if err != nil {
-			os.Exit(1)
+		hasEditor := os.Getenv("EDITOR") != ""
+		editorCmd := ""
+		if hasEditor {
+			editorCmd = os.Getenv("EDITOR")
 		}
-		os.Exit(0)
+		for _, env := range g.envs {
+			if env["name"] == "EDITOR" {
+				hasEditor = true
+				editorCmd = env["value"]
+			}
+		}
+
+		if !hasEditor {
+			log.Println("Set an enviromental variable \"EDITOR\" to open file")
+			os.Exit(0)
+		} else {
+			cmd := exec.Command(editorCmd, g.statusItems[cursor].Path)
+			// load env vars
+			cmd.Env = os.Environ()
+			for _, env := range g.envs {
+				cmd.Env = append(cmd.Env, env["name"]+"="+env["value"])
+			}
+			cmd.Stdin = os.Stdin
+			cmd.Stdout = os.Stdout
+			cmd.Stderr = os.Stderr
+			err := cmd.Run()
+			if err != nil {
+				os.Exit(1)
+			}
+			os.Exit(0)
+		}
 	})
 	return nil
 }
