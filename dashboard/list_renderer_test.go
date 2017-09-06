@@ -18,31 +18,31 @@ func TestRender(t *testing.T) {
 	if items[len(items)-1] != "row4" {
 		t.Error("invalid list display")
 	}
-	items = listRenderer.Move("bottom")
+	items = listRenderer.MoveCursorWithFocus("bottom")
 	if items[len(items)-1] != "[row9](fg-black,bg-green)" {
 		t.Error("invalid list display")
 	}
 	if items[len(items)-1] != "[row9](fg-black,bg-green)" {
 		t.Error("invalid list display")
 	}
-	items = listRenderer.Move("up")
+	items = listRenderer.MoveCursorWithFocus("up")
 	if items[len(items)-1] != "row9" {
 		t.Error("invalid list display")
 	}
 	if items[len(items)-2] != "[row8](fg-black,bg-green)" {
 		t.Error("invalid list display")
 	}
-	items = listRenderer.Move("up")
-	items = listRenderer.Move("up")
-	items = listRenderer.Move("up")
+	items = listRenderer.MoveCursorWithFocus("up")
+	items = listRenderer.MoveCursorWithFocus("up")
+	items = listRenderer.MoveCursorWithFocus("up")
 	if items[len(items)-1] != "row8" {
 		t.Error("invalid list display")
 	}
-	items = listRenderer.Move("top")
+	items = listRenderer.MoveCursorWithFocus("top")
 	if items[len(items)-1] != "row4" {
 		t.Error("invalid list display")
 	}
-	listRenderer.Move("bottom")
+	listRenderer.MoveCursorWithFocus("bottom")
 	items = listRenderer.ResetRender()
 	if items[len(items)-1] != "row4" {
 		t.Error("invalid list display")

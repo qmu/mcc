@@ -44,6 +44,7 @@ type Widget struct {
 	Type       string
 	IssueRegex string `yaml:"issue_regex"`
 	Content    interface{}
+	Path       string
 }
 
 // Menu is the schema implements Config.Widgets.Menu

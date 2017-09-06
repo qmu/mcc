@@ -1,0 +1,13 @@
+line1 hogehogehoge
+line2 hogehogehoge
+line3 hogehogehoge
+line4 hogehogehoge
+line5 hogehogehoge
+line6 hogehogehoge
+line7 hogehogehoge
+line8 hogehogehoge
+
+2017-08-02 21:14:50 Error: [MissingControllerException] Controller class DocsController could not be found.
+2017/08/03 21:14:50 Error: [MissingControllerException] Controller class DocsController could not be found.
+2017-08-04 21:14:50 Error: [MissingControllerException] Controller class DocsController could not be found.
+2017-08-05 21:14:50 Error: [MissingControllerException] Controller class DocsController could not be found.

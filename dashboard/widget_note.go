@@ -1,6 +1,7 @@
 package dashboard
 
 import (
+	"io/ioutil"
 	"regexp"
 	"strings"
 
@@ -17,18 +18,35 @@ type NoteWidget struct {
 }
 
 // NewNoteWidget constructs a New NoteWidget
-func NewNoteWidget(wi Widget) (n *NoteWidget, err error) {
+func NewNoteWidget(wi Widget, execPath string) (n *NoteWidget, err error) {
 	n = new(NoteWidget)
 
 	var note string
-	if err := m2s.Decode(wi.Content, &note); err != nil {
-		return nil, err
+	if wi.Type == "text_file" {
+		// for TextFile Widget
+		var path string
+		if wi.Path[0:1] == "/" {
+			path = wi.Path
+		} else {
+			path = "./" + execPath + "/" + wi.Path
+		}
+		b, err := ioutil.ReadFile(path)
+
+		if err != nil {
+			return n, err
+		}
+		note = string(b)
+	} else {
+		// for Note Widget
+		if err := m2s.Decode(wi.Content, &note); err != nil {
+			return nil, err
+		}
 	}
 
 	items := strings.Split(note, "\n")
 	var body []string
 	for _, item := range items {
-		rep := regexp.MustCompile(`(^#.*)`)
+		rep := regexp.MustCompile(`(^#.*|^--*)`)
 		item = rep.ReplaceAllString(item, "[$1](fg-blue)")
 		body = append(body, " "+item)
 	}

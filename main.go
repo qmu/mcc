@@ -5,9 +5,9 @@ import (
 	"log"
 	"os"
 
-	_ "github.com/k0kubun/pp"
 	"github.com/qmu/mcc/dashboard"
 	"github.com/spf13/cobra"
+	// "github.com/k0kubun/pp"
 )
 
 func main() {
@@ -43,7 +43,8 @@ var RootCmd = &cobra.Command{
 			}
 		}
 		if err := dashboard.NewDashboard(Version, ConfigSchemaVersion, config); err != nil {
-			return
+			log.Panicln(err)
+			os.Exit(1)
 		}
 	},
 }

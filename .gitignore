@@ -1,3 +1,14 @@
+# Win
+Thumbs.db
+  
+# Mac
+.DS_Store
+ 
+# Vim
+*.sw?
+*~
+._*
+
 # Compiled Object files, Static and Dynamic libs (Shared Objects)
 *.o
 *.a

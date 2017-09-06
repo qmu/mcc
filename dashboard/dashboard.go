@@ -1,6 +1,7 @@
 package dashboard
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -8,7 +9,6 @@ import (
 	ui "github.com/gizak/termui"
 	version "github.com/hashicorp/go-version"
 	"github.com/qmu/mcc/github"
-	// "github.com/k0kubun/pp"
 )
 
 // WidgetItem define common interface for each widgets
@@ -30,6 +30,7 @@ type Dashboard struct {
 	githubWidgets   []*GithubIssueWidget
 	active          int // active widget index of Dashboard.widgetPositions
 	client          *github.Client
+	header          *ui.Par // for debug
 }
 
 type widgetPosition struct {
@@ -39,6 +40,8 @@ type widgetPosition struct {
 	vOffset    int
 	height     int
 	widgetItem WidgetItem
+	widthFrom  int
+	widthTo    int
 }
 
 // NewDashboard constructs a new Dashboard
@@ -81,7 +84,9 @@ func NewDashboard(appVersion string, configSchemaVersion string, configPath stri
 
 func (d *Dashboard) prepareUI() (err error) {
 	d.layoutHeader()
-	d.layoutWidgets()
+	if err = d.layoutWidgets(); err != nil {
+		return
+	}
 	for _, w := range d.widgetPositions {
 		d.deactivateWidget(w.widgetItem)
 	}
@@ -169,6 +174,10 @@ func (d *Dashboard) setKeyBindings() error {
 	ui.Handle("/sys/kbd/C-l", func(ui.Event) {
 		d.rightColWidget()
 	})
+	// press tab to switch widget
+	ui.Handle("/sys/kbd/<tab>", func(ui.Event) {
+		d.nextWidget()
+	})
 
 	ui.Handle("/sys/wnd/resize", func(e ui.Event) {
 		ui.Body.Width = ui.TermWidth()
@@ -180,13 +189,20 @@ func (d *Dashboard) setKeyBindings() error {
 	return nil
 }
 
+func (d *Dashboard) nextWidget() {
+	d.moveWidget(d.active + 1)
+}
+
 func (d *Dashboard) downerRowWidget() {
 	c := d.widgetPositions[d.active]
 	num := d.active + 1
-	for i := 0; i < len(d.widgetPositions)-1; i++ {
+	for i := 0; i < len(d.widgetPositions); i++ {
 		w := d.widgetPositions[i]
-		if c.row < w.row && w.stack == 0 && w.col <= c.col {
+		cond1 := c.row == w.row && c.col == w.col && w.stack == c.stack+1
+		cond2 := c.row < w.row && w.stack == 0 && w.widthFrom <= c.widthFrom && c.widthFrom <= w.widthTo
+		if cond1 || cond2 {
 			num = i
+			break
 		}
 	}
 	d.moveWidget(num)
@@ -194,21 +210,21 @@ func (d *Dashboard) downerRowWidget() {
 
 func (d *Dashboard) upperRowWidget() {
 	c := d.widgetPositions[d.active]
-	if c.row > 0 && c.stack == 0 {
-		for i := len(d.widgetPositions) - 1; i >= 0; i-- {
-			var row int
-			if i < d.active && d.widgetPositions[i].row <= row {
-				if d.widgetPositions[i].col <= c.col {
-					d.moveWidget(i)
-					break
-				}
-			} else {
-				row = d.widgetPositions[i].row
-			}
-		}
-	} else {
+	if c.row == 0 && c.stack == 0 {
 		d.moveWidget(d.active - 1)
 	}
+	for i := len(d.widgetPositions) - 1; i >= 0; i-- {
+		w := d.widgetPositions[i]
+		if i < d.active {
+			cond1 := w.row == c.row && w.col == c.col && w.stack == c.stack-1
+			cond2 := w.row < c.row && w.widthFrom <= c.widthFrom && c.widthFrom <= w.widthTo
+			if cond1 || cond2 {
+				d.moveWidget(i)
+				break
+			}
+		}
+	}
+
 }
 
 func (d *Dashboard) rightColWidget() {
@@ -234,14 +250,14 @@ func (d *Dashboard) leftColWidget() {
 	cursor := c.widgetItem.GetHighlightenPos()
 	myPosition := c.vOffset + cursor
 	for i := len(d.widgetPositions) - 1; i >= 0; i-- {
-		wp := d.widgetPositions[i]
-		if i < d.active && col > wp.col {
-			if myPosition >= wp.vOffset && myPosition <= wp.vOffset+wp.height {
+		w := d.widgetPositions[i]
+		if i < d.active && col > w.col && c.row == w.row {
+			if myPosition >= w.vOffset && myPosition <= w.vOffset+w.height {
 				d.moveWidget(i)
 				break
 			}
 		} else {
-			col = wp.col
+			col = w.col
 		}
 	}
 }
@@ -281,13 +297,14 @@ func (d *Dashboard) getActiveWidget() (w WidgetItem) {
 }
 
 func (d *Dashboard) layoutHeader() {
-	header := ui.NewPar("Press q to quit, Press C-[j,k,h,l] to switch widget, Press j or k to move cursor")
+	header := ui.NewPar("Press q to quit, Press tab or C-[j,k,h,l] to switch widget, Press j or k to move cursor")
 	header.Height = 1
 	header.Border = false
 	header.TextFgColor = ui.ColorWhite
 	ui.Body.AddRows(
 		ui.NewRow(
 			ui.NewCol(12, 0, header)))
+	d.header = header
 }
 
 func (d *Dashboard) layoutWidgets() (err error) {
@@ -309,7 +326,7 @@ func (d *Dashboard) layoutWidgets() (err error) {
 						return err
 					}
 				case "note":
-					wi, err = NewNoteWidget(w)
+					wi, err = NewNoteWidget(w, d.execPath)
 					if err != nil {
 						return err
 					}
@@ -321,6 +338,24 @@ func (d *Dashboard) layoutWidgets() (err error) {
 					}
 					wi = giw
 					d.githubWidgets = append(d.githubWidgets, giw)
+				case "text_file":
+					wi, err = NewNoteWidget(w, d.execPath)
+					if err != nil {
+						return err
+					}
+				case "git_status":
+					wi, err = NewGitStatusWidget(w, d.execPath, d.config.Envs)
+					if err != nil {
+						return err
+					}
+				case "tail_file":
+					wi, err = NewTailFileWidget(w, d.execPath)
+					if err != nil {
+						return err
+					}
+				}
+				if wi == nil {
+					return errors.New("Widget type \"" + w.Type + "\" is not supported")
 				}
 				gw := wi.GetWidget()
 				cols = append(cols, gw)
@@ -331,6 +366,8 @@ func (d *Dashboard) layoutWidgets() (err error) {
 					vOffset:    offset,
 					height:     gw.Height,
 					widgetItem: wi,
+					widthFrom:  100 / len(row.Cols) * i,
+					widthTo:    100 / len(row.Cols) * (i + 1),
 				})
 				offset += gw.Height
 			}

@@ -2,6 +2,8 @@
 schema_version: v1.0.0
 timezone: Asia/Tokyo
 envs:
+  - name: EDITOR
+    value: vim
   - name: HOGE1
     value: env val 1
   - name: HOGE2
@@ -16,41 +18,42 @@ rows:
       - section: col
         widgets:
           - type: note
-            title: ROW1 COL1
+            title: NOTE WIDGET
             height: 100%
             content: |
+              # text text text
+              
               text text text
-              text text text
+              
+              # text text text
+              
+              text #hogehoge text text
+              
+              ## text text text
+              
               text text text
 
       - section: col
         widgets:
-          - type: note
-            title: ROW1 COL2
+          - type: text_file
+            title: TEXT FILE WIDGET
             height: 100%
-            content: |
-              text text text
-              text text text
-              text text text
+            path: ./example.md
 
       - section: col
         widgets:
-          - type: note
-            title: ROW1 COL3
+          - type: git_status
+            title: GIT STATUS WIDGET
             height: 100%
-            content: |
-              text text text
-              text text text
-              text text text
 
   - section: row
-    height: 80%
+    height: 60%
     cols:
       - section: col
         widgets:
           - type: menu
-            title: MENU1
-            height: 25%
+            title: MENU WIDGET 1
+            height: 40%
             content:
               - category: Category1
                 name: Menu1
@@ -105,8 +108,8 @@ rows:
                 command: echo "hogeeeeeeeeeeeee"
 
           - type: menu
-            title: MENU2
-            height: 15%
+            title: MENU WIDGET 2
+            height: 30%
             content:
               - category: Category3
                 name: Menu1
@@ -134,8 +137,8 @@ rows:
                 command: echo "hogeeeeeeeeeeeee"
 
           - type: menu
-            title: MENU3
-            height: 25%
+            title: MENU WIDGET 3
+            height: 30%
             content:
               - category: Category4
                 name: Menu1
@@ -171,71 +174,13 @@ rows:
                 command: echo "hogeeeeeeeeeeeee"
               - category: Category5
                 name: Menu9
-                description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-                command: echo "hogeeeeeeeeeeeee"
-
-          - type: menu
-            title: MENU4
-            height: 25%
-            content:
-              - category: Category6
-                name: Menu1
-                description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-                command: echo "hogeeeeeeeeeeeee"
-              - category: Category6
-                name: Menu2
-                description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-                command: echo "hogeeeeeeeeeeeee"
-              - category: Category6
-                name: Menu3
-                description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-                command: echo "hogeeeeeeeeeeeee"
-              - category: Category6
-                name: Menu4
-                description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-                command: echo "hogeeeeeeeeeeeee"
-              - category: Category6
-                name: Menu5
-                description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-                command: echo "hogeeeeeeeeeeeee"
-              - category: Category7
-                name: Menu6
-                description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-                command: echo "hogeeeeeeeeeeeee"
-              - category: Category7
-                name: Menu7
-                description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-                command: echo "hogeeeeeeeeeeeee"
-              - category: Category7
-                name: Menu8
-                description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-                command: echo "hogeeeeeeeeeeeee"
-              - category: Category7
-                name: Menu9
-                description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-                command: echo "hogeeeeeeeeeeeee"
-              - category: Category7
-                name: Menu10
-                description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-                command: echo "hogeeeeeeeeeeeee"
-
-          - type: menu
-            title: MENU5
-            height: 10%
-            content:
-              - category: Category8
-                name: Menu1
-                description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-                command: echo "hogeeeeeeeeeeeee"
-              - category: Category8
-                name: Menu2
                 description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                 command: echo "hogeeeeeeeeeeeee"
 
       - section: col
         widgets:
           - type: github_issue
-            title: CURRENT ISSUE
+            title: GITHUB ISSUE WIDGET
             height: 80%
             issue_regex: "i([0-9]*).*"
 
@@ -254,3 +199,14 @@ rows:
               ## text text text
               
               text text text
+
+  - section: row
+    height: 20%
+    cols:
+      - section: col
+        widgets:
+          - type: tail_file
+            title: TAIL FILE WIDGET
+            height: 100%
+            path: ./example.log
+            

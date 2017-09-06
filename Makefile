@@ -1,5 +1,5 @@
 NAME := mcc
-VERSION := v0.9.3
+VERSION := v0.9.4
 CONFIG_SCHEMA_VERSION := v1.0.0
 SRCS      := $(shell find . -name '*.go' -type f)
 LDFLAGS   := -ldflags "-X main.Version=$(VERSION) -X main.ConfigSchemaVersion=$(CONFIG_SCHEMA_VERSION)"
@@ -9,7 +9,7 @@ version:
 	go run $(LDFLAGS) *.go -v
 
 run:
-	go run $(LDFLAGS) *.go -c _example/example1.yml
+	go run $(LDFLAGS) *.go -c _example/example.yml
 
 erd:
 	go-erd -path ./dashboard/ |dot -Tsvg > ./tmp/dashboard_erd.svg
