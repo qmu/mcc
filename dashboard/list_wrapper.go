@@ -110,7 +110,7 @@ func (l *ListWrapper) Render() {
 // ResetRender returns a initial multi-line texts
 func (l *ListWrapper) ResetRender() {
 	l.widget.BorderLabelFg = ui.ColorWhite
-	l.widget.BorderFg = ui.ColorWhite
+	l.widget.BorderFg = ui.ColorBlue
 	l.widget.Items = l.listRenderer.ResetRender()
 	ui.Render(ui.Body)
 }
