@@ -11,29 +11,22 @@ import (
 	"github.com/qmu/mcc/github"
 )
 
-// WidgetItem define common interface for each widgets
-type WidgetItem interface {
-	Activate()
-	Deactivate()
-	IsDisabled() bool
-	IsReady() bool
-	GetWidget() *ui.List
-	GetHighlightenPos() int
-}
-
 // Dashboard controls termui's widget layout and keybindings
 type Dashboard struct {
-	execPath        string
-	configPath      string
-	config          *Config
-	widgetPositions []*widgetPosition
-	githubWidgets   []*GithubIssueWidget
-	active          int // active widget index of Dashboard.widgetPositions
-	client          *github.Client
-	header          *ui.Par // for debug
+	execPath            string
+	configPath          string
+	config              *Config
+	widgets             []*widgetInfo
+	githubWidgets       []*GithubIssueWidget
+	active              int // active widget index of Dashboard.widgets
+	client              *github.Client
+	header              *ui.Par // for debug
+	appVersion          string
+	configSchemaVersion string
 }
 
-type widgetPosition struct {
+type widgetInfo struct {
+	widgetType string
 	row        int
 	col        int
 	stack      int
@@ -44,14 +37,27 @@ type widgetPosition struct {
 	widthTo    int
 }
 
+// WidgetItem define common interface for each widgets
+type WidgetItem interface {
+	Activate()
+	Deactivate()
+	IsDisabled() bool
+	IsReady() bool
+	GetWidget() *ui.List
+	GetHighlightenPos() int
+	Render() error
+}
+
 // NewDashboard constructs a new Dashboard
 func NewDashboard(appVersion string, configSchemaVersion string, configPath string) (err error) {
 	d := new(Dashboard)
 	d.execPath = filepath.Dir(configPath)
 	d.configPath = configPath
+	d.appVersion = appVersion
+	d.configSchemaVersion = configSchemaVersion
 
 	// initialize termui
-	if err := ui.Init(); err != nil {
+	if err = ui.Init(); err != nil {
 		panic(err)
 	}
 	defer ui.Close()
@@ -63,16 +69,9 @@ func NewDashboard(appVersion string, configSchemaVersion string, configPath stri
 	}
 	d.config = configManager.LoadedData
 
-	// check the ConfigSchemaVersion
-	vApp, err := version.NewVersion(configSchemaVersion)
-	vConfig, err := version.NewVersion(d.config.SchemaVersion)
-	if err != nil {
+	// check ConfigSchemaVersion
+	if err = d.checkConfigScheme(); err != nil {
 		return
-	}
-	if vConfig.LessThan(vApp) {
-		fmt.Printf("mcc %s supports schema_version %s but ths schema_version in %s seems to be %s\n", appVersion, vApp, configPath, vConfig)
-		fmt.Printf("please upgrade mcc or %s first\n", configPath)
-		os.Exit(1)
 	}
 
 	// initialize interface
@@ -83,45 +82,78 @@ func NewDashboard(appVersion string, configSchemaVersion string, configPath stri
 }
 
 func (d *Dashboard) prepareUI() (err error) {
+	// layout header and body
 	d.layoutHeader()
 	if err = d.layoutWidgets(); err != nil {
 		return
 	}
-	for _, w := range d.widgetPositions {
+
+	// deactivate all, and activate first widget
+	for _, w := range d.widgets {
 		d.deactivateWidget(w.widgetItem)
 	}
-	d.activateWidget(d.widgetPositions[0].widgetItem)
+	d.activateWidget(d.widgets[0].widgetItem)
 
-	if d.hasGithubIssueWidget() {
-		go func() {
+	// init asynchronously
+	if d.hasWidget("github_issue") {
+		go d.renderGitHubIssueWidgets()
+	}
 
-			// initialize GitHub Client
-			host := d.config.GitHubHost
-			if d.config.GitHubHost == "" {
-				host = "github.com"
-			}
-			c, err := github.NewClient(d.execPath, host)
-			if err != nil {
-				for _, w := range d.githubWidgets {
-					w.Disable()
-				}
-			} else {
-				if err = c.Init(); err != nil {
-					return
-				}
-				d.client = c
-			}
-
-			for _, w := range d.githubWidgets {
-				if !w.IsDisabled() {
-					w.Render(d.client)
-				}
-			}
-		}()
+	// init asynchronously
+	if d.hasWidget("git_status") {
+		go d.renderGitStatusWidgets()
 	}
 
 	ui.Loop()
 	return nil
+}
+
+func (d *Dashboard) renderGitHubIssueWidgets() {
+	// initialize GitHub Client
+	host := d.config.GitHubHost
+	if d.config.GitHubHost == "" {
+		host = "github.com"
+	}
+	c, err := github.NewClient(d.execPath, host)
+	if err != nil {
+		for _, w := range d.githubWidgets {
+			w.Disable()
+		}
+	} else {
+		if err = c.Init(); err != nil {
+			return
+		}
+		d.client = c
+	}
+
+	for _, w := range d.githubWidgets {
+		if !w.IsDisabled() {
+			w.SetClient(d.client)
+			w.Render()
+		}
+	}
+}
+
+func (d *Dashboard) renderGitStatusWidgets() {
+	for _, w := range d.widgets {
+		if w.widgetType == "git_status" && !w.widgetItem.IsDisabled() {
+			w.widgetItem.Render()
+		}
+	}
+}
+
+func (d *Dashboard) checkConfigScheme() (err error) {
+	vApp, err := version.NewVersion(d.configSchemaVersion)
+	vConfig, err := version.NewVersion(d.config.SchemaVersion)
+	if err != nil {
+		return
+	}
+	if vConfig.LessThan(vApp) {
+		fmt.Printf("mcc %s supports schema_version %s but ths schema_version in %s seems to be %s\n", d.appVersion, vApp, d.configPath, vConfig)
+		fmt.Printf("please upgrade mcc or %s first\n", d.configPath)
+		os.Exit(1)
+	}
+	return
 }
 
 func (d *Dashboard) activateWidget(w WidgetItem) {
@@ -134,12 +166,12 @@ func (d *Dashboard) deactivateWidget(w WidgetItem) {
 	ui.ResetHandlers()
 }
 
-func (d *Dashboard) hasGithubIssueWidget() bool {
+func (d *Dashboard) hasWidget(widgetType string) bool {
 	result := false
 	for _, row := range d.config.Rows {
 		for _, col := range row.Cols {
 			for _, w := range col.Widgets {
-				if w.Type == "github_issue" {
+				if w.Type == widgetType {
 					result = true
 				}
 			}
@@ -194,10 +226,10 @@ func (d *Dashboard) nextWidget() {
 }
 
 func (d *Dashboard) downerRowWidget() {
-	c := d.widgetPositions[d.active]
+	c := d.widgets[d.active]
 	num := d.active + 1
-	for i := 0; i < len(d.widgetPositions); i++ {
-		w := d.widgetPositions[i]
+	for i := 0; i < len(d.widgets); i++ {
+		w := d.widgets[i]
 		cond1 := c.row == w.row && c.col == w.col && w.stack == c.stack+1
 		cond2 := c.row < w.row && w.stack == 0 && w.widthFrom <= c.widthFrom && c.widthFrom <= w.widthTo
 		if cond1 || cond2 {
@@ -209,12 +241,12 @@ func (d *Dashboard) downerRowWidget() {
 }
 
 func (d *Dashboard) upperRowWidget() {
-	c := d.widgetPositions[d.active]
+	c := d.widgets[d.active]
 	if c.row == 0 && c.stack == 0 {
 		d.moveWidget(d.active - 1)
 	}
-	for i := len(d.widgetPositions) - 1; i >= 0; i-- {
-		w := d.widgetPositions[i]
+	for i := len(d.widgets) - 1; i >= 0; i-- {
+		w := d.widgets[i]
 		if i < d.active {
 			cond1 := w.row == c.row && w.col == c.col && w.stack == c.stack-1
 			cond2 := w.row < c.row && w.widthFrom <= c.widthFrom && c.widthFrom <= w.widthTo
@@ -229,10 +261,10 @@ func (d *Dashboard) upperRowWidget() {
 
 func (d *Dashboard) rightColWidget() {
 	col := 0
-	c := d.widgetPositions[d.active]
+	c := d.widgets[d.active]
 	cursor := c.widgetItem.GetHighlightenPos()
 	myPosition := c.vOffset + cursor
-	for i, w := range d.widgetPositions {
+	for i, w := range d.widgets {
 		if w.row == c.row && i > d.active && col < w.col {
 			if myPosition >= w.vOffset && myPosition <= w.vOffset+w.height {
 				d.moveWidget(i)
@@ -245,12 +277,12 @@ func (d *Dashboard) rightColWidget() {
 }
 
 func (d *Dashboard) leftColWidget() {
-	col := d.widgetPositions[len(d.widgetPositions)-1].col
-	c := d.widgetPositions[d.active]
+	col := d.widgets[len(d.widgets)-1].col
+	c := d.widgets[d.active]
 	cursor := c.widgetItem.GetHighlightenPos()
 	myPosition := c.vOffset + cursor
-	for i := len(d.widgetPositions) - 1; i >= 0; i-- {
-		w := d.widgetPositions[i]
+	for i := len(d.widgets) - 1; i >= 0; i-- {
+		w := d.widgets[i]
 		if i < d.active && col > w.col && c.row == w.row {
 			if myPosition >= w.vOffset && myPosition <= w.vOffset+w.height {
 				d.moveWidget(i)
@@ -266,10 +298,10 @@ func (d *Dashboard) moveWidget(posIdx int) {
 	w := d.getActiveWidget()
 	d.deactivateWidget(w)
 	ini := d.active
-	if posIdx > len(d.widgetPositions)-1 {
+	if posIdx > len(d.widgets)-1 {
 		d.active = 0
 	} else if posIdx < 0 {
-		d.active = len(d.widgetPositions) - 1
+		d.active = len(d.widgets) - 1
 	} else {
 		d.active = posIdx
 	}
@@ -288,7 +320,7 @@ func (d *Dashboard) moveWidget(posIdx int) {
 }
 
 func (d *Dashboard) getActiveWidget() (w WidgetItem) {
-	for k, w := range d.widgetPositions {
+	for k, w := range d.widgets {
 		if d.active == k {
 			return w.widgetItem
 		}
@@ -359,7 +391,8 @@ func (d *Dashboard) layoutWidgets() (err error) {
 				}
 				gw := wi.GetWidget()
 				cols = append(cols, gw)
-				d.widgetPositions = append(d.widgetPositions, &widgetPosition{
+				d.widgets = append(d.widgets, &widgetInfo{
+					widgetType: w.Type,
 					row:        h,
 					col:        i,
 					stack:      j,

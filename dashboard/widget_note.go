@@ -90,3 +90,8 @@ func (n *NoteWidget) GetHighlightenPos() int {
 func (n *NoteWidget) GetWidget() *ui.List {
 	return n.renderer.GetWidget()
 }
+
+// Render is the implementation of widget.Render
+func (n *NoteWidget) Render() (err error) {
+	return
+}

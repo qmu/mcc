@@ -118,3 +118,8 @@ func (n *TailFileWidget) GetHighlightenPos() int {
 func (n *TailFileWidget) GetWidget() *ui.List {
 	return n.renderer.GetWidget()
 }
+
+// Render is the implementation of widget.Render
+func (n *TailFileWidget) Render() (err error) {
+	return
+}

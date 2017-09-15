@@ -194,3 +194,8 @@ func (m *MenuWidget) getLongest() (n1 int, n2 int, n3 int) {
 	}
 	return n1, n2, n3
 }
+
+// Render is the implementation of widget.Render
+func (m *MenuWidget) Render() (err error) {
+	return
+}

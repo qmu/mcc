@@ -76,9 +76,13 @@ func (g *GithubIssueWidget) Disable() {
 	ui.Render(ui.Body)
 }
 
-// Render renders the issue contents
-func (g *GithubIssueWidget) Render(client *github.Client) (err error) {
+// SetClient sets Github Client
+func (g *GithubIssueWidget) SetClient(client *github.Client) {
 	g.client = client
+}
+
+// Render renders the issue contents
+func (g *GithubIssueWidget) Render() (err error) {
 
 	body, err := g.buildBody()
 	if err != nil {

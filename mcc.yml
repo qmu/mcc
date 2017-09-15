@@ -9,7 +9,7 @@ rows:
         widgets:
           - type: menu
             title: DEVELOPMENT
-            height: 100%
+            height: 60%
             content:
             - category: GitHub
               name: Project Home
@@ -35,6 +35,9 @@ rows:
               name: Update mcc
               description: self updateing
               command: bin/mcc --self-update
+          - type: git_status
+            title: GIT STATUS
+            height: 40%
 
       - section: col
         widgets:
