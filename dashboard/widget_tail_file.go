@@ -115,11 +115,21 @@ func (n *TailFileWidget) GetHighlightenPos() int {
 }
 
 // GetWidget is the implementation of widget.Activate
-func (n *TailFileWidget) GetWidget() *ui.List {
-	return n.renderer.GetWidget()
+func (n *TailFileWidget) GetWidget() []ui.GridBufferer {
+	return []ui.GridBufferer{n.renderer.GetWidget()}
 }
 
 // Render is the implementation of widget.Render
 func (n *TailFileWidget) Render() (err error) {
 	return
+}
+
+// GetWidth is the implementation of widget.Render
+func (n *TailFileWidget) GetWidth() int {
+	return n.renderer.GetWidth()
+}
+
+// GetHeight is the implementation of widget.Render
+func (n *TailFileWidget) GetHeight() int {
+	return n.renderer.GetHeight()
 }

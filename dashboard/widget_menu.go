@@ -75,8 +75,8 @@ func (m *MenuWidget) GetHighlightenPos() int {
 }
 
 // GetWidget is the implementation of widget.Activate
-func (m *MenuWidget) GetWidget() *ui.List {
-	return m.renderer.GetWidget()
+func (m *MenuWidget) GetWidget() []ui.GridBufferer {
+	return []ui.GridBufferer{m.renderer.GetWidget()}
 }
 
 func (m *MenuWidget) setKeyBindings() error {
@@ -198,4 +198,14 @@ func (m *MenuWidget) getLongest() (n1 int, n2 int, n3 int) {
 // Render is the implementation of widget.Render
 func (m *MenuWidget) Render() (err error) {
 	return
+}
+
+// GetWidth is the implementation of widget.Render
+func (m *MenuWidget) GetWidth() int {
+	return m.renderer.GetWidth()
+}
+
+// GetHeight is the implementation of widget.Render
+func (m *MenuWidget) GetHeight() int {
+	return m.renderer.GetHeight()
 }

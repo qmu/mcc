@@ -51,6 +51,21 @@ rows:
     cols:
       - section: col
         widgets:
+          - type: docker_status
+            height: 100%
+            content:
+              - metrics: cpu
+                name: Web Server
+                container: sample_cakephp_1
+              - metrics: memory
+                name: Web Server
+                container: sample_cakephp_1
+              - metrics: memory
+                name: DB Server
+                container: sample_mysql_1
+
+      - section: col
+        widgets:
           - type: menu
             title: MENU WIDGET 1
             height: 40%
@@ -181,24 +196,8 @@ rows:
         widgets:
           - type: github_issue
             title: GITHUB ISSUE WIDGET
-            height: 80%
+            height: 100%
             issue_regex: "i([0-9]*).*"
-
-          - type: note
-            title: INFORMATION
-            height: 20%
-            content: |
-              # text text text
-              
-              text text text
-              
-              # text text text
-              
-              text #hogehoge text text
-              
-              ## text text text
-              
-              text text text
 
   - section: row
     height: 20%

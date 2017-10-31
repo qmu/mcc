@@ -49,7 +49,7 @@ func NewClient(execPath string, host string) (g *Client, err error) {
 	}
 	for _, remote := range remotes {
 		if remote.Config().Name == "origin" {
-			u := remote.Config().URL
+			u := remote.Config().URLs[0]
 			rep1 := regexp.MustCompile(`.*:(.*)/.*`)
 			g.repoOwner = rep1.ReplaceAllString(u, "$1")
 			rep2 := regexp.MustCompile(`.*/(.*)\.git`)

@@ -252,8 +252,8 @@ func (g *GitStatusWidget) GetHighlightenPos() int {
 }
 
 // GetWidget is the implementation of widget.Activate
-func (g *GitStatusWidget) GetWidget() *ui.List {
-	return g.renderer.GetWidget()
+func (g *GitStatusWidget) GetWidget() []ui.GridBufferer {
+	return []ui.GridBufferer{g.renderer.GetWidget()}
 }
 
 func (g *GitStatusWidget) setKeyBindings() error {
@@ -314,4 +314,14 @@ func (g *GitStatusWidget) Render() (err error) {
 	g.renderer.ResetRender()
 
 	return
+}
+
+// GetWidth is the implementation of widget.Render
+func (g *GitStatusWidget) GetWidth() int {
+	return g.renderer.GetWidth()
+}
+
+// GetHeight is the implementation of widget.Render
+func (g *GitStatusWidget) GetHeight() int {
+	return g.renderer.GetHeight()
 }

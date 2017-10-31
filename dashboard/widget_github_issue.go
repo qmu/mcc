@@ -101,8 +101,8 @@ func (g *GithubIssueWidget) Render() (err error) {
 }
 
 // GetWidget is the implementation of Widget.Activate
-func (g *GithubIssueWidget) GetWidget() *ui.List {
-	return g.renderer.GetWidget()
+func (g *GithubIssueWidget) GetWidget() []ui.GridBufferer {
+	return []ui.GridBufferer{g.renderer.GetWidget()}
 }
 
 func (g *GithubIssueWidget) buildBody() (body []string, err error) {
@@ -163,8 +163,7 @@ func (g *GithubIssueWidget) buildBody() (body []string, err error) {
 
 func (g *GithubIssueWidget) overflow(text string) (result string) {
 	lines := strings.Split(text, "\n")
-	w := g.GetWidget()
-	splitlen := w.Width - 2 - g.indent
+	splitlen := g.GetWidth() - 2 - g.indent
 	for _, line := range lines {
 		cnt := 0
 		for _, c := range line {
@@ -198,4 +197,14 @@ func (g *GithubIssueWidget) putIndent(text string) (result string) {
 		result += " [" + strings.Repeat(" ", indent) + ": ](fg-blue)" + s + "\n"
 	}
 	return
+}
+
+// GetWidth is the implementation of widget.Render
+func (g *GithubIssueWidget) GetWidth() int {
+	return g.renderer.GetWidth()
+}
+
+// GetHeight is the implementation of widget.Render
+func (g *GithubIssueWidget) GetHeight() int {
+	return g.renderer.GetHeight()
 }

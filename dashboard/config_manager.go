@@ -41,6 +41,7 @@ type Widget struct {
 	Col        int
 	Height     string // percent
 	RealHeight int
+	RealWidth  int
 	Type       string
 	IssueRegex string `yaml:"issue_regex"`
 	Content    interface{}
@@ -55,6 +56,13 @@ type Menu struct {
 	Command     string
 }
 
+// Container is the schema implements Config.Widgets.Conttainer
+type Container struct {
+	Metrics   string
+	Name      string
+	Container string
+}
+
 // NewConfigManager constructs a ConfigManager
 func NewConfigManager(path string) (c *ConfigManager, err error) {
 	c = new(ConfigManager)
@@ -66,6 +74,7 @@ func NewConfigManager(path string) (c *ConfigManager, err error) {
 		return
 	}
 	windowH := ui.TermHeight() - 1
+	windowW := ui.TermWidth() - 1
 	for i1, row := range c.LoadedData.Rows {
 		rowH := utils.Percentalize(windowH, row.Height)
 		for i2, col := range row.Cols {
@@ -78,6 +87,7 @@ func NewConfigManager(path string) (c *ConfigManager, err error) {
 					c.LoadedData.Rows[i1].Cols[i2].Widgets[i3].RealHeight = widgetH
 					cntH += widgetH
 				}
+				c.LoadedData.Rows[i1].Cols[i2].Widgets[i3].RealWidth = windowW / len(row.Cols)
 			}
 		}
 	}

@@ -87,11 +87,21 @@ func (n *NoteWidget) GetHighlightenPos() int {
 }
 
 // GetWidget is the implementation of widget.Activate
-func (n *NoteWidget) GetWidget() *ui.List {
-	return n.renderer.GetWidget()
+func (n *NoteWidget) GetWidget() []ui.GridBufferer {
+	return []ui.GridBufferer{n.renderer.GetWidget()}
 }
 
 // Render is the implementation of widget.Render
 func (n *NoteWidget) Render() (err error) {
 	return
+}
+
+// GetWidth is the implementation of widget.Render
+func (n *NoteWidget) GetWidth() int {
+	return n.renderer.GetWidth()
+}
+
+// GetHeight is the implementation of widget.Render
+func (n *NoteWidget) GetHeight() int {
+	return n.renderer.GetHeight()
 }

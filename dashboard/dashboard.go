@@ -43,7 +43,7 @@ type WidgetItem interface {
 	Deactivate()
 	IsDisabled() bool
 	IsReady() bool
-	GetWidget() *ui.List
+	GetWidget() []ui.GridBufferer
 	GetHighlightenPos() int
 	Render() error
 }
@@ -218,6 +218,16 @@ func (d *Dashboard) setKeyBindings() error {
 		ui.Render(ui.Body)
 	})
 
+	if d.hasWidget("docker_status") {
+		ui.Handle("/timer/1s", func(e ui.Event) {
+			for _, w := range d.widgets {
+				if w.widgetType == "docker_status" && !w.widgetItem.IsDisabled() {
+					w.widgetItem.Render()
+				}
+			}
+		})
+	}
+
 	return nil
 }
 
@@ -385,24 +395,29 @@ func (d *Dashboard) layoutWidgets() (err error) {
 					if err != nil {
 						return err
 					}
+				case "docker_status":
+					wi, err = NewDockerStatusWidget(w)
+					if err != nil {
+						return err
+					}
 				}
 				if wi == nil {
 					return errors.New("Widget type \"" + w.Type + "\" is not supported")
 				}
 				gw := wi.GetWidget()
-				cols = append(cols, gw)
+				cols = append(cols, gw...)
 				d.widgets = append(d.widgets, &widgetInfo{
 					widgetType: w.Type,
 					row:        h,
 					col:        i,
 					stack:      j,
 					vOffset:    offset,
-					height:     gw.Height,
+					height:     w.RealHeight,
 					widgetItem: wi,
 					widthFrom:  100 / len(row.Cols) * i,
 					widthTo:    100 / len(row.Cols) * (i + 1),
 				})
-				offset += gw.Height
+				offset += w.RealHeight
 			}
 			newCols = append(newCols, ui.NewCol(12/colsCnt, 0, cols...))
 		}

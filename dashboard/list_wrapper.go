@@ -116,7 +116,7 @@ func (l *ListWrapper) ResetRender() {
 }
 
 // GetWidget returns the instance of ui.List
-func (l *ListWrapper) GetWidget() *ui.List {
+func (l *ListWrapper) GetWidget() ui.GridBufferer {
 	return l.widget
 }
 
@@ -150,4 +150,14 @@ func (l *ListWrapper) MmoveCursorWithFocus(direction string) {
 	l.gPressed = false // cancel gg to top
 	l.widget.Items = l.listRenderer.MoveCursorWithFocus(direction)
 	ui.Render(ui.Body)
+}
+
+// GetWidth is the implementation of widget.Render
+func (l *ListWrapper) GetWidth() int {
+	return l.widget.Width
+}
+
+// GetHeight is the implementation of widget.Render
+func (l *ListWrapper) GetHeight() int {
+	return l.widget.Height
 }
