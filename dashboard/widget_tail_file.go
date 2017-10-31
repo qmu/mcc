@@ -11,6 +11,7 @@ import (
 
 // TailFileWidget is a command launcher
 type TailFileWidget struct {
+	options  *WidgetOptions
 	renderer *ListWrapper
 	isReady  bool
 	disabled bool
@@ -18,18 +19,19 @@ type TailFileWidget struct {
 }
 
 // NewTailFileWidget constructs a New TailFileWidget
-func NewTailFileWidget(wi Widget, execPath string) (n *TailFileWidget, err error) {
+func NewTailFileWidget(opt *WidgetOptions) (n *TailFileWidget, err error) {
 	n = new(TailFileWidget)
-	if wi.Path[0:1] == "/" {
-		n.path = wi.Path
+	n.options = opt
+	if n.options.extendedWidget.widget.Path[0:1] == "/" {
+		n.path = n.options.extendedWidget.widget.Path
 	} else {
-		n.path = "./" + execPath + "/" + wi.Path
+		n.path = "./" + n.options.execPath + "/" + n.options.extendedWidget.widget.Path
 	}
-	opt := &ListWrapperOption{
-		Title:      wi.Title,
-		RealHeight: wi.RealHeight,
+	lopt := &ListWrapperOption{
+		Title:      n.options.GetTitle(),
+		RealHeight: n.options.GetHeight(),
 	}
-	n.renderer = NewListWrapper(opt)
+	n.renderer = NewListWrapper(lopt)
 	n.isReady = true
 	n.tail()
 
@@ -114,22 +116,22 @@ func (n *TailFileWidget) GetHighlightenPos() int {
 	return n.renderer.GetCursor()
 }
 
-// GetWidget is the implementation of widget.Activate
-func (n *TailFileWidget) GetWidget() []ui.GridBufferer {
+// GetGridBufferers is the implementation of stack.Activate
+func (n *TailFileWidget) GetGridBufferers() []ui.GridBufferer {
 	return []ui.GridBufferer{n.renderer.GetWidget()}
 }
 
-// Render is the implementation of widget.Render
+// Render is the implementation of stack.Render
 func (n *TailFileWidget) Render() (err error) {
 	return
 }
 
-// GetWidth is the implementation of widget.Render
+// GetWidth is the implementation of stack.Render
 func (n *TailFileWidget) GetWidth() int {
 	return n.renderer.GetWidth()
 }
 
-// GetHeight is the implementation of widget.Render
+// GetHeight is the implementation of stack.Render
 func (n *TailFileWidget) GetHeight() int {
 	return n.renderer.GetHeight()
 }

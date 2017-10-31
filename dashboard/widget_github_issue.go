@@ -10,9 +10,10 @@ import (
 	"golang.org/x/text/width"
 )
 
-// GithubIssueWidget is a widget which shows a issue
+// GithubIssueWidget is a stack which shows a issue
 // of the current branch referering its name including issue id
 type GithubIssueWidget struct {
+	options    *WidgetOptions
 	renderer   *ListWrapper
 	active     bool
 	client     *github.Client
@@ -24,16 +25,17 @@ type GithubIssueWidget struct {
 }
 
 // NewGithubIssueWidget constructs a New GithubIssueWidget
-func NewGithubIssueWidget(wi Widget, timezone string) (g *GithubIssueWidget, err error) {
+func NewGithubIssueWidget(opt *WidgetOptions) (g *GithubIssueWidget, err error) {
 	g = new(GithubIssueWidget)
+	g.options = opt
 	g.indent = 9
-	g.timezone = timezone
-	opt := &ListWrapperOption{
-		Title:      wi.Title,
-		RealHeight: wi.RealHeight,
+	g.timezone = g.options.timezone
+	lopt := &ListWrapperOption{
+		Title:      g.options.GetTitle(),
+		RealHeight: g.options.GetHeight(),
 	}
-	g.issueRegex = wi.IssueRegex
-	g.renderer = NewListWrapper(opt)
+	g.issueRegex = g.options.extendedWidget.widget.IssueRegex
+	g.renderer = NewListWrapper(lopt)
 
 	return
 }
@@ -100,8 +102,8 @@ func (g *GithubIssueWidget) Render() (err error) {
 	return
 }
 
-// GetWidget is the implementation of Widget.Activate
-func (g *GithubIssueWidget) GetWidget() []ui.GridBufferer {
+// GetGridBufferers is the implementation of Widget.Activate
+func (g *GithubIssueWidget) GetGridBufferers() []ui.GridBufferer {
 	return []ui.GridBufferer{g.renderer.GetWidget()}
 }
 
@@ -199,12 +201,12 @@ func (g *GithubIssueWidget) putIndent(text string) (result string) {
 	return
 }
 
-// GetWidth is the implementation of widget.Render
+// GetWidth is the implementation of stack.Render
 func (g *GithubIssueWidget) GetWidth() int {
 	return g.renderer.GetWidth()
 }
 
-// GetHeight is the implementation of widget.Render
+// GetHeight is the implementation of stack.Render
 func (g *GithubIssueWidget) GetHeight() int {
 	return g.renderer.GetHeight()
 }

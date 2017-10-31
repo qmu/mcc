@@ -1,16 +1,25 @@
 package dashboard
 
 import (
+	"fmt"
 	"io/ioutil"
+	"os"
 
-	ui "github.com/gizak/termui"
-	"github.com/qmu/mcc/utils"
+	version "github.com/hashicorp/go-version"
 	yaml "gopkg.in/yaml.v1"
 )
 
 // ConfigManager load and unmarshal config file
 type ConfigManager struct {
-	LoadedData *Config
+	config  *Config
+	options *ConfigManagerOptions
+}
+
+// ConfigManagerOptions is some options for ConfigManager constructor
+type ConfigManagerOptions struct {
+	configPath          string
+	appVersion          string
+	configSchemaVersion string
 }
 
 // Config is the root schema of config file
@@ -37,15 +46,14 @@ type Col struct {
 
 // Widget is the schema implements Config.Widgets
 type Widget struct {
-	Title      string
-	Col        int
-	Height     string // percent
-	RealHeight int
-	RealWidth  int
-	Type       string
-	IssueRegex string `yaml:"issue_regex"`
-	Content    interface{}
-	Path       string
+	Title          string
+	Col            int
+	Height         string // percent
+	Type           string
+	IssueRegex     string `yaml:"issue_regex"`
+	Content        interface{}
+	Path           string
+	extendedWidget *ExtendedWidget
 }
 
 // Menu is the schema implements Config.Widgets.Menu
@@ -64,32 +72,42 @@ type Container struct {
 }
 
 // NewConfigManager constructs a ConfigManager
-func NewConfigManager(path string) (c *ConfigManager, err error) {
+func NewConfigManager(opt *ConfigManagerOptions) (c *ConfigManager, err error) {
 	c = new(ConfigManager)
-	file, err := ioutil.ReadFile(path)
+	c.options = opt
+	file, err := ioutil.ReadFile(opt.configPath)
 	if err != nil {
 		return
 	}
-	if err = yaml.Unmarshal(file, &c.LoadedData); err != nil {
+	err = yaml.Unmarshal(file, &c.config)
+	if err != nil {
 		return
 	}
-	windowH := ui.TermHeight() - 1
-	windowW := ui.TermWidth() - 1
-	for i1, row := range c.LoadedData.Rows {
-		rowH := utils.Percentalize(windowH, row.Height)
-		for i2, col := range row.Cols {
-			cntH := 0
-			for i3, w := range col.Widgets {
-				if len(col.Widgets)-1 == i3 {
-					c.LoadedData.Rows[i1].Cols[i2].Widgets[i3].RealHeight = rowH - cntH
-				} else {
-					widgetH := utils.Percentalize(rowH, w.Height)
-					c.LoadedData.Rows[i1].Cols[i2].Widgets[i3].RealHeight = widgetH
-					cntH += widgetH
-				}
-				c.LoadedData.Rows[i1].Cols[i2].Widgets[i3].RealWidth = windowW / len(row.Cols)
-			}
-		}
+
+	// check ConfigSchemaVersion
+	if err = c.checkConfigScheme(); err != nil {
+		return
+	}
+
+	return
+}
+
+func (c *ConfigManager) checkConfigScheme() (err error) {
+	vApp, err := version.NewVersion(c.options.configSchemaVersion)
+	vConfig, err := version.NewVersion(c.config.SchemaVersion)
+	if err != nil {
+		return
+	}
+	if vConfig.LessThan(vApp) {
+		fmt.Printf("mcc %s supports schema_version %s but ths schema_version in %s seems to be %s\n", c.options.appVersion, vApp, c.options.configPath, vConfig)
+		fmt.Printf("please upgrade mcc or %s first\n", c.options.configPath)
+		os.Exit(1)
 	}
 	return
+}
+
+// GetConfig is
+func (c *ConfigManager) GetConfig() *Config {
+	return c.config
+
 }

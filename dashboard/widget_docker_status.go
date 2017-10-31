@@ -16,7 +16,7 @@ import (
 
 // DockerStatusWidget is a command launcher
 type DockerStatusWidget struct {
-	widget     Widget
+	options    *WidgetOptions
 	gauges     []gaugeModel
 	isReady    bool
 	disabled   bool
@@ -34,9 +34,10 @@ type gaugeModel struct {
 }
 
 // NewDockerStatusWidget constructs a New DockerStatusWidget
-func NewDockerStatusWidget(wi Widget) (n *DockerStatusWidget, err error) {
+func NewDockerStatusWidget(opt *WidgetOptions) (n *DockerStatusWidget, err error) {
 	n = new(DockerStatusWidget)
-	if err := m2s.Decode(wi.Content, &n.containers); err != nil {
+	n.options = opt
+	if err := m2s.Decode(n.options.GetContent(), &n.containers); err != nil {
 		return nil, err
 	}
 	endpoint := "unix:///var/run/docker.sock"
@@ -44,7 +45,6 @@ func NewDockerStatusWidget(wi Widget) (n *DockerStatusWidget, err error) {
 	if err != nil {
 		return nil, err
 	}
-	n.widget = wi
 	if err = n.buildGauges(); err != nil {
 		return nil, err
 	}
@@ -56,8 +56,8 @@ func (n *DockerStatusWidget) buildGauges() (err error) {
 	for _, v := range n.containers {
 		g := ui.NewGauge()
 		g.Percent = 0
-		g.Width = n.widget.RealWidth
-		g.Height = n.widget.RealHeight / l
+		g.Width = n.options.GetWidth()
+		g.Height = n.options.GetHeight() / l
 		g.BorderLabelFg = ui.ColorWhite
 		var metrics string
 		if v.Metrics == "cpu" {
@@ -70,10 +70,10 @@ func (n *DockerStatusWidget) buildGauges() (err error) {
 			return errors.New(v.Metrics + " is not available for the type of docker_status widget")
 		}
 		lbl := v.Name + " (" + v.Container + ")" + " - " + metrics
-		if n.widget.Title == "" {
+		if n.options.GetTitle() == "" {
 			g.BorderLabel = lbl
 		} else {
-			g.BorderLabel = n.widget.Title + " - " + lbl
+			g.BorderLabel = n.options.GetTitle() + " - " + lbl
 		}
 		g.Label = "fetching... "
 		g.LabelAlign = ui.AlignRight
@@ -144,8 +144,8 @@ func (n *DockerStatusWidget) GetHighlightenPos() int {
 	return 100
 }
 
-// GetWidget is the implementation of widget.Activate
-func (n *DockerStatusWidget) GetWidget() []ui.GridBufferer {
+// GetGridBufferers is the implementation of widget.Activate
+func (n *DockerStatusWidget) GetGridBufferers() []ui.GridBufferer {
 	var gauges []ui.GridBufferer
 	for _, g := range n.gauges {
 		gauges = append(gauges, g.gauge)
@@ -243,10 +243,10 @@ func (n *DockerStatusWidget) getStats(id string) (s *docker.Stats, err error) {
 
 // GetWidth is the implementation of widget.Render
 func (n *DockerStatusWidget) GetWidth() int {
-	return n.widget.RealWidth
+	return n.options.GetWidth()
 }
 
 // GetHeight is the implementation of widget.Render
 func (n *DockerStatusWidget) GetHeight() int {
-	return n.widget.RealHeight
+	return n.options.GetHeight()
 }

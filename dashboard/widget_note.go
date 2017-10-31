@@ -12,23 +12,24 @@ import (
 
 // NoteWidget is a command launcher
 type NoteWidget struct {
+	options  *WidgetOptions
 	renderer *ListWrapper
 	isReady  bool
 	disabled bool
 }
 
 // NewNoteWidget constructs a New NoteWidget
-func NewNoteWidget(wi Widget, execPath string) (n *NoteWidget, err error) {
+func NewNoteWidget(opt *WidgetOptions) (n *NoteWidget, err error) {
 	n = new(NoteWidget)
-
+	n.options = opt
 	var note string
-	if wi.Type == "text_file" {
+	if n.options.extendedWidget.widgetType == "text_file" {
 		// for TextFile Widget
 		var path string
-		if wi.Path[0:1] == "/" {
-			path = wi.Path
+		if n.options.extendedWidget.widget.Path[0:1] == "/" {
+			path = n.options.extendedWidget.widget.Path
 		} else {
-			path = "./" + execPath + "/" + wi.Path
+			path = "./" + n.options.execPath + "/" + n.options.extendedWidget.widget.Path
 		}
 		b, err := ioutil.ReadFile(path)
 
@@ -38,7 +39,7 @@ func NewNoteWidget(wi Widget, execPath string) (n *NoteWidget, err error) {
 		note = string(b)
 	} else {
 		// for Note Widget
-		if err := m2s.Decode(wi.Content, &note); err != nil {
+		if err := m2s.Decode(n.options.extendedWidget.GetContent(), &note); err != nil {
 			return nil, err
 		}
 	}
@@ -50,12 +51,12 @@ func NewNoteWidget(wi Widget, execPath string) (n *NoteWidget, err error) {
 		item = rep.ReplaceAllString(item, "[$1](fg-blue)")
 		body = append(body, " "+item)
 	}
-	opt := &ListWrapperOption{
-		Title:      wi.Title,
-		RealHeight: wi.RealHeight,
+	lopt := &ListWrapperOption{
+		Title:      n.options.GetTitle(),
+		RealHeight: n.options.GetHeight(),
 		Body:       body,
 	}
-	n.renderer = NewListWrapper(opt)
+	n.renderer = NewListWrapper(lopt)
 	n.isReady = true
 
 	return
@@ -86,22 +87,22 @@ func (n *NoteWidget) GetHighlightenPos() int {
 	return n.renderer.GetCursor()
 }
 
-// GetWidget is the implementation of widget.Activate
-func (n *NoteWidget) GetWidget() []ui.GridBufferer {
+// GetGridBufferers is the implementation of stack.Activate
+func (n *NoteWidget) GetGridBufferers() []ui.GridBufferer {
 	return []ui.GridBufferer{n.renderer.GetWidget()}
 }
 
-// Render is the implementation of widget.Render
+// Render is the implementation of stack.Render
 func (n *NoteWidget) Render() (err error) {
 	return
 }
 
-// GetWidth is the implementation of widget.Render
+// GetWidth is the implementation of stack.Render
 func (n *NoteWidget) GetWidth() int {
 	return n.renderer.GetWidth()
 }
 
-// GetHeight is the implementation of widget.Render
+// GetHeight is the implementation of stack.Render
 func (n *NoteWidget) GetHeight() int {
 	return n.renderer.GetHeight()
 }

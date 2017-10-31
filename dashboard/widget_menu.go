@@ -18,6 +18,7 @@ import (
 
 // MenuWidget is a command launcher
 type MenuWidget struct {
+	options      *WidgetOptions
 	renderer     *ListWrapper
 	menus        []Menu
 	headerHeight int
@@ -27,22 +28,23 @@ type MenuWidget struct {
 }
 
 // NewMenuWidget constructs a New MenuWidget
-func NewMenuWidget(wi Widget, envs []map[string]string) (m *MenuWidget, err error) {
+func NewMenuWidget(opt *WidgetOptions) (m *MenuWidget, err error) {
 	m = new(MenuWidget)
-	if err := m2s.Decode(wi.Content, &m.menus); err != nil {
+	m.options = opt
+	if err := m2s.Decode(opt.extendedWidget.GetContent(), &m.menus); err != nil {
 		return nil, err
 	}
 	h := m.buildHeader()
 	m.headerHeight = len(h)
-	m.envs = envs
-	opt := &ListWrapperOption{
-		Title:         wi.Title,
-		RealHeight:    wi.RealHeight,
+	m.envs = m.options.envs
+	lopt := &ListWrapperOption{
+		Title:         m.options.GetTitle(),
+		RealHeight:    m.options.GetHeight(),
 		Header:        h,
 		Body:          m.buildBody(),
 		LineHighLight: true,
 	}
-	m.renderer = NewListWrapper(opt)
+	m.renderer = NewListWrapper(lopt)
 	m.isReady = true
 
 	return
@@ -74,8 +76,8 @@ func (m *MenuWidget) GetHighlightenPos() int {
 	return m.renderer.GetCursor() + m.headerHeight
 }
 
-// GetWidget is the implementation of widget.Activate
-func (m *MenuWidget) GetWidget() []ui.GridBufferer {
+// GetGridBufferers is the implementation of stack.Activate
+func (m *MenuWidget) GetGridBufferers() []ui.GridBufferer {
 	return []ui.GridBufferer{m.renderer.GetWidget()}
 }
 
@@ -195,17 +197,17 @@ func (m *MenuWidget) getLongest() (n1 int, n2 int, n3 int) {
 	return n1, n2, n3
 }
 
-// Render is the implementation of widget.Render
+// Render is the implementation of stack.Render
 func (m *MenuWidget) Render() (err error) {
 	return
 }
 
-// GetWidth is the implementation of widget.Render
+// GetWidth is the implementation of stack.Render
 func (m *MenuWidget) GetWidth() int {
 	return m.renderer.GetWidth()
 }
 
-// GetHeight is the implementation of widget.Render
+// GetHeight is the implementation of stack.Render
 func (m *MenuWidget) GetHeight() int {
 	return m.renderer.GetHeight()
 }

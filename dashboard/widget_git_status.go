@@ -17,12 +17,11 @@ import (
 
 // GitStatusWidget is a command launcher
 type GitStatusWidget struct {
+	options     *WidgetOptions
 	renderer    *ListWrapper
 	isReady     bool
 	disabled    bool
 	statusItems StatusItems
-	envs        []map[string]string
-	execPath    string
 }
 
 // StatusItem is a struct which stores each file status of git status
@@ -68,20 +67,19 @@ func (b ByPath) Less(i, j int) bool {
 }
 
 // NewGitStatusWidget constructs a New GitStatusWidget
-func NewGitStatusWidget(wi Widget, execPath string, envs []map[string]string) (g *GitStatusWidget, err error) {
+func NewGitStatusWidget(opt *WidgetOptions) (g *GitStatusWidget, err error) {
 	g = new(GitStatusWidget)
-	g.envs = envs
-	g.execPath = execPath
+	g.options = opt
 
 	header := g.buildHeader()
 
-	opt := &ListWrapperOption{
-		Title:         wi.Title,
-		RealHeight:    wi.RealHeight,
+	lopt := &ListWrapperOption{
+		Title:         g.options.GetTitle(),
+		RealHeight:    g.options.GetHeight(),
 		Header:        header,
 		LineHighLight: true,
 	}
-	g.renderer = NewListWrapper(opt)
+	g.renderer = NewListWrapper(lopt)
 	g.isReady = true
 
 	return
@@ -251,8 +249,8 @@ func (g *GitStatusWidget) GetHighlightenPos() int {
 	return g.renderer.GetCursor()
 }
 
-// GetWidget is the implementation of widget.Activate
-func (g *GitStatusWidget) GetWidget() []ui.GridBufferer {
+// GetGridBufferers is the implementation of widget.Activate
+func (g *GitStatusWidget) GetGridBufferers() []ui.GridBufferer {
 	return []ui.GridBufferer{g.renderer.GetWidget()}
 }
 
@@ -268,7 +266,7 @@ func (g *GitStatusWidget) setKeyBindings() error {
 		if hasEditor {
 			editorCmd = os.Getenv("EDITOR")
 		}
-		for _, env := range g.envs {
+		for _, env := range g.options.envs {
 			if env["name"] == "EDITOR" {
 				hasEditor = true
 				editorCmd = env["value"]
@@ -282,7 +280,7 @@ func (g *GitStatusWidget) setKeyBindings() error {
 			cmd := exec.Command(editorCmd, g.statusItems[cursor].Path)
 			// load env vars
 			cmd.Env = os.Environ()
-			for _, env := range g.envs {
+			for _, env := range g.options.envs {
 				cmd.Env = append(cmd.Env, env["name"]+"="+env["value"])
 			}
 			cmd.Stdin = os.Stdin
@@ -300,7 +298,7 @@ func (g *GitStatusWidget) setKeyBindings() error {
 
 // Render is the implementation of widget.Render
 func (g *GitStatusWidget) Render() (err error) {
-	body, err := g.buildBody(g.execPath)
+	body, err := g.buildBody(g.options.execPath)
 	if err != nil {
 		return
 	}
