@@ -28,7 +28,15 @@ type Config struct {
 	Timezone      string
 	GitHubHost    string `yaml:"github_url"`
 	Envs          []map[string]string
-	Rows          []Row
+	Widgets       []Widget
+	Layout        []Tab
+}
+
+// Tab is the schema implements Config.Widgets.Section
+type Tab struct {
+	Section string
+	Name    string
+	Rows    []Row
 }
 
 // Row is the schema implements Config.Widgets.Section
@@ -42,10 +50,12 @@ type Row struct {
 type Col struct {
 	Section string
 	Widgets []Widget
+	Stacks  []string
 }
 
 // Widget is the schema implements Config.Widgets
 type Widget struct {
+	ID             string
 	Title          string
 	Col            int
 	Height         string // percent
@@ -109,5 +119,4 @@ func (c *ConfigManager) checkConfigScheme() (err error) {
 // GetConfig is
 func (c *ConfigManager) GetConfig() *Config {
 	return c.config
-
 }

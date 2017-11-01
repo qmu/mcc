@@ -63,6 +63,7 @@ func (n *TailFileWidget) tail() (err error) {
 			Location: &loc,
 			ReOpen:   true,
 			Follow:   true,
+			Logger:   tail.DiscardingLogger,
 		})
 		if err != nil {
 			return

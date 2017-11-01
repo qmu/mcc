@@ -11,17 +11,30 @@ type ExtendedWidget struct {
 	index        int
 	widget       Widget
 	widgetType   string
+	tab          int
 	row          int
 	col          int
 	stack        int
 	vOffset      int
 	height       int
 	width        int
+	point        Point
 	widgetter    Widgetter
-	widthFrom    int
-	widthTo      int
+	widthFrom    int // int of percentage e.g. 33(%)
+	widthTo      int // int of percentage e.g. 66(%)
 	title        string
 	githubWidget *GithubIssueWidget
+
+	bottomWidget *ExtendedWidget
+	topWidget    *ExtendedWidget
+	leftWidget   *ExtendedWidget
+	rightWidget  *ExtendedWidget
+}
+
+// Point is
+type Point struct {
+	x int
+	y int
 }
 
 // Widgetter define common interface for each widgets

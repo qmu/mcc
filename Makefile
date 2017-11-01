@@ -1,6 +1,6 @@
 NAME := mcc
 VERSION := v0.9.5
-CONFIG_SCHEMA_VERSION := v1.0.0
+CONFIG_SCHEMA_VERSION := v1.1.0
 SRCS      := $(shell find . -name '*.go' -type f)
 LDFLAGS   := -ldflags "-X main.Version=$(VERSION) -X main.ConfigSchemaVersion=$(CONFIG_SCHEMA_VERSION)"
 GH_UPLOAD := github-release upload --user qmu --repo $(NAME) --tag $(VERSION)

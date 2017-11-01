@@ -2,6 +2,8 @@ package dashboard
 
 import (
 	"path/filepath"
+	"strconv"
+	"strings"
 
 	ui "github.com/gizak/termui"
 	"github.com/qmu/mcc/github"
@@ -9,13 +11,13 @@ import (
 
 // Dashboard controls termui's widget layout and keybindings
 type Dashboard struct {
-	execPath      string
-	config        *Config
-	widgetManager *WidgetManager
-	githubWidgets []*GithubIssueWidget
-	client        *github.Client
-	header        *ui.Par // for debug
-	active        int
+	execPath          string
+	config            *Config
+	widgetManager     *WidgetManager
+	githubWidgets     []*GithubIssueWidget
+	client            *github.Client
+	activeTabIndex    int
+	activeWidgetIndex int
 }
 
 // NewDashboard constructs a new Dashboard
@@ -31,6 +33,7 @@ func NewDashboard(appVersion string, configSchemaVersion string, configPath stri
 
 	// init widgetManager
 	d.widgetManager, err = NewWidgetManager(&WidgetManagerOptions{
+		execPath:            d.execPath,
 		configPath:          configPath,
 		appVersion:          appVersion,
 		configSchemaVersion: configSchemaVersion,
@@ -40,28 +43,8 @@ func NewDashboard(appVersion string, configSchemaVersion string, configPath stri
 	}
 	d.config = d.widgetManager.config
 
-	// initialize interface
-	if err = d.prepareUI(); err != nil {
-		return
-	}
-
-	ui.Loop()
-	return
-}
-
-func (d *Dashboard) prepareUI() (err error) {
-	// layout header and body
-	d.layoutHeader()
-	if err = d.layoutWidgets(); err != nil {
-		return
-	}
-
-	// deactivate all, and activate first widget
-	widgets := d.widgetManager.GetAllWidgets()
-	for _, w := range widgets {
-		d.deactivate(w)
-	}
-	d.activate(widgets[0])
+	// layout first tab
+	d.switchTab(0)
 
 	// init asynchronously
 	if d.widgetManager.HasWidget("github_issue") {
@@ -76,41 +59,64 @@ func (d *Dashboard) prepareUI() (err error) {
 			}
 		}()
 	}
-	return nil
+
+	ui.Loop()
+	return
 }
 
-func (d *Dashboard) layoutHeader() {
-	header := ui.NewPar("Press q to quit, Press C-[j,k,h,l] to switch widget, Press j or k to move cursor")
-	header.Height = 1
-	header.Border = false
-	header.TextFgColor = ui.ColorWhite
+func (d *Dashboard) switchTab(idx int) {
+	if idx > len(d.config.Layout)-1 {
+		return
+	}
+	tab := d.config.Layout[idx]
+	d.activeTabIndex = idx
+	// layout header and body
+	if err := d.layout(tab); err != nil {
+		panic(err)
+	}
+}
+
+func (d *Dashboard) layout(tab Tab) (err error) {
+	ui.Clear()
+	ui.Body.Rows = ui.Body.Rows[:0]
+
+	// header
+	// header := ui.NewPar("Press q to quit, Press C-[j,k,h,l] to switch widget")
+	// header.Height = 1
+	// header.Border = false
+	// header.TextFgColor = ui.ColorWhite
+
+	tabs := []*ui.Row{}
+	for i, t := range d.config.Layout {
+		tabP := ui.NewList()
+		color := "(fg-white,bg-default)"
+		if tab.Name == t.Name {
+			color = "(fg-white,bg-blue)"
+		}
+		space := strings.Repeat(" ", 500)
+		tabP.Items = []string{"[ " + strconv.Itoa(i+1) + "." + t.Name + space + "]" + color}
+		tabP.Height = 3
+		tabP.Border = true
+		tabP.BorderFg = ui.ColorBlue
+		tabs = append(tabs, ui.NewCol(2, 0, tabP))
+	}
+
 	ui.Body.AddRows(
-		ui.NewRow(
-			ui.NewCol(12, 0, header)))
-	d.header = header
-}
+		ui.NewRow(tabs...))
 
-func (d *Dashboard) layoutWidgets() (err error) {
+	// body
 	cnt := 0
 	var newRows []*ui.Row
-	for _, row := range d.config.Rows {
+	d.githubWidgets = []*GithubIssueWidget{}
+	for _, row := range tab.Rows {
 		var newCols []*ui.Row
 		for _, col := range row.Cols {
 			var cols []ui.GridBufferer
 			for _, w := range col.Widgets {
-				ew := w.extendedWidget
-				err = ew.Vary(&WidgetOptions{
-					envs:     d.config.Envs,
-					execPath: d.execPath,
-					timezone: d.config.Timezone,
-				})
-				if err != nil {
-					return err
-				}
-				gw := ew.GetGridBufferers()
+				gw := w.extendedWidget.GetGridBufferers()
 				cols = append(cols, gw...)
 				if w.Type == "github_issue" {
-					d.githubWidgets = append(d.githubWidgets, ew.githubWidget)
+					d.githubWidgets = append(d.githubWidgets, w.extendedWidget.githubWidget)
 				}
 				cnt++
 			}
@@ -122,6 +128,13 @@ func (d *Dashboard) layoutWidgets() (err error) {
 	ui.Body.AddRows(newRows...)
 	ui.Body.Align()
 	ui.Render(ui.Body)
+
+	// deactivate all, and activate first widget
+	widgets := d.widgetManager.GetAllWidgets()
+	for _, w := range widgets {
+		w.Deactivate()
+	}
+	d.activateFirstWidgetOnTab(tab)
 
 	return nil
 }
@@ -177,6 +190,43 @@ func (d *Dashboard) setKeyBindings() error {
 	ui.Handle("/sys/kbd/C-l", func(ui.Event) {
 		d.rightColWidget()
 	})
+	// press 1 to switch tab
+	ui.Handle("/sys/kbd/1", func(ui.Event) {
+		d.switchTab(0)
+	})
+	// press 2 to switch tab
+	ui.Handle("/sys/kbd/2", func(ui.Event) {
+		d.switchTab(1)
+	})
+	// press 3 to switch tab
+	ui.Handle("/sys/kbd/3", func(ui.Event) {
+		d.switchTab(2)
+	})
+	// press 4 to switch tab
+	ui.Handle("/sys/kbd/4", func(ui.Event) {
+		d.switchTab(3)
+	})
+	// press 5 to switch tab
+	ui.Handle("/sys/kbd/5", func(ui.Event) {
+		d.switchTab(4)
+	})
+	// press 6 to switch tab
+	ui.Handle("/sys/kbd/6", func(ui.Event) {
+		d.switchTab(5)
+	})
+	// press 7 to switch tab
+	ui.Handle("/sys/kbd/7", func(ui.Event) {
+		d.switchTab(6)
+	})
+	// press 8 to switch tab
+	ui.Handle("/sys/kbd/8", func(ui.Event) {
+		d.switchTab(7)
+	})
+	// press 9 to switch tab
+	ui.Handle("/sys/kbd/9", func(ui.Event) {
+		d.switchTab(8)
+	})
+
 	ui.Handle("/sys/wnd/resize", func(e ui.Event) {
 		ui.Body.Width = ui.TermWidth()
 		ui.Body.Align()
@@ -197,56 +247,58 @@ func (d *Dashboard) setKeyBindings() error {
 	return nil
 }
 
+func (d *Dashboard) activateFirstWidgetOnTab(tab Tab) {
+	w := d.widgetManager.GetWidgetByIndex(d.activeWidgetIndex)
+	if w != nil {
+		for _, r := range tab.Rows {
+			for _, c := range r.Cols {
+				for _, wi := range c.Widgets {
+					if !wi.extendedWidget.IsDisabled() && wi.extendedWidget.IsReady() {
+						w.Deactivate()
+						d.activate(wi.extendedWidget)
+						return
+					}
+				}
+			}
+		}
+	}
+}
+
+func (d *Dashboard) activate(w *ExtendedWidget) {
+	ui.ResetHandlers()
+	w.Activate()
+	d.setKeyBindings()
+	d.activeWidgetIndex = w.index
+}
+
 func (d *Dashboard) downerRowWidget() {
-	w1 := d.widgetManager.GetWidgetByIndex(d.active)
-	w2 := d.widgetManager.GetDownerWidget(d.active)
-	if w1 != nil && w2 != nil {
-		d.deactivate(w1)
-		d.activate(w2)
+	w := d.widgetManager.GetWidgetByIndex(d.activeWidgetIndex)
+	if w != nil && w.bottomWidget != nil {
+		w.Deactivate()
+		d.activate(w.bottomWidget)
 	}
 }
 
 func (d *Dashboard) upperRowWidget() {
-	w1 := d.widgetManager.GetWidgetByIndex(d.active)
-	w2 := d.widgetManager.GetUpperWidget(d.active)
-	if w1 != nil && w2 != nil {
-		d.deactivate(w1)
-		d.activate(w2)
+	w := d.widgetManager.GetWidgetByIndex(d.activeWidgetIndex)
+	if w != nil && w.topWidget != nil {
+		w.Deactivate()
+		d.activate(w.topWidget)
 	}
 }
 
 func (d *Dashboard) rightColWidget() {
-	w1 := d.widgetManager.GetWidgetByIndex(d.active)
-	w2 := d.widgetManager.GetRightWidget(d.active)
-	if w1 != nil && w2 != nil {
-		d.deactivate(w1)
-		d.activate(w2)
+	w := d.widgetManager.GetWidgetByIndex(d.activeWidgetIndex)
+	if w != nil && w.rightWidget != nil {
+		w.Deactivate()
+		d.activate(w.rightWidget)
 	}
 }
 
 func (d *Dashboard) leftColWidget() {
-	w1 := d.widgetManager.GetWidgetByIndex(d.active)
-	w2 := d.widgetManager.GetLeftWidget(d.active)
-	if w1 != nil && w2 != nil {
-		d.deactivate(w1)
-		d.activate(w2)
-	}
-}
-
-func (d *Dashboard) deactivate(w *ExtendedWidget) {
-	w.Deactivate()
-	ui.ResetHandlers()
-}
-
-func (d *Dashboard) activate(w *ExtendedWidget) {
-	w.Activate()
-	d.setKeyBindings()
-	total := d.widgetManager.GetAllWidgetsCount()
-	if w.index > total-1 {
-		d.active = 0
-	} else if w.index < 0 {
-		d.active = total - 1
-	} else {
-		d.active = w.index
+	w := d.widgetManager.GetWidgetByIndex(d.activeWidgetIndex)
+	if w != nil && w.leftWidget != nil {
+		w.Deactivate()
+		d.activate(w.leftWidget)
 	}
 }

@@ -1,7 +1,13 @@
 package dashboard
 
-import "github.com/qmu/mcc/utils"
-import ui "github.com/gizak/termui"
+import (
+	"errors"
+	"math"
+	"strconv"
+
+	ui "github.com/gizak/termui"
+	"github.com/qmu/mcc/utils"
+)
 
 // WidgetManager load and unmarshal config file
 type WidgetManager struct {
@@ -13,6 +19,7 @@ type WidgetManager struct {
 
 // WidgetManagerOptions is some options for ConfigManager constructor
 type WidgetManagerOptions struct {
+	execPath            string
 	configPath          string
 	appVersion          string
 	configSchemaVersion string
@@ -33,51 +40,196 @@ func NewWidgetManager(opt *WidgetManagerOptions) (w *WidgetManager, err error) {
 		return
 	}
 	w.config = w.configManager.GetConfig()
-
+	err = w.loadWidgetsToLayout()
+	if err != nil {
+		return
+	}
 	w.constructRealWidgets()
+	w.calcDistances()
 
 	return
 }
 
-func (c *WidgetManager) constructRealWidgets() {
-	windowH := ui.TermHeight() - 1
-	windowW := ui.TermWidth() - 1
-	idx := 0
-	for i1, row := range c.config.Rows {
-		rowH := utils.Percentalize(windowH, row.Height)
-		for i2, col := range row.Cols {
-			cntH := 0
-			offset := 1
-			for i3, w := range col.Widgets {
-				realWidth := windowW / len(row.Cols)
-				realHeight := 0
-				if len(col.Widgets)-1 == i3 {
-					realHeight = rowH - cntH
-				} else {
-					realHeight = utils.Percentalize(rowH, w.Height)
-					cntH += realHeight
+func (c *WidgetManager) loadWidgetsToLayout() (err error) {
+	for i1, tab := range c.config.Layout {
+		for i2, row := range tab.Rows {
+			for i3, col := range row.Cols {
+				for _, s := range col.Stacks {
+					wi, err := c.getWidgetByID(s)
+					if err != nil {
+						return err
+					}
+					c.config.Layout[i1].Rows[i2].Cols[i3].Widgets = append(c.config.Layout[i1].Rows[i2].Cols[i3].Widgets, wi)
 				}
-				rw := &ExtendedWidget{
-					index:      idx,
-					widget:     w,
-					widgetType: w.Type,
-					row:        i1,
-					col:        i2,
-					stack:      i3,
-					vOffset:    offset,
-					height:     realHeight,
-					width:      realWidth,
-					widthFrom:  100 / len(row.Cols) * i2,
-					widthTo:    100 / len(row.Cols) * (i2 + 1),
-					title:      w.Title,
-				}
-				c.exWidgets = append(c.exWidgets, rw)
-				c.config.Rows[i1].Cols[i2].Widgets[i3].extendedWidget = rw
-				offset += realHeight
-				idx++
 			}
 		}
 	}
+	return
+}
+
+func (c *WidgetManager) constructRealWidgets() (err error) {
+	windowH := ui.TermHeight() - 1
+	windowW := ui.TermWidth() - 1
+	idx := 0
+	for i1, tab := range c.config.Layout {
+		rowHTotal := 0
+		for i2, row := range tab.Rows {
+			rowH := utils.Percentalize(windowH, row.Height)
+			for i3, col := range row.Cols {
+				cntH := 0
+				offset := 1
+				stackHTotal := 0
+				for i4, w := range col.Widgets {
+					realWidth := windowW / len(row.Cols)
+					realHeight := 0
+					if len(col.Widgets)-1 == i3 {
+						realHeight = rowH - cntH
+					} else {
+						realHeight = utils.Percentalize(rowH, w.Height)
+						cntH += realHeight
+					}
+					rw := &ExtendedWidget{
+						index:      idx,
+						widget:     w,
+						widgetType: w.Type,
+						tab:        i1,
+						row:        i2,
+						col:        i3,
+						stack:      i4,
+						vOffset:    offset,
+						height:     realHeight,
+						width:      realWidth,
+						point: Point{
+							x: windowW/len(row.Cols)*i3 + (realWidth / 2),
+							y: rowHTotal + stackHTotal + (realHeight / 2),
+						},
+						widthFrom: 100 / len(row.Cols) * i3,
+						widthTo:   100 / len(row.Cols) * (i3 + 1),
+						title:     w.Title,
+					}
+					rw.title += "   x:" + strconv.Itoa(rw.point.x) + " y:" + strconv.Itoa(rw.point.y)
+
+					err := rw.Vary(&WidgetOptions{
+						envs:     c.config.Envs,
+						execPath: c.options.execPath,
+						timezone: c.config.Timezone,
+					})
+					if err != nil {
+						return err
+					}
+
+					c.exWidgets = append(c.exWidgets, rw)
+					c.config.Layout[i1].Rows[i2].Cols[i3].Widgets[i4].extendedWidget = rw
+					offset += realHeight
+					idx++
+					stackHTotal += realHeight
+				}
+			}
+			rowHTotal += rowH
+		}
+	}
+	return
+}
+
+func (c *WidgetManager) calcDistances() {
+	type distance struct {
+		from    *ExtendedWidget
+		to      *ExtendedWidget
+		toX     int
+		toY     int
+		toTab   int
+		toIndex int
+		value   float64
+	}
+	distances := []*distance{}
+	for i1, w1 := range c.exWidgets {
+		for i2, w2 := range c.exWidgets {
+			if i1 != i2 && i1 < i2 && w1.tab == w2.tab {
+				distances = append(distances, &distance{
+					from:    w1,
+					to:      w2,
+					toX:     w2.point.x,
+					toY:     w2.point.y,
+					toTab:   w2.tab,
+					toIndex: w2.index,
+					value:   c.vectorDistance(w1.point, w2.point),
+				})
+			}
+		}
+	}
+	for _, w := range c.exWidgets {
+		// bottom
+		var nearest *distance
+		for _, d := range distances {
+			if w.tab == d.toTab && w.index != d.toIndex && w.point.y < d.toY && math.Abs(float64(d.to.point.x-w.point.x)) < float64(w.width/2) {
+				if nearest == nil || nearest.value > d.value {
+					nearest = d
+				}
+			}
+		}
+		if nearest != nil {
+			w.bottomWidget = nearest.to
+		}
+
+		// top
+		nearest = nil
+		for _, d := range distances {
+			if w.tab == d.toTab && w.index != d.toIndex && w.point.y > d.toY && math.Abs(float64(d.to.point.x-w.point.x)) < float64(w.width/2) {
+				if nearest == nil || nearest.value > d.value {
+					nearest = d
+				}
+			}
+		}
+		if nearest != nil {
+			w.topWidget = nearest.to
+		}
+
+		// right
+		nearest = nil
+		for _, d := range distances {
+			if w.tab == d.toTab && w.index != d.toIndex && w.point.x < d.toX {
+				if nearest == nil || nearest.value > d.value {
+					nearest = d
+				}
+			}
+		}
+		if nearest != nil {
+			w.rightWidget = nearest.to
+		}
+
+		// left
+		nearest = nil
+		for _, d := range distances {
+			if w.tab == d.toTab && w.index != d.toIndex && w.point.x > d.toX {
+				if nearest == nil || nearest.value > d.value {
+					nearest = d
+				}
+			}
+		}
+		if nearest != nil {
+			w.leftWidget = nearest.to
+		}
+	}
+
+}
+
+func (c *WidgetManager) vectorDistance(fromPoint Point, toPoint Point) (distance float64) {
+	x1 := fromPoint.x
+	y1 := fromPoint.y
+	x2 := toPoint.x
+	y2 := toPoint.y
+	distance = math.Pow(float64((x2-x1)*(x2-x1)+(y2-y1)*(y2-y1)), 0.5)
+	return
+}
+
+func (c *WidgetManager) getWidgetByID(id string) (result Widget, err error) {
+	for _, d := range c.config.Widgets {
+		if d.ID == id {
+			result = d
+			return
+		}
+	}
+	return result, errors.New("no widget named " + id)
 }
 
 // HasWidget returns whether config contains 'widgetType' stack or not
@@ -89,95 +241,6 @@ func (c *WidgetManager) HasWidget(widgetType string) bool {
 		}
 	}
 	return result
-}
-
-// GetDownerWidget is
-func (c *WidgetManager) GetDownerWidget(from int) (result *ExtendedWidget) {
-	cw := c.exWidgets[from]
-	if cw.index == len(c.exWidgets)-1 {
-		return c.exWidgets[0]
-	}
-	for i := 0; i < len(c.exWidgets); i++ {
-		w := c.exWidgets[i]
-		if !w.IsReady() || w.IsDisabled() {
-			continue
-		}
-		cond1 := cw.row == w.row && cw.col == w.col && w.stack == cw.stack+1
-		cond2 := cw.row < w.row && w.stack == 0 && w.widthFrom <= cw.widthFrom && cw.widthFrom <= w.widthTo
-		if cond1 || cond2 {
-			result = w
-			return
-		}
-	}
-	return
-}
-
-// GetUpperWidget is
-func (c *WidgetManager) GetUpperWidget(from int) (result *ExtendedWidget) {
-	cw := c.exWidgets[from]
-	if cw.row == 0 && cw.stack == 0 {
-		return c.exWidgets[len(c.exWidgets)-1]
-	}
-	for i := len(c.exWidgets) - 1; i >= 0; i-- {
-		w := c.exWidgets[i]
-		if !w.IsReady() || w.IsDisabled() {
-			continue
-		}
-		if i < from {
-			cond1 := w.row == cw.row && w.col == cw.col && w.stack == cw.stack-1
-			cond2 := w.row < cw.row && w.widthFrom <= cw.widthFrom && cw.widthFrom <= w.widthTo
-			if cond1 || cond2 {
-				result = w
-				return
-			}
-		}
-	}
-	return
-}
-
-// GetRightWidget is
-func (c *WidgetManager) GetRightWidget(from int) (result *ExtendedWidget) {
-	col := 0
-	cw := c.exWidgets[from]
-	cursor := cw.GetHighlightenPos()
-	myPosition := cw.vOffset + cursor
-	for i, w := range c.exWidgets {
-		if !w.IsReady() || w.IsDisabled() {
-			continue
-		}
-		if w.row == cw.row && i > from && col < w.col {
-			if myPosition >= w.vOffset && myPosition <= w.vOffset+w.height {
-				result = w
-				return
-			}
-		} else {
-			col = w.col
-		}
-	}
-	return
-}
-
-// GetLeftWidget is
-func (c *WidgetManager) GetLeftWidget(from int) (result *ExtendedWidget) {
-	col := c.exWidgets[len(c.exWidgets)-1].col
-	cw := c.exWidgets[from]
-	cursor := cw.GetHighlightenPos()
-	myPosition := cw.vOffset + cursor
-	for i := len(c.exWidgets) - 1; i >= 0; i-- {
-		w := c.exWidgets[i]
-		if !w.IsReady() || w.IsDisabled() {
-			continue
-		}
-		if i < from && col > w.col && cw.row == w.row {
-			if myPosition >= w.vOffset && myPosition <= w.vOffset+w.height {
-				result = w
-				return
-			}
-		} else {
-			col = w.col
-		}
-	}
-	return
 }
 
 // GetWidgetByIndex is

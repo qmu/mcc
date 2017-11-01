@@ -58,6 +58,7 @@ func (n *DockerStatusWidget) buildGauges() (err error) {
 		g.Percent = 0
 		g.Width = n.options.GetWidth()
 		g.Height = n.options.GetHeight() / l
+		g.BorderFg = ui.ColorBlue
 		g.BorderLabelFg = ui.ColorWhite
 		var metrics string
 		if v.Metrics == "cpu" {
