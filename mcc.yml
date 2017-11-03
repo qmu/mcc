@@ -14,27 +14,27 @@ rows:
             - category: GitHub
               name: Project Home
               description: Open Github repository home by your browser
-              command: bin/lib/git-open/git-open origin master
+              command: _bin/lib/git-open/git-open origin master
             - category: GitHub
               name: Issue
               description: Open Github issue page you are on by your browser
-              command: bin/lib/github-issue-open/main
+              command: _bin/lib/github-issue-open/main
             - category: Go command
               name: Build
               description: build and distribute binary
-              command: bin/build
+              command: _bin/build
             - category: Go command
               name: Install
               description: go install github.com/qmu/mcc
-              command: bin/install
+              command: _bin/install
             - category: Go command
               name: Format
               description: go fmt to all codes
-              command: bin/go_fmt
+              command: _bin/go_fmt
             - category: Util
               name: Update mcc
               description: self updateing
-              command: bin/mcc --self-update
+              command: _bin/mcc --self-update
           - type: git_status
             title: GIT STATUS
             height: 40%

@@ -249,6 +249,34 @@ layout:
           - section: col
             stacks:
               - git_status
+      - section: row
+        height: 20%
+        cols:
+          - section: col
+            stacks:
+              - note
+
+          - section: col
+            stacks:
+              - text_file
+
+          - section: col
+            stacks:
+              - git_status
+      - section: row
+        height: 20%
+        cols:
+          - section: col
+            stacks:
+              - note
+
+          - section: col
+            stacks:
+              - text_file
+
+          - section: col
+            stacks:
+              - git_status
 
   - section: tab
     name: PRODUCTION MONITOR

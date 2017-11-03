@@ -1,4 +1,4 @@
-package dashboard
+package listable
 
 import ui "github.com/gizak/termui"
 

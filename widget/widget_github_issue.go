@@ -1,4 +1,4 @@
-package dashboard
+package widget
 
 import (
 	"fmt"
@@ -7,14 +7,15 @@ import (
 
 	ui "github.com/gizak/termui"
 	"github.com/qmu/mcc/github"
+	"github.com/qmu/mcc/widget/listable"
 	"golang.org/x/text/width"
 )
 
 // GithubIssueWidget is a stack which shows a issue
 // of the current branch referering its name including issue id
 type GithubIssueWidget struct {
-	options    *WidgetOptions
-	renderer   *ListWrapper
+	options    *Option
+	renderer   *listable.ListWrapper
 	active     bool
 	client     *github.Client
 	timezone   string
@@ -25,17 +26,17 @@ type GithubIssueWidget struct {
 }
 
 // NewGithubIssueWidget constructs a New GithubIssueWidget
-func NewGithubIssueWidget(opt *WidgetOptions) (g *GithubIssueWidget, err error) {
+func NewGithubIssueWidget(opt *Option) (g *GithubIssueWidget, err error) {
 	g = new(GithubIssueWidget)
 	g.options = opt
 	g.indent = 9
-	g.timezone = g.options.timezone
-	lopt := &ListWrapperOption{
+	g.timezone = g.options.Timezone
+	lopt := &listable.ListWrapperOption{
 		Title:      g.options.GetTitle(),
 		RealHeight: g.options.GetHeight(),
 	}
-	g.issueRegex = g.options.extendedWidget.widget.IssueRegex
-	g.renderer = NewListWrapper(lopt)
+	g.issueRegex = g.options.IssueRegex
+	g.renderer = listable.NewListWrapper(lopt)
 
 	return
 }
@@ -76,11 +77,6 @@ func (g *GithubIssueWidget) Disable() {
 	g.disabled = true
 	g.renderer.SetBody([]string{"Could not load issue number from branch name..."})
 	ui.Render(ui.Body)
-}
-
-// SetClient sets Github Client
-func (g *GithubIssueWidget) SetClient(client *github.Client) {
-	g.client = client
 }
 
 // Render renders the issue contents
@@ -209,4 +205,9 @@ func (g *GithubIssueWidget) GetWidth() int {
 // GetHeight is the implementation of stack.Render
 func (g *GithubIssueWidget) GetHeight() int {
 	return g.renderer.GetHeight()
+}
+
+// SetOption is
+func (g *GithubIssueWidget) SetOption(opt *AdditionalWidgetOption) {
+	g.client = opt.GithubClient
 }

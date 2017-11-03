@@ -1,4 +1,4 @@
-package dashboard
+package widget
 
 import (
 	"bufio"
@@ -13,13 +13,14 @@ import (
 	ui "github.com/gizak/termui"
 	"github.com/kr/pty"
 	m2s "github.com/mitchellh/mapstructure"
+	"github.com/qmu/mcc/widget/listable"
 	// "github.com/k0kubun/pp"
 )
 
 // MenuWidget is a command launcher
 type MenuWidget struct {
-	options      *WidgetOptions
-	renderer     *ListWrapper
+	options      *Option
+	renderer     *listable.ListWrapper
 	menus        []Menu
 	headerHeight int
 	isReady      bool
@@ -28,23 +29,23 @@ type MenuWidget struct {
 }
 
 // NewMenuWidget constructs a New MenuWidget
-func NewMenuWidget(opt *WidgetOptions) (m *MenuWidget, err error) {
+func NewMenuWidget(opt *Option) (m *MenuWidget, err error) {
 	m = new(MenuWidget)
 	m.options = opt
-	if err := m2s.Decode(opt.extendedWidget.GetContent(), &m.menus); err != nil {
+	if err := m2s.Decode(opt.Content, &m.menus); err != nil {
 		return nil, err
 	}
 	h := m.buildHeader()
 	m.headerHeight = len(h)
-	m.envs = m.options.envs
-	lopt := &ListWrapperOption{
+	m.envs = m.options.Envs
+	lopt := &listable.ListWrapperOption{
 		Title:         m.options.GetTitle(),
 		RealHeight:    m.options.GetHeight(),
 		Header:        h,
 		Body:          m.buildBody(),
 		LineHighLight: true,
 	}
-	m.renderer = NewListWrapper(lopt)
+	m.renderer = listable.NewListWrapper(lopt)
 	m.isReady = true
 
 	return
@@ -210,4 +211,12 @@ func (m *MenuWidget) GetWidth() int {
 // GetHeight is the implementation of stack.Render
 func (m *MenuWidget) GetHeight() int {
 	return m.renderer.GetHeight()
+}
+
+// Disable is
+func (m *MenuWidget) Disable() {
+}
+
+// SetOption is
+func (m *MenuWidget) SetOption(opt *AdditionalWidgetOption) {
 }

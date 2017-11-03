@@ -1,4 +1,4 @@
-package dashboard
+package widget
 
 import (
 	"errors"
@@ -16,7 +16,7 @@ import (
 
 // DockerStatusWidget is a command launcher
 type DockerStatusWidget struct {
-	options    *WidgetOptions
+	options    *Option
 	gauges     []gaugeModel
 	isReady    bool
 	disabled   bool
@@ -34,10 +34,10 @@ type gaugeModel struct {
 }
 
 // NewDockerStatusWidget constructs a New DockerStatusWidget
-func NewDockerStatusWidget(opt *WidgetOptions) (n *DockerStatusWidget, err error) {
+func NewDockerStatusWidget(opt *Option) (n *DockerStatusWidget, err error) {
 	n = new(DockerStatusWidget)
 	n.options = opt
-	if err := m2s.Decode(n.options.GetContent(), &n.containers); err != nil {
+	if err := m2s.Decode(n.options.Content, &n.containers); err != nil {
 		return nil, err
 	}
 	endpoint := "unix:///var/run/docker.sock"
@@ -250,4 +250,12 @@ func (n *DockerStatusWidget) GetWidth() int {
 // GetHeight is the implementation of widget.Render
 func (n *DockerStatusWidget) GetHeight() int {
 	return n.options.GetHeight()
+}
+
+// Disable is
+func (n *DockerStatusWidget) Disable() {
+}
+
+// SetOption is
+func (n *DockerStatusWidget) SetOption(opt *AdditionalWidgetOption) {
 }

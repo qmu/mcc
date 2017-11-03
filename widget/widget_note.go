@@ -1,4 +1,4 @@
-package dashboard
+package widget
 
 import (
 	"io/ioutil"
@@ -7,29 +7,30 @@ import (
 
 	ui "github.com/gizak/termui"
 	m2s "github.com/mitchellh/mapstructure"
+	"github.com/qmu/mcc/widget/listable"
 	// "github.com/k0kubun/pp"
 )
 
 // NoteWidget is a command launcher
 type NoteWidget struct {
-	options  *WidgetOptions
-	renderer *ListWrapper
+	options  *Option
+	renderer *listable.ListWrapper
 	isReady  bool
 	disabled bool
 }
 
 // NewNoteWidget constructs a New NoteWidget
-func NewNoteWidget(opt *WidgetOptions) (n *NoteWidget, err error) {
+func NewNoteWidget(opt *Option) (n *NoteWidget, err error) {
 	n = new(NoteWidget)
 	n.options = opt
 	var note string
-	if n.options.extendedWidget.widgetType == "text_file" {
+	if n.options.Type == "text_file" {
 		// for TextFile Widget
 		var path string
-		if n.options.extendedWidget.widget.Path[0:1] == "/" {
-			path = n.options.extendedWidget.widget.Path
+		if n.options.Path[0:1] == "/" {
+			path = n.options.Path
 		} else {
-			path = "./" + n.options.execPath + "/" + n.options.extendedWidget.widget.Path
+			path = "./" + n.options.ExecPath + "/" + n.options.Path
 		}
 		b, err := ioutil.ReadFile(path)
 
@@ -39,7 +40,7 @@ func NewNoteWidget(opt *WidgetOptions) (n *NoteWidget, err error) {
 		note = string(b)
 	} else {
 		// for Note Widget
-		if err := m2s.Decode(n.options.extendedWidget.GetContent(), &note); err != nil {
+		if err := m2s.Decode(n.options.Content, &note); err != nil {
 			return nil, err
 		}
 	}
@@ -51,12 +52,12 @@ func NewNoteWidget(opt *WidgetOptions) (n *NoteWidget, err error) {
 		item = rep.ReplaceAllString(item, "[$1](fg-blue)")
 		body = append(body, " "+item)
 	}
-	lopt := &ListWrapperOption{
+	lopt := &listable.ListWrapperOption{
 		Title:      n.options.GetTitle(),
 		RealHeight: n.options.GetHeight(),
 		Body:       body,
 	}
-	n.renderer = NewListWrapper(lopt)
+	n.renderer = listable.NewListWrapper(lopt)
 	n.isReady = true
 
 	return
@@ -105,4 +106,12 @@ func (n *NoteWidget) GetWidth() int {
 // GetHeight is the implementation of stack.Render
 func (n *NoteWidget) GetHeight() int {
 	return n.renderer.GetHeight()
+}
+
+// Disable is
+func (n *NoteWidget) Disable() {
+}
+
+// SetOption is
+func (n *NoteWidget) SetOption(opt *AdditionalWidgetOption) {
 }

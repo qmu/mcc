@@ -1,4 +1,4 @@
-package dashboard
+package widget
 
 import (
 	"fmt"
@@ -11,14 +11,15 @@ import (
 
 	ui "github.com/gizak/termui"
 	"github.com/qmu/mcc/utils"
+	"github.com/qmu/mcc/widget/listable"
 	"gopkg.in/src-d/go-git.v4"
 	// "github.com/k0kubun/pp"
 )
 
 // GitStatusWidget is a command launcher
 type GitStatusWidget struct {
-	options     *WidgetOptions
-	renderer    *ListWrapper
+	options     *Option
+	renderer    *listable.ListWrapper
 	isReady     bool
 	disabled    bool
 	statusItems StatusItems
@@ -67,19 +68,19 @@ func (b ByPath) Less(i, j int) bool {
 }
 
 // NewGitStatusWidget constructs a New GitStatusWidget
-func NewGitStatusWidget(opt *WidgetOptions) (g *GitStatusWidget, err error) {
+func NewGitStatusWidget(opt *Option) (g *GitStatusWidget, err error) {
 	g = new(GitStatusWidget)
 	g.options = opt
 
 	header := g.buildHeader()
 
-	lopt := &ListWrapperOption{
+	lopt := &listable.ListWrapperOption{
 		Title:         g.options.GetTitle(),
 		RealHeight:    g.options.GetHeight(),
 		Header:        header,
 		LineHighLight: true,
 	}
-	g.renderer = NewListWrapper(lopt)
+	g.renderer = listable.NewListWrapper(lopt)
 	g.isReady = true
 
 	return
@@ -266,7 +267,7 @@ func (g *GitStatusWidget) setKeyBindings() error {
 		if hasEditor {
 			editorCmd = os.Getenv("EDITOR")
 		}
-		for _, env := range g.options.envs {
+		for _, env := range g.options.Envs {
 			if env["name"] == "EDITOR" {
 				hasEditor = true
 				editorCmd = env["value"]
@@ -280,7 +281,7 @@ func (g *GitStatusWidget) setKeyBindings() error {
 			cmd := exec.Command(editorCmd, g.statusItems[cursor].Path)
 			// load env vars
 			cmd.Env = os.Environ()
-			for _, env := range g.options.envs {
+			for _, env := range g.options.Envs {
 				cmd.Env = append(cmd.Env, env["name"]+"="+env["value"])
 			}
 			cmd.Stdin = os.Stdin
@@ -298,7 +299,7 @@ func (g *GitStatusWidget) setKeyBindings() error {
 
 // Render is the implementation of widget.Render
 func (g *GitStatusWidget) Render() (err error) {
-	body, err := g.buildBody(g.options.execPath)
+	body, err := g.buildBody(g.options.ExecPath)
 	if err != nil {
 		return
 	}
@@ -322,4 +323,12 @@ func (g *GitStatusWidget) GetWidth() int {
 // GetHeight is the implementation of widget.Render
 func (g *GitStatusWidget) GetHeight() int {
 	return g.renderer.GetHeight()
+}
+
+// Disable is
+func (g *GitStatusWidget) Disable() {
+}
+
+// SetOption is
+func (g *GitStatusWidget) SetOption(opt *AdditionalWidgetOption) {
 }

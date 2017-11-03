@@ -1,4 +1,4 @@
-package dashboard
+package widget
 
 import (
 	"os"
@@ -6,32 +6,33 @@ import (
 
 	ui "github.com/gizak/termui"
 	"github.com/hpcloud/tail"
+	"github.com/qmu/mcc/widget/listable"
 	// "github.com/k0kubun/pp"
 )
 
 // TailFileWidget is a command launcher
 type TailFileWidget struct {
-	options  *WidgetOptions
-	renderer *ListWrapper
+	options  *Option
+	renderer *listable.ListWrapper
 	isReady  bool
 	disabled bool
 	path     string
 }
 
 // NewTailFileWidget constructs a New TailFileWidget
-func NewTailFileWidget(opt *WidgetOptions) (n *TailFileWidget, err error) {
+func NewTailFileWidget(opt *Option) (n *TailFileWidget, err error) {
 	n = new(TailFileWidget)
 	n.options = opt
-	if n.options.extendedWidget.widget.Path[0:1] == "/" {
-		n.path = n.options.extendedWidget.widget.Path
+	if n.options.Path[0:1] == "/" {
+		n.path = n.options.Path
 	} else {
-		n.path = "./" + n.options.execPath + "/" + n.options.extendedWidget.widget.Path
+		n.path = "./" + n.options.ExecPath + "/" + n.options.Path
 	}
-	lopt := &ListWrapperOption{
+	lopt := &listable.ListWrapperOption{
 		Title:      n.options.GetTitle(),
 		RealHeight: n.options.GetHeight(),
 	}
-	n.renderer = NewListWrapper(lopt)
+	n.renderer = listable.NewListWrapper(lopt)
 	n.isReady = true
 	n.tail()
 
@@ -135,4 +136,12 @@ func (n *TailFileWidget) GetWidth() int {
 // GetHeight is the implementation of stack.Render
 func (n *TailFileWidget) GetHeight() int {
 	return n.renderer.GetHeight()
+}
+
+// Disable is
+func (n *TailFileWidget) Disable() {
+}
+
+// SetOption is
+func (n *TailFileWidget) SetOption(opt *AdditionalWidgetOption) {
 }
