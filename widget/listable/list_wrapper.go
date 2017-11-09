@@ -28,6 +28,7 @@ func NewListWrapper(opt *ListWrapperOption) (l *ListWrapper) {
 	w.Height = opt.RealHeight
 	w.Items = []string{"loading..."}
 	w.BorderLabel = opt.Title
+	w.BorderLabelFg = ui.ColorWhite
 	l.widget = w
 
 	ropt := &ListRendererOption{

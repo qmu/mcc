@@ -30,37 +30,43 @@ type ConfRoot struct {
 	Timezone      string
 	GitHubHost    string `yaml:"github_url"`
 	Envs          []map[string]string
-	Widgets       []ConfWidget
-	Layout        []ConfTab
+	Widgets       []confWidget
+	Layout        []confTab
 }
 
-// ConfTab is the schema implements ConfRoot.OriginalWidgets.Section
-type ConfTab struct {
+// confTab is the schema implements ConfRoot.OriginalWidgets.Section
+type confTab struct {
 	Section string
+	Index   int
 	Name    string
-	Rows    []ConfRow
+	Rows    []confRow
 }
 
-// ConfRow is the schema implements ConfRoot.OriginalWidgets.Section
-type ConfRow struct {
+// confRow is the schema implements ConfRoot.OriginalWidgets.Section
+type confRow struct {
 	Section string
 	Height  string // percent
-	Cols    []ConfCol
+	Cols    []confCol
 }
 
-// ConfCol is the schema implements ConfRoot.OriginalWidgets.Section
-type ConfCol struct {
+// confCol is the schema implements ConfRoot.OriginalWidgets.Section
+type confCol struct {
 	Section string
 	Widgets []*widget.WrapperWidget
-	Stacks  []string
+	Stacks  []confStack
 }
 
-// ConfWidget is the schema implements ConfRoot.OriginalWidgets
-type ConfWidget struct {
+// confCol is the schema implements ConfRoot.OriginalWidgets.Section
+type confStack struct {
+	ID     string
+	Height string // percent
+}
+
+// confWidget is the schema implements ConfRoot.OriginalWidgets
+type confWidget struct {
 	ID         string
 	Title      string
 	Col        int
-	Height     string // percent
 	Type       string
 	IssueRegex string `yaml:"issue_regex"`
 	Content    interface{}

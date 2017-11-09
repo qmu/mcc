@@ -13,7 +13,6 @@ import (
 	"github.com/qmu/mcc/utils"
 	"github.com/qmu/mcc/widget/listable"
 	"gopkg.in/src-d/go-git.v4"
-	// "github.com/k0kubun/pp"
 )
 
 // GitStatusWidget is a command launcher

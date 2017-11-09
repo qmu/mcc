@@ -4,7 +4,7 @@ import (
 	"errors"
 
 	ui "github.com/gizak/termui"
-	"github.com/qmu/mcc/collection/vector"
+	"github.com/qmu/mcc/config/vector"
 )
 
 // WrapperWidget is

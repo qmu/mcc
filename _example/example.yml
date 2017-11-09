@@ -15,7 +15,6 @@ widgets:
   - id: note
     type: note
     title: NOTE WIDGET
-    height: 100%
     content: |
       # text text text
       
@@ -32,17 +31,14 @@ widgets:
   - id: text_file
     type: text_file
     title: TEXT FILE WIDGET
-    height: 100%
     path: ./example.md
 
   - id: git_status
     type: git_status
     title: GIT STATUS WIDGET
-    height: 100%
 
   - id: docker_status
     type: docker_status
-    height: 100%
     content:
       - metrics: cpu
         name: Web Server
@@ -57,7 +53,6 @@ widgets:
   - id: menu1
     type: menu
     title: MENU WIDGET 1
-    height: 40%
     content:
       - category: Category1
         name: Menu1
@@ -115,7 +110,6 @@ widgets:
   - id: menu2
     type: menu
     title: MENU WIDGET 2
-    height: 30%
     content:
       - category: Category3
         name: Menu1
@@ -145,7 +139,6 @@ widgets:
   - id: menu3
     type: menu
     title: MENU WIDGET 3
-    height: 30%
     content:
       - category: Category4
         name: Menu1
@@ -187,13 +180,11 @@ widgets:
   - id: github_issue
     type: github_issue
     title: GITHUB ISSUE WIDGET
-    height: 100%
     issue_regex: "i([0-9]*).*"
 
   - id: tail_file
     type: tail_file
     title: TAIL FILE WIDGET
-    height: 100%
     path: ./example.log
 
 
@@ -206,77 +197,88 @@ layout:
         cols:
           - section: col
             stacks:
-              - docker_status
+              - id: docker_status
+                height: 100% 
 
           - section: col
             stacks:
-              - menu1
-              - menu2
-              - menu3
+              - id: menu1
+                height: 33% 
+              - id: menu2
+                height: 33% 
+              - id: menu3
+                height: 33% 
 
           - section: col
             stacks:
-              - github_issue
+              - id: github_issue
+                height: 100% 
 
   - section: tab
     name: PROJECT INFORMATION
     rows:
       - section: row
-        height: 20%
+        height: 30%
         cols:
           - section: col
             stacks:
-              - note
+              - id: note
+                height: 33% 
+              - id: note
+                height: 33% 
+              - id: note
+                height: 33% 
 
           - section: col
             stacks:
-              - text_file
+              - id: text_file
+                height: 100% 
 
           - section: col
             stacks:
-              - git_status
+              - id: text_file
+                height: 40% 
+              - id: text_file
+                height: 60% 
+
+      - section: row
+        height: 10%
+        cols:
+          - section: col
+            stacks:
+              - id: note
+                height: 100% 
+
+          - section: col
+            stacks:
+              - id: text_file
+                height: 100% 
+
       - section: row
         height: 20%
         cols:
           - section: col
             stacks:
-              - note
+              - id: note
+                height: 100% 
 
           - section: col
             stacks:
-              - text_file
+              - id: text_file
+                height: 100% 
 
-          - section: col
-            stacks:
-              - git_status
       - section: row
         height: 20%
         cols:
           - section: col
             stacks:
-              - note
+              - id: note
+                height: 100% 
 
           - section: col
             stacks:
-              - text_file
-
-          - section: col
-            stacks:
-              - git_status
-      - section: row
-        height: 20%
-        cols:
-          - section: col
-            stacks:
-              - note
-
-          - section: col
-            stacks:
-              - text_file
-
-          - section: col
-            stacks:
-              - git_status
+              - id: git_status
+                height: 100% 
 
   - section: tab
     name: PRODUCTION MONITOR
@@ -286,5 +288,33 @@ layout:
         cols:
           - section: col
             stacks:
-              - tail_file
+              - id: tail_file
+                height: 100% 
+
+
+
+  - section: tab
+    name: PRODUCTION MONITOR
+    rows:
+      - section: row
+        height: 20%
+        cols:
+          - section: col
+            stacks:
+              - id: tail_file
+                height: 100% 
+
+
+
+
+  - section: tab
+    name: PRODUCTION MONITOR
+    rows:
+      - section: row
+        height: 20%
+        cols:
+          - section: col
+            stacks:
+              - id: tail_file
+                height: 100% 
 

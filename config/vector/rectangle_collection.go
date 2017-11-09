@@ -101,15 +101,35 @@ func (r *RectangleCollection) CalcDistances() {
 		}
 		if nearestTop != nil {
 			r.rects[i].TopWidgetIndex = nearestTop.to.index
+		} else {
+			r.rects[i].TopWidgetIndex = -1
 		}
 		if nearestBottom != nil {
 			r.rects[i].BottomWidgetIndex = nearestBottom.to.index
+		} else {
+			r.rects[i].BottomWidgetIndex = -1
 		}
 		if nearestLeft != nil {
 			r.rects[i].LeftWidgetIndex = nearestLeft.to.index
+		} else {
+			r.rects[i].LeftWidgetIndex = -1
 		}
 		if nearestRight != nil {
 			r.rects[i].RightWidgetIndex = nearestRight.to.index
+		} else {
+			r.rects[i].RightWidgetIndex = -1
+		}
+	}
+	// prevent moving on incorrect widget if the cursor is on the edge wiget.
+	// this works if the layout is not filled with widgets.
+	for i, r1 := range r.rects {
+		for _, r2 := range r.rects {
+			if r1.index != r2.index && r1.BottomWidgetIndex == r2.index && r1.area.lb.y == r2.area.lb.y {
+				r.rects[i].BottomWidgetIndex = -1
+			}
+			if r1.index != r2.index && r1.RightWidgetIndex == r2.index && r1.area.rb.x == r2.area.rb.x {
+				r.rects[i].RightWidgetIndex = -1
+			}
 		}
 	}
 }

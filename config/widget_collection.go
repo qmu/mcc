@@ -1,4 +1,4 @@
-package collection
+package config
 
 import (
 	"errors"
@@ -6,36 +6,35 @@ import (
 	"strings"
 
 	ui "github.com/gizak/termui"
-	"github.com/qmu/mcc/collection/config"
-	"github.com/qmu/mcc/collection/vector"
+	"github.com/qmu/mcc/config/vector"
 	"github.com/qmu/mcc/utils"
 	"github.com/qmu/mcc/widget"
 )
 
 // WidgetCollection load and unmarshal config file
 type WidgetCollection struct {
-	config        *config.ConfRoot
-	configManager *config.Loader
-	execPath      string
-	total         int
+	config            *ConfRoot
+	configManager     *Loader
+	execPath          string
+	totalTab          int
+	activeWidgetIndex int
+	activeTabIndex    int
 }
 
 // NewWidgetCollection constructs a WidgetCollection
-func NewWidgetCollection(opt *config.LoaderOption) (c *WidgetCollection, err error) {
+func NewWidgetCollection(opt *LoaderOption) (c *WidgetCollection, err error) {
 	c = new(WidgetCollection)
-
-	c.configManager, err = config.NewLoader(opt)
+	c.configManager, err = NewLoader(opt)
+	c.activeTabIndex = -1
 	if err != nil {
 		return
 	}
 	c.config = c.configManager.GetConfig()
-
 	c.execPath = opt.ExecPath
 	err = c.buildCollection()
 	if err != nil {
 		return
 	}
-
 	return
 }
 
@@ -49,22 +48,19 @@ func (c *WidgetCollection) buildCollection() (err error) {
 	idx := 0
 	for i1, tab := range c.config.Layout {
 		rowHTotal := 0
+		c.config.Layout[i1].Index = i1
 		for _, row := range tab.Rows {
 			rowH := utils.Percentalize(windowH, row.Height)
 			for i3, col := range row.Cols {
 				cntH := 0
 				stackHTotal := 0
-				for _, id := range col.Stacks {
-					wi, err := c.getWidgetByID(id)
-					if err != nil {
-						return err
-					}
+				for _, stack := range col.Stacks {
 					realWidth := windowW / len(row.Cols)
 					realHeight := 0
 					if len(col.Stacks)-1 == i3 {
 						realHeight = rowH - cntH
 					} else {
-						realHeight = utils.Percentalize(rowH, wi.Height)
+						realHeight = utils.Percentalize(rowH, stack.Height)
 						cntH += realHeight
 					}
 					collection.Register(&vector.RectangleOptions{
@@ -83,8 +79,8 @@ func (c *WidgetCollection) buildCollection() (err error) {
 			}
 			rowHTotal += rowH
 		}
+		c.totalTab++
 	}
-	c.total = idx + 1
 
 	collection.CalcDistances()
 
@@ -92,8 +88,8 @@ func (c *WidgetCollection) buildCollection() (err error) {
 	for i1, tab := range c.config.Layout {
 		for i2, row := range tab.Rows {
 			for i3, col := range row.Cols {
-				for _, id := range col.Stacks {
-					wi, err := c.getWidgetByID(id)
+				for _, stack := range col.Stacks {
+					wi, err := c.getWidgetByID(stack.ID)
 					if err != nil {
 						return err
 					}
@@ -128,7 +124,7 @@ func (c *WidgetCollection) buildCollection() (err error) {
 	return
 }
 
-func (c *WidgetCollection) getWidgetByID(id string) (result config.ConfWidget, err error) {
+func (c *WidgetCollection) getWidgetByID(id string) (result confWidget, err error) {
 	for _, d := range c.config.Widgets {
 		if d.ID == id {
 			result = d
@@ -138,37 +134,7 @@ func (c *WidgetCollection) getWidgetByID(id string) (result config.ConfWidget, e
 	return result, errors.New("no widget named " + id)
 }
 
-// GetConfig is
-func (c *WidgetCollection) GetConfig() *config.ConfRoot {
-	return c.config
-}
-
-// HasWidget returns whether config contains 'widgetType' stack or not
-func (c *WidgetCollection) HasWidget(widgetType string) bool {
-	result := false
-	c.MapWidgets(func(wi *widget.WrapperWidget) (err error) {
-		if wi.WidgetType == widgetType {
-			result = true
-		}
-		return
-	})
-	return result
-}
-
-// GetActiveWidgetsOf is
-func (c *WidgetCollection) GetActiveWidgetsOf(name string) (result []*widget.WrapperWidget) {
-	c.MapWidgets(func(wi *widget.WrapperWidget) (err error) {
-		if wi.WidgetType == name && !wi.IsDisabled() {
-			result = append(result, wi)
-		}
-
-		return
-	})
-	return
-}
-
-// GetWidgetByIndex is
-func (c *WidgetCollection) GetWidgetByIndex(index int) (result *widget.WrapperWidget) {
+func (c *WidgetCollection) getWidgetByIndex(index int) (result *widget.WrapperWidget) {
 	c.MapWidgets(func(wi *widget.WrapperWidget) (err error) {
 		if index == wi.Index {
 			result = wi
@@ -178,41 +144,7 @@ func (c *WidgetCollection) GetWidgetByIndex(index int) (result *widget.WrapperWi
 	return
 }
 
-// GetTabByTabIndex is
-func (c *WidgetCollection) GetTabByTabIndex(tabIndex int) (result config.ConfTab) {
-	for i, tab := range c.config.Layout {
-		if i == tabIndex {
-			result = tab
-			return
-		}
-	}
-	return
-}
-
-// MapWidgets is
-func (c *WidgetCollection) MapWidgets(fn func(*widget.WrapperWidget) error) (err error) {
-	for _, tab := range c.config.Layout {
-		for _, row := range tab.Rows {
-			for _, col := range row.Cols {
-				for _, wi := range col.Widgets {
-					err = fn(wi)
-					if err != nil {
-						return
-					}
-				}
-			}
-		}
-	}
-	return
-}
-
-// Count is
-func (c *WidgetCollection) Count() int {
-	return c.total
-}
-
-// Render is
-func (c *WidgetCollection) Render(tab config.ConfTab) (err error) {
+func (c *WidgetCollection) render(tab confTab) (err error) {
 	ui.Clear()
 	ui.Body.Rows = ui.Body.Rows[:0]
 
@@ -220,7 +152,7 @@ func (c *WidgetCollection) Render(tab config.ConfTab) (err error) {
 	for i, t := range c.config.Layout {
 		tabP := ui.NewList()
 		color := "(fg-white,bg-default)"
-		if tab.Name == t.Name {
+		if tab.Index == t.Index {
 			color = "(fg-white,bg-blue)"
 		}
 		space := strings.Repeat(" ", 500)
@@ -256,6 +188,97 @@ func (c *WidgetCollection) Render(tab config.ConfTab) (err error) {
 	ui.Render(ui.Body)
 
 	return nil
+}
+
+func (c *WidgetCollection) activateFirstWidgetOnTab(idx int) {
+	for _, r := range c.config.Layout[idx].Rows {
+		for _, cl := range r.Cols {
+			for _, wi := range cl.Widgets {
+				if !wi.IsDisabled() && wi.IsReady() {
+					wi.Activate()
+					c.activeWidgetIndex = wi.Index
+					return
+				}
+			}
+		}
+	}
+}
+
+// SwitchTab is
+func (c *WidgetCollection) SwitchTab(tabIdx int) {
+	if tabIdx > c.totalTab-1 || tabIdx == c.activeTabIndex {
+		return
+	}
+	// layout header and body
+	for i, tab := range c.config.Layout {
+		if i == tabIdx {
+			if err := c.render(tab); err != nil {
+				panic(err)
+			}
+		}
+	}
+	// deactivate all, and activate first widget
+	c.MapWidgets(func(w *widget.WrapperWidget) (err error) {
+		if w.Tab == tabIdx {
+			w.Deactivate()
+		}
+		return
+	})
+
+	c.activateFirstWidgetOnTab(tabIdx)
+	c.activeTabIndex = tabIdx
+}
+
+// NextWidget is
+func (c *WidgetCollection) NextWidget(direction string) {
+	from := c.getWidgetByIndex(c.activeWidgetIndex)
+	toIdx := from.GetNeighborIndex(direction)
+	to := c.getWidgetByIndex(toIdx)
+	if from != nil && to != nil && !to.IsDisabled() && to.IsReady() {
+		from.Deactivate()
+		to.Activate()
+		c.activeWidgetIndex = toIdx
+	}
+}
+
+// HasWidget returns whether config contains 'widgetType' stack or not
+func (c *WidgetCollection) HasWidget(widgetType string) bool {
+	result := false
+	c.MapWidgets(func(wi *widget.WrapperWidget) (err error) {
+		if wi.WidgetType == widgetType {
+			result = true
+		}
+		return
+	})
+	return result
+}
+
+// GetActiveWidgetsOf is
+func (c *WidgetCollection) GetActiveWidgetsOf(name string) (result []*widget.WrapperWidget) {
+	c.MapWidgets(func(wi *widget.WrapperWidget) (err error) {
+		if wi.WidgetType == name && !wi.IsDisabled() {
+			result = append(result, wi)
+		}
+		return
+	})
+	return
+}
+
+// MapWidgets is
+func (c *WidgetCollection) MapWidgets(fn func(*widget.WrapperWidget) error) (err error) {
+	for _, tab := range c.config.Layout {
+		for _, row := range tab.Rows {
+			for _, col := range row.Cols {
+				for _, wi := range col.Widgets {
+					err = fn(wi)
+					if err != nil {
+						return
+					}
+				}
+			}
+		}
+	}
+	return
 }
 
 // GetGithubHost is
