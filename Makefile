@@ -25,6 +25,9 @@ build:
 	mkdir -p _build
 	gox $(LDFLAGS) -osarch="linux/amd64 darwin/amd64 linux/386 darwin/386" -output="_build/{{.OS}}_{{.Arch}}_{{.Dir}}"
 
+test:
+	go test github.com/qmu/mcc/...
+
 release:
 	mkdir release
 	go get github.com/aktau/github-release/...

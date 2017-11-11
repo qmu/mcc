@@ -1,19 +1,15 @@
 package listable
 
-import (
-	"testing"
-
-	"github.com/qmu/mcc/dashboard"
-)
+import "testing"
 
 func TestRender(t *testing.T) {
-	opt := &dashboard.ListRendererOption{
+	opt := &ListRendererOption{
 		Header:        buildHeader(),
 		Body:          buildBody(),
 		MaxH:          8,
 		LineHighLight: true,
 	}
-	listRenderer := dashboard.NewListRenderer(opt)
+	listRenderer := NewListRenderer(opt)
 	items := listRenderer.RenderActually()
 	if items[len(items)-1] != "row4" {
 		t.Error("invalid list display")
