@@ -190,10 +190,34 @@ widgets:
 
 layout:
   - section: tab
-    name: DEV ENVIRONMENT
+    name: LAYOUT EXAMPLE
     rows:
       - section: row
-        height: 60%
+        height: 70%
+        cols:
+          - section: col
+            stacks:
+              - id: menu1
+                height: 50% 
+              - id: menu2
+                height: 25% 
+              - id: menu3
+                height: 25% 
+
+          - section: col
+            stacks:
+              - id: github_issue
+                height: 80% 
+              - id: git_status
+                height: 20% 
+
+          - section: col
+            stacks:
+              - id: note
+                height: 100% 
+
+      - section: row
+        height: 30%
         cols:
           - section: col
             stacks:
@@ -202,20 +226,11 @@ layout:
 
           - section: col
             stacks:
-              - id: menu1
-                height: 33% 
-              - id: menu2
-                height: 33% 
-              - id: menu3
-                height: 33% 
-
-          - section: col
-            stacks:
-              - id: github_issue
+              - id: tail_file
                 height: 100% 
 
   - section: tab
-    name: PROJECT INFORMATION
+    name: COMPLEX GRID 
     rows:
       - section: row
         height: 30%
@@ -254,12 +269,20 @@ layout:
               - id: text_file
                 height: 100% 
 
-      - section: row
-        height: 20%
-        cols:
           - section: col
             stacks:
-              - id: note
+              - id: text_file
+                height: 100% 
+
+          - section: col
+            stacks:
+              - id: text_file
+                height: 100% 
+
+
+          - section: col
+            stacks:
+              - id: text_file
                 height: 100% 
 
           - section: col
@@ -275,46 +298,43 @@ layout:
               - id: note
                 height: 100% 
 
+      - section: row
+        height: 20%
+        cols:
           - section: col
             stacks:
-              - id: git_status
+              - id: note
+                height: 100% 
+          - section: col
+            stacks:
+              - id: note
+                height: 100% 
+
+      - section: row
+        height: 20%
+        cols:
+          - section: col
+            stacks:
+              - id: note
+                height: 100% 
+
+          - section: col
+            stacks:
+              - id: text_file
+                height: 100% 
+
+          - section: col
+            stacks:
+              - id: note
                 height: 100% 
 
   - section: tab
-    name: PRODUCTION MONITOR
+    name: ONE OTHER TAB
     rows:
       - section: row
         height: 20%
         cols:
           - section: col
             stacks:
-              - id: tail_file
+              - id: note
                 height: 100% 
-
-
-
-  - section: tab
-    name: PRODUCTION MONITOR
-    rows:
-      - section: row
-        height: 20%
-        cols:
-          - section: col
-            stacks:
-              - id: tail_file
-                height: 100% 
-
-
-
-
-  - section: tab
-    name: PRODUCTION MONITOR
-    rows:
-      - section: row
-        height: 20%
-        cols:
-          - section: col
-            stacks:
-              - id: tail_file
-                height: 100% 
-
