@@ -50,14 +50,15 @@ func (c *ViewManager) buildCollection() (err error) {
 		rowHTotal := 0
 		c.config.Layout[i1].Index = i1
 		for i2, row := range tab.Rows {
+			colWTotal := 0
 			rowH := utils.Percentalize(windowH, row.Height)
 			for i3, col := range row.Cols {
 				stackHTotal := 0
+				realWidth := windowW / len(row.Cols)
+				if col.Width > 0 {
+					realWidth = windowW / 12 * col.Width
+				}
 				for i4, stack := range col.Stacks {
-					realWidth := windowW / len(row.Cols)
-					if col.Width > 0 {
-						realWidth = windowW / 12 * col.Width
-					}
 					realHeight := 0
 					// jusify height to fill at the very last of stacks
 					if i4 == len(col.Stacks)-1 {
@@ -74,12 +75,13 @@ func (c *ViewManager) buildCollection() (err error) {
 						Index:      idx,
 						RowIndex:   i2,
 						ColIndex:   i3,
+						LastCol:    i3 == len(row.Cols)-1,
 						FirstStack: i4 == 0,
 						LastStack:  i4 == len(col.Stacks)-1,
 						WindowW:    windowW,
 						WindowH:    windowH,
 						TabIndex:   i1,
-						CenterX:    windowW/len(row.Cols)*i3 + (realWidth / 2),
+						CenterX:    colWTotal + (realWidth / 2),
 						CenterY:    rowHTotal + stackHTotal + (realHeight / 2),
 						Width:      realWidth,
 						Height:     realHeight,
@@ -87,6 +89,7 @@ func (c *ViewManager) buildCollection() (err error) {
 					idx++
 					stackHTotal += realHeight
 				}
+				colWTotal += realWidth
 			}
 			rowHTotal += rowH
 		}

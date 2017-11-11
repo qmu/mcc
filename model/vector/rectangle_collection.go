@@ -67,34 +67,39 @@ func (r *RectangleCollection) CalcDistances() {
 		var nearestBottom *distance
 		var nearestLeft *distance
 		var nearestRight *distance
-		// if the distance is almost same
-		// first widget should be primary
-		privilege := 0
-		offset := 3
 		for _, d := range distances {
 			if f.index == d.toIndex || f.index != d.fromIndex || d.value < 0 {
 				continue
 			}
-			d.value = d.value + float64(privilege)
+			// if the distance is almost same
+			// first widget should be primary
 			if d.direction == "top" && !f.edge.top && (!f.firstStack || f.rowIndex-1 == d.to.rowIndex) {
 				if nearestTop == nil || nearestTop.value > d.value {
+					if f.firstStack && f.colIndex == 0 && d.to.colIndex == 0 && d.to.lastStack {
+						d.value = d.value / 2
+					}
 					nearestTop = d
-					privilege = privilege + offset
 				}
-			} else if d.direction == "right" && !f.edge.right && f.rowIndex == d.to.rowIndex {
+			} else if d.direction == "right" && !f.edge.right && f.rowIndex == d.to.rowIndex && f.colIndex != d.to.colIndex {
 				if nearestRight == nil || nearestRight.value > d.value {
+					if f.firstStack && d.to.firstStack && f.colIndex+1 == d.to.colIndex {
+						d.value = d.value / 2
+					}
 					nearestRight = d
-					privilege = privilege + offset
 				}
 			} else if d.direction == "bottom" && !f.edge.bottom && (!f.lastStack || f.rowIndex+1 == d.to.rowIndex) {
 				if nearestBottom == nil || nearestBottom.value > d.value {
+					if f.lastStack && f.colIndex == 0 && d.to.colIndex == 0 && d.to.firstStack {
+						d.value = d.value / 2
+					}
 					nearestBottom = d
-					privilege = privilege + offset
 				}
-			} else if d.direction == "left" && !f.edge.left && f.rowIndex == d.to.rowIndex {
+			} else if d.direction == "left" && !f.edge.left && f.rowIndex == d.to.rowIndex && f.colIndex != d.to.colIndex {
 				if nearestLeft == nil || nearestLeft.value > d.value {
+					if f.firstStack && d.to.firstStack && f.colIndex-1 == d.to.colIndex {
+						d.value = d.value / 2
+					}
 					nearestLeft = d
-					privilege = privilege + offset
 				}
 			}
 		}
