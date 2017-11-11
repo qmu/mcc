@@ -19,6 +19,10 @@ type ViewManager struct {
 	totalTab          int
 	activeWidgetIndex int
 	activeTabIndex    int
+
+	// remember widget walk
+	lastWidget    *widget.WrapperWidget
+	lastDirection string
 }
 
 // NewViewManager constructs a ViewManager
@@ -246,6 +250,8 @@ func (c *ViewManager) SwitchTab(tabIdx int) {
 
 	c.activateFirstWidgetOnTab(tabIdx)
 	c.activeTabIndex = tabIdx
+	c.lastWidget = nil
+	c.lastDirection = ""
 }
 
 // NextWidget is
@@ -253,22 +259,38 @@ func (c *ViewManager) NextWidget(direction string) {
 	from := c.getWidgetByIndex(c.activeWidgetIndex)
 	toIdx := from.GetNeighborIndex(direction)
 	to := c.getWidgetByIndex(toIdx)
-	if from != nil && to != nil {
-		if !to.IsDisabled() && to.IsReady() {
+
+	// if moving back to last widget, move remembered widget
+	tb := c.lastDirection == "top" && direction == "bottom"
+	bt := c.lastDirection == "bottom" && direction == "top"
+	rl := c.lastDirection == "right" && direction == "left"
+	lr := c.lastDirection == "left" && direction == "right"
+	if tb || bt || rl || lr {
+		c.moveActually(from, c.lastWidget, direction)
+	} else if from != nil && to != nil {
+		c.moveActually(from, to, direction)
+	}
+}
+
+func (c *ViewManager) moveActually(from *widget.WrapperWidget, to *widget.WrapperWidget, direction string) {
+	if !to.IsDisabled() && to.IsReady() {
+		from.Deactivate()
+		to.Activate()
+		c.activeWidgetIndex = to.Index
+		c.lastWidget = from
+		c.lastDirection = direction
+	} else if to.IsDisabled() {
+		return
+	} else if !to.IsReady() {
+		// skip !IsReady widget
+		skipIdx := to.GetNeighborIndex(direction)
+		skip := c.getWidgetByIndex(skipIdx)
+		if skipIdx != -1 && skip != nil {
 			from.Deactivate()
-			to.Activate()
-			c.activeWidgetIndex = toIdx
-		} else if to.IsDisabled() {
-			return
-		} else if !to.IsReady() {
-			// skip !IsReady widget
-			skipIdx := to.GetNeighborIndex(direction)
-			skip := c.getWidgetByIndex(skipIdx)
-			if skipIdx != -1 && skip != nil {
-				from.Deactivate()
-				c.activeWidgetIndex = toIdx
-				c.NextWidget(direction)
-			}
+			c.activeWidgetIndex = to.Index
+			c.lastWidget = from
+			c.lastDirection = direction
+			c.NextWidget(direction)
 		}
 	}
 }
