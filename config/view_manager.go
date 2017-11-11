@@ -11,8 +11,8 @@ import (
 	"github.com/qmu/mcc/widget"
 )
 
-// WidgetCollection load and unmarshal config file
-type WidgetCollection struct {
+// ViewManager load and unmarshal config file
+type ViewManager struct {
 	config            *ConfRoot
 	configManager     *Loader
 	execPath          string
@@ -21,9 +21,9 @@ type WidgetCollection struct {
 	activeTabIndex    int
 }
 
-// NewWidgetCollection constructs a WidgetCollection
-func NewWidgetCollection(opt *LoaderOption) (c *WidgetCollection, err error) {
-	c = new(WidgetCollection)
+// NewViewManager constructs a ViewManager
+func NewViewManager(opt *LoaderOption) (c *ViewManager, err error) {
+	c = new(ViewManager)
 	c.configManager, err = NewLoader(opt)
 	c.activeTabIndex = -1
 	if err != nil {
@@ -38,7 +38,7 @@ func NewWidgetCollection(opt *LoaderOption) (c *WidgetCollection, err error) {
 	return
 }
 
-func (c *WidgetCollection) buildCollection() (err error) {
+func (c *ViewManager) buildCollection() (err error) {
 	collection, err := vector.NewRectangleCollection()
 	if err != nil {
 		return
@@ -124,7 +124,7 @@ func (c *WidgetCollection) buildCollection() (err error) {
 	return
 }
 
-func (c *WidgetCollection) getWidgetByID(id string) (result confWidget, err error) {
+func (c *ViewManager) getWidgetByID(id string) (result confWidget, err error) {
 	for _, d := range c.config.Widgets {
 		if d.ID == id {
 			result = d
@@ -134,7 +134,7 @@ func (c *WidgetCollection) getWidgetByID(id string) (result confWidget, err erro
 	return result, errors.New("no widget named " + id)
 }
 
-func (c *WidgetCollection) getWidgetByIndex(index int) (result *widget.WrapperWidget) {
+func (c *ViewManager) getWidgetByIndex(index int) (result *widget.WrapperWidget) {
 	c.MapWidgets(func(wi *widget.WrapperWidget) (err error) {
 		if index == wi.Index {
 			result = wi
@@ -144,7 +144,7 @@ func (c *WidgetCollection) getWidgetByIndex(index int) (result *widget.WrapperWi
 	return
 }
 
-func (c *WidgetCollection) render(tab confTab) (err error) {
+func (c *ViewManager) render(tab confTab) (err error) {
 	ui.Clear()
 	ui.Body.Rows = ui.Body.Rows[:0]
 
@@ -190,7 +190,7 @@ func (c *WidgetCollection) render(tab confTab) (err error) {
 	return nil
 }
 
-func (c *WidgetCollection) activateFirstWidgetOnTab(idx int) {
+func (c *ViewManager) activateFirstWidgetOnTab(idx int) {
 	for _, r := range c.config.Layout[idx].Rows {
 		for _, cl := range r.Cols {
 			for _, wi := range cl.Widgets {
@@ -205,7 +205,7 @@ func (c *WidgetCollection) activateFirstWidgetOnTab(idx int) {
 }
 
 // SwitchTab is
-func (c *WidgetCollection) SwitchTab(tabIdx int) {
+func (c *ViewManager) SwitchTab(tabIdx int) {
 	if tabIdx > c.totalTab-1 || tabIdx == c.activeTabIndex {
 		return
 	}
@@ -230,7 +230,7 @@ func (c *WidgetCollection) SwitchTab(tabIdx int) {
 }
 
 // NextWidget is
-func (c *WidgetCollection) NextWidget(direction string) {
+func (c *ViewManager) NextWidget(direction string) {
 	from := c.getWidgetByIndex(c.activeWidgetIndex)
 	toIdx := from.GetNeighborIndex(direction)
 	to := c.getWidgetByIndex(toIdx)
@@ -242,7 +242,7 @@ func (c *WidgetCollection) NextWidget(direction string) {
 }
 
 // HasWidget returns whether config contains 'widgetType' stack or not
-func (c *WidgetCollection) HasWidget(widgetType string) bool {
+func (c *ViewManager) HasWidget(widgetType string) bool {
 	result := false
 	c.MapWidgets(func(wi *widget.WrapperWidget) (err error) {
 		if wi.WidgetType == widgetType {
@@ -254,7 +254,7 @@ func (c *WidgetCollection) HasWidget(widgetType string) bool {
 }
 
 // GetActiveWidgetsOf is
-func (c *WidgetCollection) GetActiveWidgetsOf(name string) (result []*widget.WrapperWidget) {
+func (c *ViewManager) GetActiveWidgetsOf(name string) (result []*widget.WrapperWidget) {
 	c.MapWidgets(func(wi *widget.WrapperWidget) (err error) {
 		if wi.WidgetType == name && !wi.IsDisabled() {
 			result = append(result, wi)
@@ -265,7 +265,7 @@ func (c *WidgetCollection) GetActiveWidgetsOf(name string) (result []*widget.Wra
 }
 
 // MapWidgets is
-func (c *WidgetCollection) MapWidgets(fn func(*widget.WrapperWidget) error) (err error) {
+func (c *ViewManager) MapWidgets(fn func(*widget.WrapperWidget) error) (err error) {
 	for _, tab := range c.config.Layout {
 		for _, row := range tab.Rows {
 			for _, col := range row.Cols {
@@ -282,6 +282,6 @@ func (c *WidgetCollection) MapWidgets(fn func(*widget.WrapperWidget) error) (err
 }
 
 // GetGithubHost is
-func (c *WidgetCollection) GetGithubHost() string {
+func (c *ViewManager) GetGithubHost() string {
 	return c.config.GitHubHost
 }
