@@ -4,21 +4,21 @@ import (
 	"path/filepath"
 
 	ui "github.com/gizak/termui"
-	"github.com/qmu/mcc/config"
 	"github.com/qmu/mcc/github"
+	"github.com/qmu/mcc/model"
 	"github.com/qmu/mcc/widget"
 )
 
-// Dashboard controls termui's widget layout and keybindings
-type Dashboard struct {
+// Controller controls termui's widget layout and keybindings
+type Controller struct {
 	execPath    string
-	viewManager *config.ViewManager
+	viewManager *model.ViewManager
 	client      *github.Client
 }
 
-// NewDashboard constructs a new Dashboard
-func NewDashboard(appVersion string, configSchemaVersion string, configPath string) (err error) {
-	d := new(Dashboard)
+// NewController constructs a new Controller
+func NewController(appVersion string, configSchemaVersion string, configPath string) (err error) {
+	d := new(Controller)
 	d.execPath = filepath.Dir(configPath)
 
 	// initialize termui
@@ -27,7 +27,7 @@ func NewDashboard(appVersion string, configSchemaVersion string, configPath stri
 	}
 	defer ui.Close()
 
-	d.viewManager, err = config.NewViewManager(&config.LoaderOption{
+	d.viewManager, err = model.NewViewManager(&model.ConfigLoaderOption{
 		ExecPath:            d.execPath,
 		ConfigPath:          configPath,
 		AppVersion:          appVersion,
@@ -59,7 +59,7 @@ func NewDashboard(appVersion string, configSchemaVersion string, configPath stri
 	return
 }
 
-func (d *Dashboard) setKeyBindings() error {
+func (d *Controller) setKeyBindings() error {
 	ui.Handle("/sys/kbd/q", func(ui.Event) {
 		ui.StopLoop()
 	})
@@ -128,7 +128,7 @@ func (d *Dashboard) setKeyBindings() error {
 	return nil
 }
 
-func (d *Dashboard) renderGitHubIssueWidgets() {
+func (d *Controller) renderGitHubIssueWidgets() {
 	// initialize GitHub Client
 	host := d.viewManager.GetGithubHost()
 	if host == "" {

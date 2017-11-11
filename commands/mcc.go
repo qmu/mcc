@@ -37,7 +37,7 @@ func Mcc() (err error) {
 					os.Exit(1)
 				}
 			}
-			if err := controller.NewDashboard(Version, ConfigSchemaVersion, config); err != nil {
+			if err := controller.NewController(Version, ConfigSchemaVersion, config); err != nil {
 				log.Panicln(err)
 				os.Exit(1)
 			}

@@ -1,4 +1,4 @@
-package config
+package model
 
 import (
 	"fmt"
@@ -10,14 +10,14 @@ import (
 	yaml "gopkg.in/yaml.v1"
 )
 
-// Loader load and unmarshal config file
-type Loader struct {
+// ConfigLoader load and unmarshal config file
+type ConfigLoader struct {
 	config  *ConfRoot
-	options *LoaderOption
+	options *ConfigLoaderOption
 }
 
-// LoaderOption is some options for Loader constructor
-type LoaderOption struct {
+// ConfigLoaderOption is some options for ConfigLoader constructor
+type ConfigLoaderOption struct {
 	ExecPath            string
 	ConfigPath          string
 	AppVersion          string
@@ -73,9 +73,9 @@ type confWidget struct {
 	Path       string
 }
 
-// NewLoader constructs a Loader
-func NewLoader(opt *LoaderOption) (c *Loader, err error) {
-	c = new(Loader)
+// NewLoader constructs a ConfigLoader
+func NewLoader(opt *ConfigLoaderOption) (c *ConfigLoader, err error) {
+	c = new(ConfigLoader)
 	c.options = opt
 	file, err := ioutil.ReadFile(opt.ConfigPath)
 	if err != nil {
@@ -92,7 +92,7 @@ func NewLoader(opt *LoaderOption) (c *Loader, err error) {
 	return
 }
 
-func (c *Loader) checkConfigScheme() (err error) {
+func (c *ConfigLoader) checkConfigScheme() (err error) {
 	vApp, err := version.NewVersion(c.options.ConfigSchemaVersion)
 	vConfig, err := version.NewVersion(c.config.SchemaVersion)
 	if err != nil {
@@ -107,6 +107,6 @@ func (c *Loader) checkConfigScheme() (err error) {
 }
 
 // GetConfig is
-func (c *Loader) GetConfig() *ConfRoot {
+func (c *ConfigLoader) GetConfig() *ConfRoot {
 	return c.config
 }

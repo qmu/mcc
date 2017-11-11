@@ -1,4 +1,4 @@
-package config
+package model
 
 import (
 	"errors"
@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	ui "github.com/gizak/termui"
-	"github.com/qmu/mcc/config/vector"
+	"github.com/qmu/mcc/model/vector"
 	"github.com/qmu/mcc/utils"
 	"github.com/qmu/mcc/widget"
 )
@@ -14,7 +14,7 @@ import (
 // ViewManager load and unmarshal config file
 type ViewManager struct {
 	config            *ConfRoot
-	configManager     *Loader
+	configManager     *ConfigLoader
 	execPath          string
 	totalTab          int
 	activeWidgetIndex int
@@ -22,7 +22,7 @@ type ViewManager struct {
 }
 
 // NewViewManager constructs a ViewManager
-func NewViewManager(opt *LoaderOption) (c *ViewManager, err error) {
+func NewViewManager(opt *ConfigLoaderOption) (c *ViewManager, err error) {
 	c = new(ViewManager)
 	c.configManager, err = NewLoader(opt)
 	c.activeTabIndex = -1
@@ -93,6 +93,7 @@ func (c *ViewManager) buildCollection() (err error) {
 					if err != nil {
 						return err
 					}
+
 					ew := &widget.WrapperWidget{
 						Index:      idx,
 						WidgetType: wi.Type,
@@ -112,6 +113,7 @@ func (c *ViewManager) buildCollection() (err error) {
 					}
 					c.config.Layout[i1].Rows[i2].Cols[i3].Widgets = append(c.config.Layout[i1].Rows[i2].Cols[i3].Widgets, ew)
 					idx++
+
 				}
 			}
 		}
@@ -144,7 +146,21 @@ func (c *ViewManager) getWidgetByIndex(index int) (result *widget.WrapperWidget)
 	return
 }
 
-func (c *ViewManager) render(tab confTab) (err error) {
+func (c *ViewManager) activateFirstWidgetOnTab(idx int) {
+	for _, r := range c.config.Layout[idx].Rows {
+		for _, cl := range r.Cols {
+			for _, wi := range cl.Widgets {
+				if !wi.IsDisabled() && wi.IsReady() {
+					wi.Activate()
+					c.activeWidgetIndex = wi.Index
+					return
+				}
+			}
+		}
+	}
+}
+
+func (c *ViewManager) renderTabPane(tab confTab) (err error) {
 	ui.Clear()
 	ui.Body.Rows = ui.Body.Rows[:0]
 
@@ -190,20 +206,6 @@ func (c *ViewManager) render(tab confTab) (err error) {
 	return nil
 }
 
-func (c *ViewManager) activateFirstWidgetOnTab(idx int) {
-	for _, r := range c.config.Layout[idx].Rows {
-		for _, cl := range r.Cols {
-			for _, wi := range cl.Widgets {
-				if !wi.IsDisabled() && wi.IsReady() {
-					wi.Activate()
-					c.activeWidgetIndex = wi.Index
-					return
-				}
-			}
-		}
-	}
-}
-
 // SwitchTab is
 func (c *ViewManager) SwitchTab(tabIdx int) {
 	if tabIdx > c.totalTab-1 || tabIdx == c.activeTabIndex {
@@ -212,7 +214,7 @@ func (c *ViewManager) SwitchTab(tabIdx int) {
 	// layout header and body
 	for i, tab := range c.config.Layout {
 		if i == tabIdx {
-			if err := c.render(tab); err != nil {
+			if err := c.renderTabPane(tab); err != nil {
 				panic(err)
 			}
 		}
