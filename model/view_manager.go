@@ -49,29 +49,37 @@ func (c *ViewManager) buildCollection() (err error) {
 	for i1, tab := range c.config.Layout {
 		rowHTotal := 0
 		c.config.Layout[i1].Index = i1
-		for _, row := range tab.Rows {
+		for i2, row := range tab.Rows {
 			rowH := utils.Percentalize(windowH, row.Height)
 			for i3, col := range row.Cols {
-				cntH := 0
 				stackHTotal := 0
-				for _, stack := range col.Stacks {
+				for i4, stack := range col.Stacks {
 					realWidth := windowW / len(row.Cols)
 					realHeight := 0
-					if len(col.Stacks)-1 == i3 {
-						realHeight = rowH - cntH
+					// jusify height to fill at the very last of stacks
+					if i4 == len(col.Stacks)-1 {
+						// at the last row
+						if i2 == len(tab.Rows)-1 {
+							realHeight = windowH - rowHTotal - 3
+						} else {
+							realHeight = rowH - stackHTotal
+						}
 					} else {
 						realHeight = utils.Percentalize(rowH, stack.Height)
-						cntH += realHeight
 					}
 					collection.Register(&vector.RectangleOptions{
-						Index:    idx,
-						WindowW:  windowW,
-						WindowH:  windowH,
-						TabIndex: i1,
-						CenterX:  windowW/len(row.Cols)*i3 + (realWidth / 2),
-						CenterY:  rowHTotal + stackHTotal + (realHeight / 2),
-						Width:    realWidth,
-						Height:   realHeight,
+						Index:      idx,
+						RowIndex:   i2,
+						ColIndex:   i3,
+						FirstStack: i4 == 0,
+						LastStack:  i4 == len(col.Stacks)-1,
+						WindowW:    windowW,
+						WindowH:    windowH,
+						TabIndex:   i1,
+						CenterX:    windowW/len(row.Cols)*i3 + (realWidth / 2),
+						CenterY:    rowHTotal + stackHTotal + (realHeight / 2),
+						Width:      realWidth,
+						Height:     realHeight,
 					})
 					idx++
 					stackHTotal += realHeight
@@ -236,10 +244,23 @@ func (c *ViewManager) NextWidget(direction string) {
 	from := c.getWidgetByIndex(c.activeWidgetIndex)
 	toIdx := from.GetNeighborIndex(direction)
 	to := c.getWidgetByIndex(toIdx)
-	if from != nil && to != nil && !to.IsDisabled() && to.IsReady() {
-		from.Deactivate()
-		to.Activate()
-		c.activeWidgetIndex = toIdx
+	if from != nil && to != nil {
+		if !to.IsDisabled() && to.IsReady() {
+			from.Deactivate()
+			to.Activate()
+			c.activeWidgetIndex = toIdx
+		} else if to.IsDisabled() {
+			return
+		} else if !to.IsReady() {
+			// skip !IsReady widget
+			skipIdx := to.GetNeighborIndex(direction)
+			skip := c.getWidgetByIndex(skipIdx)
+			if skipIdx != -1 && skip != nil {
+				from.Deactivate()
+				c.activeWidgetIndex = toIdx
+				c.NextWidget(direction)
+			}
+		}
 	}
 }
 

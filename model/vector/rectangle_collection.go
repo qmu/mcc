@@ -48,16 +48,6 @@ func (r *RectangleCollection) CalcDistances() {
 				if i1 == i2 || w1.Tab != w2.Tab {
 					continue
 				}
-				var val float64
-				if d == "top" {
-					val = w1.toTop(w2)
-				} else if d == "right" {
-					val = w1.toRight(w2)
-				} else if d == "bottom" {
-					val = w1.toBottom(w2)
-				} else if d == "left" {
-					val = w1.toLeft(w2)
-				}
 				distances = append(distances, &distance{
 					direction: d,
 					from:      w1,
@@ -67,7 +57,7 @@ func (r *RectangleCollection) CalcDistances() {
 					toTab:     w2.Tab,
 					fromIndex: w1.index,
 					toIndex:   w2.index,
-					value:     val,
+					value:     w1.getDistance(w2, d),
 				})
 			}
 		}
@@ -77,25 +67,34 @@ func (r *RectangleCollection) CalcDistances() {
 		var nearestBottom *distance
 		var nearestLeft *distance
 		var nearestRight *distance
+		// if the distance is almost same
+		// first widget should be primary
+		privilege := 0
+		offset := 3
 		for _, d := range distances {
 			if f.index == d.toIndex || f.index != d.fromIndex || d.value < 0 {
 				continue
 			}
-			if d.direction == "top" && !f.edge.top {
+			d.value = d.value + float64(privilege)
+			if d.direction == "top" && !f.edge.top && (!f.firstStack || f.rowIndex-1 == d.to.rowIndex) {
 				if nearestTop == nil || nearestTop.value > d.value {
 					nearestTop = d
+					privilege = privilege + offset
 				}
-			} else if d.direction == "right" && !f.edge.right {
+			} else if d.direction == "right" && !f.edge.right && f.rowIndex == d.to.rowIndex {
 				if nearestRight == nil || nearestRight.value > d.value {
 					nearestRight = d
+					privilege = privilege + offset
 				}
-			} else if d.direction == "bottom" && !f.edge.bottom {
+			} else if d.direction == "bottom" && !f.edge.bottom && (!f.lastStack || f.rowIndex+1 == d.to.rowIndex) {
 				if nearestBottom == nil || nearestBottom.value > d.value {
 					nearestBottom = d
+					privilege = privilege + offset
 				}
-			} else if d.direction == "left" && !f.edge.left {
+			} else if d.direction == "left" && !f.edge.left && f.rowIndex == d.to.rowIndex {
 				if nearestLeft == nil || nearestLeft.value > d.value {
 					nearestLeft = d
+					privilege = privilege + offset
 				}
 			}
 		}
@@ -120,7 +119,7 @@ func (r *RectangleCollection) CalcDistances() {
 			r.rects[i].RightWidgetIndex = -1
 		}
 	}
-	// prevent moving on incorrect widget if the cursor is on the edge wiget.
+	// prevent moving on incorrect widget if the cursor is on the edge widget.
 	// this works if the layout is not filled with widgets.
 	for i, r1 := range r.rects {
 		for _, r2 := range r.rects {

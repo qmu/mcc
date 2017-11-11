@@ -132,7 +132,7 @@ func (n *DockerStatusWidget) Deactivate() {
 
 // IsDisabled is the implementation of Widget.IsDisabled
 func (n *DockerStatusWidget) IsDisabled() bool {
-	return n.disabled
+	return true
 }
 
 // IsReady is the implementation of Widget.IsReady

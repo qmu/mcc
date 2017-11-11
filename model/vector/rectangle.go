@@ -4,9 +4,13 @@ import "math"
 
 // Rectangle is
 type Rectangle struct {
-	index int
-	edge  Edge
-	area  Area
+	index      int
+	rowIndex   int
+	colIndex   int
+	firstStack bool
+	lastStack  bool
+	edge       Edge
+	area       Area
 
 	Height            int
 	Width             int
@@ -20,14 +24,18 @@ type Rectangle struct {
 
 // RectangleOptions is
 type RectangleOptions struct {
-	Index    int
-	WindowW  int
-	WindowH  int
-	TabIndex int
-	CenterX  int
-	CenterY  int
-	Height   int
-	Width    int
+	Index      int
+	RowIndex   int
+	ColIndex   int
+	FirstStack bool
+	LastStack  bool
+	WindowW    int
+	WindowH    int
+	TabIndex   int
+	CenterX    int
+	CenterY    int
+	Height     int
+	Width      int
 }
 
 // NewRectangle is
@@ -40,11 +48,15 @@ func NewRectangle(opt *RectangleOptions) (r *Rectangle) {
 		y: opt.CenterY,
 	}
 	r = &Rectangle{
-		index:  opt.Index,
-		Tab:    opt.TabIndex,
-		Height: opt.Height,
-		Width:  opt.Width,
-		Center: center,
+		index:      opt.Index,
+		rowIndex:   opt.RowIndex,
+		colIndex:   opt.ColIndex,
+		firstStack: opt.FirstStack,
+		lastStack:  opt.LastStack,
+		Tab:        opt.TabIndex,
+		Height:     opt.Height,
+		Width:      opt.Width,
+		Center:     center,
 		edge: Edge{
 			top:    center.y-opt.Height/2-1 <= 0,
 			right:  center.x+opt.Width/2+1 >= windowW,
@@ -96,6 +108,19 @@ type Point struct {
 	y int
 }
 
+func (v *Rectangle) getDistance(from *Rectangle, d string) float64 {
+	var val float64
+	if d == "top" {
+		val = v.toTop(from)
+	} else if d == "right" {
+		val = v.toRight(from)
+	} else if d == "bottom" {
+		val = v.toBottom(from)
+	} else if d == "left" {
+		val = v.toLeft(from)
+	}
+	return val
+}
 func (v *Rectangle) toTop(wTop *Rectangle) float64 {
 	wBottom := v
 	if wBottom.Center.y < wTop.Center.y {
@@ -103,7 +128,8 @@ func (v *Rectangle) toTop(wTop *Rectangle) float64 {
 	}
 	v1 := ltTolb(wBottom.area, wTop.area)
 	v2 := rtTorb(wBottom.area, wTop.area)
-	return v1 + v2
+	v3 := vectorDistance(wBottom.Center, wTop.Center)
+	return v1 + v2 + v3
 }
 func (v *Rectangle) toBottom(wBottom *Rectangle) float64 {
 	wTop := v
@@ -112,7 +138,8 @@ func (v *Rectangle) toBottom(wBottom *Rectangle) float64 {
 	}
 	v1 := lbTolt(wTop.area, wBottom.area)
 	v2 := rbTort(wTop.area, wBottom.area)
-	return v1 + v2
+	v3 := vectorDistance(wBottom.Center, wTop.Center)
+	return v1 + v2 + v3
 }
 func (v *Rectangle) toRight(wRight *Rectangle) float64 {
 	wLeft := v
@@ -121,7 +148,8 @@ func (v *Rectangle) toRight(wRight *Rectangle) float64 {
 	}
 	v1 := rtTolt(wLeft.area, wRight.area)
 	v2 := rbTolb(wLeft.area, wRight.area)
-	return v1 + v2
+	v3 := vectorDistance(wLeft.Center, wRight.Center)
+	return v1 + v2 + v3
 }
 func (v *Rectangle) toLeft(wLeft *Rectangle) float64 {
 	wRight := v
@@ -130,7 +158,8 @@ func (v *Rectangle) toLeft(wLeft *Rectangle) float64 {
 	}
 	v1 := lbTorb(wRight.area, wLeft.area)
 	v2 := ltTort(wRight.area, wLeft.area)
-	return v1 + v2
+	v3 := vectorDistance(wLeft.Center, wRight.Center)
+	return v1 + v2 + v3
 }
 
 func ltTolb(areaBottom Area, areaTop Area) float64 {
