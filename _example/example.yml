@@ -196,6 +196,7 @@ layout:
         height: 70%
         cols:
           - section: col
+            width: 4
             stacks:
               - id: menu1
                 height: 50% 
@@ -205,6 +206,7 @@ layout:
                 height: 25% 
 
           - section: col
+            width: 5
             stacks:
               - id: github_issue
                 height: 80% 
@@ -212,6 +214,7 @@ layout:
                 height: 20% 
 
           - section: col
+            width: 3
             stacks:
               - id: note
                 height: 100% 
@@ -220,11 +223,13 @@ layout:
         height: 30%
         cols:
           - section: col
+            width: 3
             stacks:
               - id: docker_status
                 height: 100% 
 
           - section: col
+            width: 9
             stacks:
               - id: tail_file
                 height: 100% 

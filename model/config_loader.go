@@ -54,6 +54,7 @@ type confCol struct {
 	Section string
 	Widgets []*widget.WrapperWidget
 	Stacks  []confStack
+	Width   int // grid system, accepts 1~12
 }
 
 // confCol is the schema implements ConfRoot.OriginalWidgets.Section

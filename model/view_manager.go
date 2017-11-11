@@ -55,6 +55,9 @@ func (c *ViewManager) buildCollection() (err error) {
 				stackHTotal := 0
 				for i4, stack := range col.Stacks {
 					realWidth := windowW / len(row.Cols)
+					if col.Width > 0 {
+						realWidth = windowW / 12 * col.Width
+					}
 					realHeight := 0
 					// jusify height to fill at the very last of stacks
 					if i4 == len(col.Stacks)-1 {
@@ -121,7 +124,6 @@ func (c *ViewManager) buildCollection() (err error) {
 					}
 					c.config.Layout[i1].Rows[i2].Cols[i3].Widgets = append(c.config.Layout[i1].Rows[i2].Cols[i3].Widgets, ew)
 					idx++
-
 				}
 			}
 		}
@@ -202,7 +204,11 @@ func (c *ViewManager) renderTabPane(tab confTab) (err error) {
 				cols = append(cols, gw...)
 				cnt++
 			}
-			newCols = append(newCols, ui.NewCol(12/len(row.Cols), 0, cols...))
+			colWidth := 12 / len(row.Cols)
+			if col.Width > 0 {
+				colWidth = col.Width
+			}
+			newCols = append(newCols, ui.NewCol(colWidth, 0, cols...))
 		}
 		newRows = append(newRows, ui.NewRow(newCols...))
 	}
