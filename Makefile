@@ -12,7 +12,9 @@ run:
 	go run $(LDFLAGS) *.go -c _example/example.yml
 
 erd:
-	go-erd -path ./dashboard/ |dot -Tsvg > ./_build/dashboard_erd.svg
+	go-erd -path ./widget |dot -Tsvg > ./_build/widget_erd.svg
+	go-erd -path ./model |dot -Tsvg > ./_build/model_erd.svg
+	go-erd -path ./model/vector |dot -Tsvg > ./_build/vector_erd.svg
 
 fmt:
 	gofmt -s -w ./
