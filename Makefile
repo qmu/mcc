@@ -2,7 +2,7 @@ NAME := mcc
 VERSION := v0.9.5
 CONFIG_SCHEMA_VERSION := v1.1.0
 SRCS      := $(shell find . -name '*.go' -type f)
-LDFLAGS   := -ldflags "-X github.com/qmu/mcc/commands.Version=$(VERSION) -X github.com/qmu/mcc/commands.ConfigSchemaVersion=$(CONFIG_SCHEMA_VERSION)"
+LDFLAGS   := -ldflags "-X github.com/qmu/mcc/controller.Version=$(VERSION) -X github.com/qmu/mcc/controller.ConfigSchemaVersion=$(CONFIG_SCHEMA_VERSION)"
 GH_UPLOAD := github-release upload --user qmu --repo $(NAME) --tag $(VERSION)
 
 version:

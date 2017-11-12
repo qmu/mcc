@@ -4,11 +4,11 @@ import (
 	"log"
 	"os"
 
-	"github.com/qmu/mcc/commands"
+	"github.com/qmu/mcc/controller"
 )
 
 func main() {
-	if err := commands.Mcc(); err != nil {
+	if err := controller.Run(); err != nil {
 		log.Panicln(err)
 		os.Exit(1)
 	}

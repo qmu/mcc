@@ -1,11 +1,10 @@
-package commands
+package controller
 
 import (
 	"fmt"
 	"log"
 	"os"
 
-	"github.com/qmu/mcc/controller"
 	"github.com/spf13/cobra"
 )
 
@@ -18,8 +17,8 @@ var ConfigSchemaVersion string
 // RootCmd is the cobra's root command
 var RootCmd *cobra.Command
 
-// Mcc runs mcc
-func Mcc() (err error) {
+// Run runs mcc
+func Run() (err error) {
 	var config string
 	RootCmd = &cobra.Command{
 		Use: "mcc",
@@ -37,7 +36,7 @@ func Mcc() (err error) {
 					os.Exit(1)
 				}
 			}
-			if err := controller.NewController(Version, ConfigSchemaVersion, config); err != nil {
+			if err := NewController(Version, ConfigSchemaVersion, config); err != nil {
 				log.Panicln(err)
 				os.Exit(1)
 			}
