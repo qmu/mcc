@@ -28,7 +28,7 @@ build:
 	gox $(LDFLAGS) -osarch="linux/amd64 darwin/amd64 linux/386 darwin/386" -output="_build/{{.OS}}_{{.Arch}}_{{.Dir}}"
 
 test:
-	go test github.com/qmu/mcc/...
+	go test github.com/qmu/mcc/... -cover
 
 release:
 	mkdir release
