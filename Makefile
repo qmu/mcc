@@ -30,6 +30,9 @@ build:
 test:
 	go test github.com/qmu/mcc/... -cover
 
+bench:
+	go test github.com/qmu/mcc/... -bench . -benchmem
+
 release:
 	mkdir release
 	go get github.com/aktau/github-release/...

@@ -4,11 +4,58 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"strconv"
 
 	version "github.com/hashicorp/go-version"
 	"github.com/qmu/mcc/widget"
 	yaml "gopkg.in/yaml.v1"
 )
+
+// ConfRoot is the root schema of config file
+type ConfRoot struct {
+	SchemaVersion string `yaml:"schema_version"`
+	Timezone      string
+	GitHubHost    string `yaml:"github_url"`
+	Envs          []map[string]string
+	Widgets       []widgetNode
+	Layout        []tabNode
+}
+
+// tabNode is the schema implements ConfRoot.OriginalWidgets.Section
+type tabNode struct {
+	Index int
+	Name  string
+	Rows  []rowNode
+}
+
+// rowNode is the schema implements ConfRoot.OriginalWidgets.Section
+type rowNode struct {
+	Height string // percent
+	Cols   []colNode
+}
+
+// colNode is the schema implements ConfRoot.OriginalWidgets.Section
+type colNode struct {
+	Widgets []*widget.WrapperWidget
+	Stacks  []stackNode
+	Width   int // grid system, accepts 1~12
+}
+
+// colNode is the schema implements ConfRoot.OriginalWidgets.Section
+type stackNode struct {
+	ID     string
+	Height string // percent
+}
+
+// widgetNode is the schema implements ConfRoot.OriginalWidgets
+type widgetNode struct {
+	ID         string
+	Title      string
+	Type       string
+	IssueRegex string `yaml:"issue_regex"`
+	Content    interface{}
+	Path       string
+}
 
 // ConfigLoader load and unmarshal config file
 type ConfigLoader struct {
@@ -22,56 +69,6 @@ type ConfigLoaderOption struct {
 	ConfigPath          string
 	AppVersion          string
 	ConfigSchemaVersion string
-}
-
-// ConfRoot is the root schema of config file
-type ConfRoot struct {
-	SchemaVersion string `yaml:"schema_version"`
-	Timezone      string
-	GitHubHost    string `yaml:"github_url"`
-	Envs          []map[string]string
-	Widgets       []confWidget
-	Layout        []confTab
-}
-
-// confTab is the schema implements ConfRoot.OriginalWidgets.Section
-type confTab struct {
-	Section string
-	Index   int
-	Name    string
-	Rows    []confRow
-}
-
-// confRow is the schema implements ConfRoot.OriginalWidgets.Section
-type confRow struct {
-	Section string
-	Height  string // percent
-	Cols    []confCol
-}
-
-// confCol is the schema implements ConfRoot.OriginalWidgets.Section
-type confCol struct {
-	Section string
-	Widgets []*widget.WrapperWidget
-	Stacks  []confStack
-	Width   int // grid system, accepts 1~12
-}
-
-// confCol is the schema implements ConfRoot.OriginalWidgets.Section
-type confStack struct {
-	ID     string
-	Height string // percent
-}
-
-// confWidget is the schema implements ConfRoot.OriginalWidgets
-type confWidget struct {
-	ID         string
-	Title      string
-	Col        int
-	Type       string
-	IssueRegex string `yaml:"issue_regex"`
-	Content    interface{}
-	Path       string
 }
 
 // NewLoader constructs a ConfigLoader
@@ -90,6 +87,30 @@ func NewLoader(opt *ConfigLoaderOption) (c *ConfigLoader, err error) {
 	if err != nil {
 		return
 	}
+	validator, err := NewConfigValidator()
+	if err != nil {
+		return
+	}
+
+	res, err := validator.validate(c.config)
+	if err != nil {
+		return
+	}
+	if res != nil {
+		fmt.Println("==================================================================")
+		fmt.Println("CONFIGURATION ERROR")
+		fmt.Println("==================================================================")
+		for i, r := range res {
+			fmt.Println("No." + strconv.Itoa(i+1) + " : " + r.message + " (position : " + r.position + ")")
+		}
+		fmt.Println("==================================================================")
+		os.Exit(0)
+	}
+
+	err = c.fixIncompleteParamas()
+	if err != nil {
+		return
+	}
 	return
 }
 
@@ -104,6 +125,16 @@ func (c *ConfigLoader) checkConfigScheme() (err error) {
 		fmt.Printf("please upgrade mcc or %s first\n", c.options.ConfigPath)
 		os.Exit(1)
 	}
+	return
+}
+
+func (c *ConfigLoader) fixIncompleteParamas() (err error) {
+	// for _, t := range c.config.Layout {
+	// 	for _, r := range t.Rows {
+	// 		pp.Println(r.Height)
+	// 	}
+	// }
+	// os.Exit(0)
 	return
 }
 

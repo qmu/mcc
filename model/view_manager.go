@@ -35,6 +35,7 @@ func NewViewManager(opt *ConfigLoaderOption) (c *ViewManager, err error) {
 	}
 	c.config = c.configManager.GetConfig()
 	c.execPath = opt.ExecPath
+
 	err = c.buildCollection()
 	if err != nil {
 		return
@@ -143,10 +144,10 @@ func (c *ViewManager) buildCollection() (err error) {
 	return
 }
 
-func (c *ViewManager) getWidgetByID(id string) (result confWidget, err error) {
+func (c *ViewManager) getWidgetByID(id string) (result *widgetNode, err error) {
 	for _, d := range c.config.Widgets {
 		if d.ID == id {
-			result = d
+			result = &d
 			return
 		}
 	}
@@ -177,7 +178,7 @@ func (c *ViewManager) activateFirstWidgetOnTab(idx int) {
 	}
 }
 
-func (c *ViewManager) renderTabPane(tab confTab) (err error) {
+func (c *ViewManager) renderTabPane(tab *tabNode) (err error) {
 	ui.Clear()
 	ui.Body.Rows = ui.Body.Rows[:0]
 
@@ -235,7 +236,7 @@ func (c *ViewManager) SwitchTab(tabIdx int) {
 	// layout header and body
 	for i, tab := range c.config.Layout {
 		if i == tabIdx {
-			if err := c.renderTabPane(tab); err != nil {
+			if err := c.renderTabPane(&tab); err != nil {
 				panic(err)
 			}
 		}
