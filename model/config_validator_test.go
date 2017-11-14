@@ -10,26 +10,26 @@ func BenchmarkValidateLayout(b *testing.B) {
 
 	// vErrInvalidTotalStackHeight
 	conf := ConfRoot{
-		Widgets: []widgetNode{
-			widgetNode{
+		Widgets: []*widgetNode{
+			&widgetNode{
 				ID: "hoge",
 			},
 		},
-		Layout: []tabNode{
-			tabNode{
+		Layout: []*tabNode{
+			&tabNode{
 				Name: "Tab1",
-				Rows: []rowNode{
-					rowNode{
+				Rows: []*rowNode{
+					&rowNode{
 						Height: "50%",
-						Cols: []colNode{
-							colNode{
+						Cols: []*colNode{
+							&colNode{
 								Width: 7,
-								Stacks: []stackNode{
-									stackNode{
+								Stacks: []*stackNode{
+									&stackNode{
 										ID:     "hoge",
 										Height: "80%",
 									},
-									stackNode{
+									&stackNode{
 										ID:     "hoge",
 										Height: "30%",
 									},
@@ -54,8 +54,8 @@ func BenchmarkValidateWidgets(b *testing.B) {
 
 	// vErrLackOfDockerStatusInvalidMetrics
 	conf := ConfRoot{
-		Widgets: []widgetNode{
-			widgetNode{
+		Widgets: []*widgetNode{
+			&widgetNode{
 				ID:    "widget1",
 				Title: "widget1",
 				Type:  "docker_status",
@@ -76,34 +76,34 @@ func BenchmarkValidateWidgets(b *testing.B) {
 func TestValidate(t *testing.T) {
 	v, _ := NewConfigValidator()
 	conf := ConfRoot{
-		Widgets: []widgetNode{
-			widgetNode{
+		Widgets: []*widgetNode{
+			&widgetNode{
 				ID:    "widget1",
 				Title: "widget1",
 				Type:  "tail_file",
 			},
-			widgetNode{
+			&widgetNode{
 				ID:    "widget2",
 				Title: "widget2",
 				Type:  "text_file",
 				Path:  "./",
 			},
 		},
-		Layout: []tabNode{
-			tabNode{
+		Layout: []*tabNode{
+			&tabNode{
 				Name: "Tab1",
-				Rows: []rowNode{
-					rowNode{
+				Rows: []*rowNode{
+					&rowNode{
 						Height: "50%",
-						Cols: []colNode{
-							colNode{
+						Cols: []*colNode{
+							&colNode{
 								Width: 7,
-								Stacks: []stackNode{
-									stackNode{
+								Stacks: []*stackNode{
+									&stackNode{
 										ID:     "widget1",
 										Height: "80%",
 									},
-									stackNode{
+									&stackNode{
 										ID:     "widget2",
 										Height: "30%",
 									},
@@ -132,8 +132,8 @@ func TestValidateWidgets(t *testing.T) {
 
 	// vErrLackOfWidgetID
 	conf := ConfRoot{
-		Widgets: []widgetNode{
-			widgetNode{
+		Widgets: []*widgetNode{
+			&widgetNode{
 				Type:  "note",
 				Title: "hoge",
 			},
@@ -145,8 +145,8 @@ func TestValidateWidgets(t *testing.T) {
 
 	// vErrLackOfWidgetType
 	conf = ConfRoot{
-		Widgets: []widgetNode{
-			widgetNode{
+		Widgets: []*widgetNode{
+			&widgetNode{
 				ID:    "hoge",
 				Title: "hoge",
 			},
@@ -158,8 +158,8 @@ func TestValidateWidgets(t *testing.T) {
 
 	// vErrLackOfWidgetTitle
 	conf = ConfRoot{
-		Widgets: []widgetNode{
-			widgetNode{
+		Widgets: []*widgetNode{
+			&widgetNode{
 				ID:   "hoge",
 				Type: "note",
 			},
@@ -171,8 +171,8 @@ func TestValidateWidgets(t *testing.T) {
 
 	// vErrLackOfNoteContent
 	conf = ConfRoot{
-		Widgets: []widgetNode{
-			widgetNode{
+		Widgets: []*widgetNode{
+			&widgetNode{
 				ID:    "widget1",
 				Title: "widget1",
 				Type:  "note",
@@ -185,8 +185,8 @@ func TestValidateWidgets(t *testing.T) {
 
 	// vErrLackOfTextFilePath
 	conf = ConfRoot{
-		Widgets: []widgetNode{
-			widgetNode{
+		Widgets: []*widgetNode{
+			&widgetNode{
 				ID:    "widget1",
 				Title: "widget1",
 				Type:  "text_file",
@@ -199,8 +199,8 @@ func TestValidateWidgets(t *testing.T) {
 
 	// vErrLackOfDockerStatusContent
 	conf = ConfRoot{
-		Widgets: []widgetNode{
-			widgetNode{
+		Widgets: []*widgetNode{
+			&widgetNode{
 				ID:    "widget1",
 				Title: "widget1",
 				Type:  "docker_status",
@@ -213,8 +213,8 @@ func TestValidateWidgets(t *testing.T) {
 
 	// vErrLackOfDockerStatusName
 	conf = ConfRoot{
-		Widgets: []widgetNode{
-			widgetNode{
+		Widgets: []*widgetNode{
+			&widgetNode{
 				ID:    "widget1",
 				Title: "widget1",
 				Type:  "docker_status",
@@ -233,8 +233,8 @@ func TestValidateWidgets(t *testing.T) {
 
 	// vErrLackOfDockerStatusContainer
 	conf = ConfRoot{
-		Widgets: []widgetNode{
-			widgetNode{
+		Widgets: []*widgetNode{
+			&widgetNode{
 				ID:    "widget1",
 				Title: "widget1",
 				Type:  "docker_status",
@@ -253,8 +253,8 @@ func TestValidateWidgets(t *testing.T) {
 
 	// vErrLackOfDockerStatusContainer
 	conf = ConfRoot{
-		Widgets: []widgetNode{
-			widgetNode{
+		Widgets: []*widgetNode{
+			&widgetNode{
 				ID:    "widget1",
 				Title: "widget1",
 				Type:  "docker_status",
@@ -273,8 +273,8 @@ func TestValidateWidgets(t *testing.T) {
 
 	// vErrLackOfDockerStatusInvalidMetrics
 	conf = ConfRoot{
-		Widgets: []widgetNode{
-			widgetNode{
+		Widgets: []*widgetNode{
+			&widgetNode{
 				ID:    "widget1",
 				Title: "widget1",
 				Type:  "docker_status",
@@ -294,8 +294,8 @@ func TestValidateWidgets(t *testing.T) {
 
 	// vErrLackOfMenuContent
 	conf = ConfRoot{
-		Widgets: []widgetNode{
-			widgetNode{
+		Widgets: []*widgetNode{
+			&widgetNode{
 				ID:    "widget1",
 				Title: "widget1",
 				Type:  "menu",
@@ -308,8 +308,8 @@ func TestValidateWidgets(t *testing.T) {
 
 	// vErrLackOfMenuName
 	conf = ConfRoot{
-		Widgets: []widgetNode{
-			widgetNode{
+		Widgets: []*widgetNode{
+			&widgetNode{
 				ID:    "widget1",
 				Title: "widget1",
 				Type:  "menu",
@@ -329,8 +329,8 @@ func TestValidateWidgets(t *testing.T) {
 
 	// vErrLackOfMenuCategory
 	conf = ConfRoot{
-		Widgets: []widgetNode{
-			widgetNode{
+		Widgets: []*widgetNode{
+			&widgetNode{
 				ID:    "widget1",
 				Title: "widget1",
 				Type:  "menu",
@@ -350,8 +350,8 @@ func TestValidateWidgets(t *testing.T) {
 
 	// vErrLackOfMenuDescription
 	conf = ConfRoot{
-		Widgets: []widgetNode{
-			widgetNode{
+		Widgets: []*widgetNode{
+			&widgetNode{
 				ID:    "widget1",
 				Title: "widget1",
 				Type:  "menu",
@@ -371,8 +371,8 @@ func TestValidateWidgets(t *testing.T) {
 
 	// vErrLackOfMenuCommand
 	conf = ConfRoot{
-		Widgets: []widgetNode{
-			widgetNode{
+		Widgets: []*widgetNode{
+			&widgetNode{
 				ID:    "widget1",
 				Title: "widget1",
 				Type:  "menu",
@@ -392,8 +392,8 @@ func TestValidateWidgets(t *testing.T) {
 
 	// vErrLackOfGithubIssueRegex
 	conf = ConfRoot{
-		Widgets: []widgetNode{
-			widgetNode{
+		Widgets: []*widgetNode{
+			&widgetNode{
 				ID:    "widget1",
 				Title: "widget1",
 				Type:  "github_issue",
@@ -406,8 +406,8 @@ func TestValidateWidgets(t *testing.T) {
 
 	// vErrLackOfTailFilePath
 	conf = ConfRoot{
-		Widgets: []widgetNode{
-			widgetNode{
+		Widgets: []*widgetNode{
+			&widgetNode{
 				ID:    "widget1",
 				Title: "widget1",
 				Type:  "tail_file",
@@ -430,8 +430,8 @@ func TestValidateLayout(t *testing.T) {
 
 	// vErrLackOfTabName
 	conf = ConfRoot{
-		Layout: []tabNode{
-			tabNode{},
+		Layout: []*tabNode{
+			&tabNode{},
 		},
 	}
 	if vErrs, err := v.validateLayout(&conf); vErrs[0].message != vErrLackOfTabName {
@@ -440,8 +440,8 @@ func TestValidateLayout(t *testing.T) {
 
 	// vErrLackOfTabRows
 	conf = ConfRoot{
-		Layout: []tabNode{
-			tabNode{
+		Layout: []*tabNode{
+			&tabNode{
 				Name: "Tab1",
 			},
 		},
@@ -452,13 +452,13 @@ func TestValidateLayout(t *testing.T) {
 
 	// vErrRowHeightInvalid
 	conf = ConfRoot{
-		Layout: []tabNode{
-			tabNode{
+		Layout: []*tabNode{
+			&tabNode{
 				Name: "Tab1",
-				Rows: []rowNode{
-					rowNode{
+				Rows: []*rowNode{
+					&rowNode{
 						Height: "101%",
-						Cols:   []colNode{},
+						Cols:   []*colNode{},
 					},
 				},
 			},
@@ -470,11 +470,11 @@ func TestValidateLayout(t *testing.T) {
 
 	// vErrLackOfRowCols
 	conf = ConfRoot{
-		Layout: []tabNode{
-			tabNode{
+		Layout: []*tabNode{
+			&tabNode{
 				Name: "Tab1",
-				Rows: []rowNode{
-					rowNode{
+				Rows: []*rowNode{
+					&rowNode{
 						Height: "100%",
 					},
 				},
@@ -487,14 +487,14 @@ func TestValidateLayout(t *testing.T) {
 
 	// vErrColWidthInvalid
 	conf = ConfRoot{
-		Layout: []tabNode{
-			tabNode{
+		Layout: []*tabNode{
+			&tabNode{
 				Name: "Tab1",
-				Rows: []rowNode{
-					rowNode{
+				Rows: []*rowNode{
+					&rowNode{
 						Height: "100%",
-						Cols: []colNode{
-							colNode{
+						Cols: []*colNode{
+							&colNode{
 								Width: 13,
 							},
 						},
@@ -509,14 +509,14 @@ func TestValidateLayout(t *testing.T) {
 
 	// vErrLackOfColStacks
 	conf = ConfRoot{
-		Layout: []tabNode{
-			tabNode{
+		Layout: []*tabNode{
+			&tabNode{
 				Name: "Tab1",
-				Rows: []rowNode{
-					rowNode{
+				Rows: []*rowNode{
+					&rowNode{
 						Height: "100%",
-						Cols: []colNode{
-							colNode{
+						Cols: []*colNode{
+							&colNode{
 								Width: 12,
 							},
 						},
@@ -531,17 +531,17 @@ func TestValidateLayout(t *testing.T) {
 
 	// vErrLackOfStackID
 	conf = ConfRoot{
-		Layout: []tabNode{
-			tabNode{
+		Layout: []*tabNode{
+			&tabNode{
 				Name: "Tab1",
-				Rows: []rowNode{
-					rowNode{
+				Rows: []*rowNode{
+					&rowNode{
 						Height: "100%",
-						Cols: []colNode{
-							colNode{
+						Cols: []*colNode{
+							&colNode{
 								Width: 12,
-								Stacks: []stackNode{
-									stackNode{
+								Stacks: []*stackNode{
+									&stackNode{
 										Height: "100%",
 									},
 								},
@@ -558,22 +558,22 @@ func TestValidateLayout(t *testing.T) {
 
 	// vErrWidgetDoesNotExit
 	conf = ConfRoot{
-		Widgets: []widgetNode{
-			widgetNode{
+		Widgets: []*widgetNode{
+			&widgetNode{
 				ID: "hoge",
 			},
 		},
-		Layout: []tabNode{
-			tabNode{
+		Layout: []*tabNode{
+			&tabNode{
 				Name: "Tab1",
-				Rows: []rowNode{
-					rowNode{
+				Rows: []*rowNode{
+					&rowNode{
 						Height: "100%",
-						Cols: []colNode{
-							colNode{
+						Cols: []*colNode{
+							&colNode{
 								Width: 12,
-								Stacks: []stackNode{
-									stackNode{
+								Stacks: []*stackNode{
+									&stackNode{
 										ID:     "fuga",
 										Height: "100%",
 									},
@@ -591,22 +591,22 @@ func TestValidateLayout(t *testing.T) {
 
 	// vErrWidgetDoesNotExit
 	conf = ConfRoot{
-		Widgets: []widgetNode{
-			widgetNode{
+		Widgets: []*widgetNode{
+			&widgetNode{
 				ID: "hoge",
 			},
 		},
-		Layout: []tabNode{
-			tabNode{
+		Layout: []*tabNode{
+			&tabNode{
 				Name: "Tab1",
-				Rows: []rowNode{
-					rowNode{
+				Rows: []*rowNode{
+					&rowNode{
 						Height: "100%",
-						Cols: []colNode{
-							colNode{
+						Cols: []*colNode{
+							&colNode{
 								Width: 12,
-								Stacks: []stackNode{
-									stackNode{
+								Stacks: []*stackNode{
+									&stackNode{
 										ID:     "hoge",
 										Height: "101%",
 									},
@@ -624,35 +624,35 @@ func TestValidateLayout(t *testing.T) {
 
 	// vErrInvalidTotalRowHeight
 	conf = ConfRoot{
-		Widgets: []widgetNode{
-			widgetNode{
+		Widgets: []*widgetNode{
+			&widgetNode{
 				ID: "hoge",
 			},
 		},
-		Layout: []tabNode{
-			tabNode{
+		Layout: []*tabNode{
+			&tabNode{
 				Name: "Tab1",
-				Rows: []rowNode{
-					rowNode{
+				Rows: []*rowNode{
+					&rowNode{
 						Height: "50%",
-						Cols: []colNode{
-							colNode{
+						Cols: []*colNode{
+							&colNode{
 								Width: 12,
-								Stacks: []stackNode{
-									stackNode{
+								Stacks: []*stackNode{
+									&stackNode{
 										ID: "hoge",
 									},
 								},
 							},
 						},
 					},
-					rowNode{
+					&rowNode{
 						Height: "60%",
-						Cols: []colNode{
-							colNode{
+						Cols: []*colNode{
+							&colNode{
 								Width: 12,
-								Stacks: []stackNode{
-									stackNode{
+								Stacks: []*stackNode{
+									&stackNode{
 										ID: "hoge",
 									},
 								},
@@ -669,30 +669,30 @@ func TestValidateLayout(t *testing.T) {
 
 	// vErrInvalidTotalColWidth
 	conf = ConfRoot{
-		Widgets: []widgetNode{
-			widgetNode{
+		Widgets: []*widgetNode{
+			&widgetNode{
 				ID: "hoge",
 			},
 		},
-		Layout: []tabNode{
-			tabNode{
+		Layout: []*tabNode{
+			&tabNode{
 				Name: "Tab1",
-				Rows: []rowNode{
-					rowNode{
+				Rows: []*rowNode{
+					&rowNode{
 						Height: "50%",
-						Cols: []colNode{
-							colNode{
+						Cols: []*colNode{
+							&colNode{
 								Width: 7,
-								Stacks: []stackNode{
-									stackNode{
+								Stacks: []*stackNode{
+									&stackNode{
 										ID: "hoge",
 									},
 								},
 							},
-							colNode{
+							&colNode{
 								Width: 6,
-								Stacks: []stackNode{
-									stackNode{
+								Stacks: []*stackNode{
+									&stackNode{
 										ID: "hoge",
 									},
 								},
@@ -709,26 +709,26 @@ func TestValidateLayout(t *testing.T) {
 
 	// vErrInvalidTotalStackHeight
 	conf = ConfRoot{
-		Widgets: []widgetNode{
-			widgetNode{
+		Widgets: []*widgetNode{
+			&widgetNode{
 				ID: "hoge",
 			},
 		},
-		Layout: []tabNode{
-			tabNode{
+		Layout: []*tabNode{
+			&tabNode{
 				Name: "Tab1",
-				Rows: []rowNode{
-					rowNode{
+				Rows: []*rowNode{
+					&rowNode{
 						Height: "50%",
-						Cols: []colNode{
-							colNode{
+						Cols: []*colNode{
+							&colNode{
 								Width: 7,
-								Stacks: []stackNode{
-									stackNode{
+								Stacks: []*stackNode{
+									&stackNode{
 										ID:     "hoge",
 										Height: "80%",
 									},
-									stackNode{
+									&stackNode{
 										ID:     "hoge",
 										Height: "30%",
 									},

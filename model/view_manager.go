@@ -147,7 +147,7 @@ func (c *ViewManager) buildCollection() (err error) {
 func (c *ViewManager) getWidgetByID(id string) (result *widgetNode, err error) {
 	for _, d := range c.config.Widgets {
 		if d.ID == id {
-			result = &d
+			result = d
 			return
 		}
 	}
@@ -236,7 +236,7 @@ func (c *ViewManager) SwitchTab(tabIdx int) {
 	// layout header and body
 	for i, tab := range c.config.Layout {
 		if i == tabIdx {
-			if err := c.renderTabPane(&tab); err != nil {
+			if err := c.renderTabPane(tab); err != nil {
 				panic(err)
 			}
 		}

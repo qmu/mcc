@@ -1,0 +1,48 @@
+---
+schema_version: v1.1.0
+timezone: Asia/Tokyo
+
+widgets:
+  - id: note
+    type: note
+    title: NOTE WIDGET
+    content: |
+      # text text text
+      text text text
+
+layout:
+  - name: LAYOUT EXAMPLE1
+    rows:
+      - height: 33% 
+        cols:
+          - stacks:
+              - id: note
+                height: 33%
+              - id: note
+              - id: note
+          - stacks:
+              - id: note
+              - id: note
+          - stacks:
+              - id: note
+                height: 100% 
+
+      - cols:
+          - width: 5
+            stacks:
+              - id: note
+          - stacks:
+              - id: note
+          - stacks:
+              - id: note
+
+      - cols:
+          - width: 5
+            stacks:
+              - id: note
+
+  - name: LAYOUT EXAMPLE2
+    rows:
+      - cols:
+          - stacks:
+              - id: note
