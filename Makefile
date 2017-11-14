@@ -33,6 +33,17 @@ test:
 bench:
 	go test github.com/qmu/mcc/... -bench . -benchmem
 
+lines:
+	@echo "=== implements =========================="
+	@wc -l $(shell find . -name "*.go" | grep -v /vendor/ | grep -v _test.go)
+	@echo "--- without line break & comment line"
+	@find . -name "*.go" | grep -v /vendor/ | grep -v _test.go | xargs grep -h "^\s*[^\/\/]" | wc -l
+	@echo "=== test code ==========================="
+	@wc -l $(shell find . -name "*_test.go" | grep -v /vendor/)
+	@echo "--- without line break & comment line"
+	@find . -name "*_test.go" | grep -v /vendor/ | xargs grep -h "^\s*[^\/\/]" | wc -l
+
+
 release:
 	mkdir release
 	go get github.com/aktau/github-release/...
