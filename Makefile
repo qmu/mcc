@@ -27,11 +27,15 @@ build:
 	mkdir -p _build
 	gox $(LDFLAGS) -osarch="linux/amd64 darwin/amd64 linux/386 darwin/386" -output="_build/{{.OS}}_{{.Arch}}_{{.Dir}}"
 
+# test > textfile > cat > rm... this is necessary because screen would be flush during tests
 test:
-	go test github.com/qmu/mcc/... -cover
+	go test github.com/qmu/mcc/... -cover > _build/test.txt && cat _build/test.txt
+	@rm _build/test.txt
 
+# same reason above
 bench:
-	go test github.com/qmu/mcc/... -bench . -benchmem
+	go test github.com/qmu/mcc/... -bench . -benchmem > _build/bench.txt && cat _build/bench.txt
+	@rm _build/bench.txt
 
 lines:
 	@echo "=== implements =========================="
