@@ -1,5 +1,5 @@
 NAME := mcc
-VERSION := v0.9.5
+VERSION := v0.9.6
 CONFIG_SCHEMA_VERSION := v1.1.0
 SRCS      := $(shell find . -name '*.go' -type f)
 LDFLAGS   := -ldflags "-X github.com/qmu/mcc/controller.Version=$(VERSION) -X github.com/qmu/mcc/controller.ConfigSchemaVersion=$(CONFIG_SCHEMA_VERSION)"
