@@ -58,6 +58,9 @@ lines:
 
 .PHONY: release
 release:
+	rm release
+	@make clean
+	@make build
 	mkdir release
 	go get github.com/aktau/github-release/...
 	cp -R _build/* release
