@@ -54,6 +54,7 @@ func NewController(appVersion string, configSchemaVersion string, configPath str
 			}
 		}()
 	}
+
 	if debug {
 		return
 	}
@@ -116,7 +117,7 @@ func (d *Controller) setKeyBindings() error {
 	if d.viewManager.HasWidget("docker_status") {
 		ui.Handle("/timer/1s", func(e ui.Event) {
 			err := d.viewManager.MapWidgets(func(w *widget.WrapperWidget) (err error) {
-				if w.Is("docker_status") && !w.IsDisabled() {
+				if w.Is("docker_status") {
 					w.Render()
 				}
 				return
