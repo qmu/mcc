@@ -58,7 +58,6 @@ lines:
 
 .PHONY: release
 release:
-	rm release
 	@make clean
 	@make build
 	mkdir release
