@@ -1,4 +1,4 @@
-package dashboard
+package widget
 
 import (
 	"fmt"
@@ -11,17 +11,17 @@ import (
 
 	ui "github.com/gizak/termui"
 	"github.com/qmu/mcc/utils"
+	"github.com/qmu/mcc/widget/listable"
 	"gopkg.in/src-d/go-git.v4"
-	// "github.com/k0kubun/pp"
 )
 
 // GitStatusWidget is a command launcher
 type GitStatusWidget struct {
-	renderer    *ListWrapper
+	options     *Option
+	renderer    *listable.ListWrapper
 	isReady     bool
 	disabled    bool
 	statusItems StatusItems
-	envs        []map[string]string
 }
 
 // StatusItem is a struct which stores each file status of git status
@@ -67,57 +67,32 @@ func (b ByPath) Less(i, j int) bool {
 }
 
 // NewGitStatusWidget constructs a New GitStatusWidget
-func NewGitStatusWidget(wi Widget, execPath string, envs []map[string]string) (g *GitStatusWidget, err error) {
+func NewGitStatusWidget(opt *Option) (g *GitStatusWidget, err error) {
 	g = new(GitStatusWidget)
+	g.options = opt
 
-	g.envs = envs
-	body, err := g.buildBody(execPath)
-	if err != nil {
-		return
-	}
-	var header []string
-	if body == nil {
-		body = []string{
-			"Worktree is clean",
-		}
-	} else {
-		n1, n2, n3 := g.getLongest()
-		c1 := g.fillSpaces("STAGE ", n1)
-		c2 := g.fillSpaces("STATUS ", n2)
-		c3 := g.fillSpaces("PATH ", n3)
-		header = []string{
-			" [" + c1 + " | " + c2 + " | " + c3 + "](fg-blue)\n",
-			" [" + strings.Repeat("-", 500) + "](fg-blue)\n"}
-	}
+	header := g.buildHeader()
 
-	opt := &ListWrapperOption{
-		Title:         wi.Title,
-		RealHeight:    wi.RealHeight,
+	lopt := &listable.ListWrapperOption{
+		Title:         g.options.GetTitle(),
+		RealHeight:    g.options.GetHeight(),
 		Header:        header,
-		Body:          body,
 		LineHighLight: true,
 	}
-	g.renderer = NewListWrapper(opt)
+	g.renderer = listable.NewListWrapper(lopt)
 	g.isReady = true
 
 	return
 }
 
-func (g *GitStatusWidget) getStatus(execPath string) (status git.Status, err error) {
-	// Load worktree status
-	dotGitPath, err := utils.GetDotGitPath(execPath)
-	r, err := git.PlainOpen(dotGitPath)
-	if err != nil {
-		return
-	}
-	w, err := r.Worktree()
-	if err != nil {
-		return
-	}
-	status, err = w.Status()
-	if err != nil {
-		return
-	}
+func (g *GitStatusWidget) buildHeader() (header []string) {
+	n1, n2, n3 := g.getLongest()
+	c1 := g.fillSpaces("STAGE ", n1)
+	c2 := g.fillSpaces("STATUS ", n2)
+	c3 := g.fillSpaces("PATH ", n3)
+	header = []string{
+		" [" + c1 + " | " + c2 + " | " + c3 + "](fg-blue)\n",
+		" [" + strings.Repeat("-", 500) + "](fg-blue)\n"}
 	return
 }
 
@@ -201,6 +176,24 @@ func (g *GitStatusWidget) buildBody(execPath string) (result []string, err error
 	return
 }
 
+func (g *GitStatusWidget) getStatus(execPath string) (status git.Status, err error) {
+	// Load worktree status
+	dotGitPath, err := utils.GetDotGitPath(execPath)
+	r, err := git.PlainOpen(dotGitPath)
+	if err != nil {
+		return
+	}
+	w, err := r.Worktree()
+	if err != nil {
+		return
+	}
+	status, err = w.Status()
+	if err != nil {
+		return
+	}
+	return
+}
+
 func (g *GitStatusWidget) fillSpaces(s string, longest int) string {
 	var l = longest - utf8.RuneCountInString(s)
 	for i := 0; i < l; i++ {
@@ -256,9 +249,9 @@ func (g *GitStatusWidget) GetHighlightenPos() int {
 	return g.renderer.GetCursor()
 }
 
-// GetWidget is the implementation of widget.Activate
-func (g *GitStatusWidget) GetWidget() *ui.List {
-	return g.renderer.GetWidget()
+// GetGridBufferers is the implementation of widget.Activate
+func (g *GitStatusWidget) GetGridBufferers() []ui.GridBufferer {
+	return []ui.GridBufferer{g.renderer.GetWidget()}
 }
 
 func (g *GitStatusWidget) setKeyBindings() error {
@@ -273,7 +266,7 @@ func (g *GitStatusWidget) setKeyBindings() error {
 		if hasEditor {
 			editorCmd = os.Getenv("EDITOR")
 		}
-		for _, env := range g.envs {
+		for _, env := range g.options.Envs {
 			if env["name"] == "EDITOR" {
 				hasEditor = true
 				editorCmd = env["value"]
@@ -287,7 +280,7 @@ func (g *GitStatusWidget) setKeyBindings() error {
 			cmd := exec.Command(editorCmd, g.statusItems[cursor].Path)
 			// load env vars
 			cmd.Env = os.Environ()
-			for _, env := range g.envs {
+			for _, env := range g.options.Envs {
 				cmd.Env = append(cmd.Env, env["name"]+"="+env["value"])
 			}
 			cmd.Stdin = os.Stdin
@@ -301,4 +294,40 @@ func (g *GitStatusWidget) setKeyBindings() error {
 		}
 	})
 	return nil
+}
+
+// Render is the implementation of widget.Render
+func (g *GitStatusWidget) Render() (err error) {
+	body, err := g.buildBody(g.options.ExecPath)
+	if err != nil {
+		return
+	}
+	if body == nil {
+		body = []string{
+			"Worktree is clean",
+		}
+	}
+
+	g.renderer.SetBody(body)
+	g.renderer.ResetRender()
+
+	return
+}
+
+// GetWidth is the implementation of widget.Render
+func (g *GitStatusWidget) GetWidth() int {
+	return g.renderer.GetWidth()
+}
+
+// GetHeight is the implementation of widget.Render
+func (g *GitStatusWidget) GetHeight() int {
+	return g.renderer.GetHeight()
+}
+
+// Disable is
+func (g *GitStatusWidget) Disable() {
+}
+
+// SetOption is
+func (g *GitStatusWidget) SetOption(opt *AdditionalWidgetOption) {
 }

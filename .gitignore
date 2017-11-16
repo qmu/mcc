@@ -41,11 +41,10 @@ _testmain.go
 vendor/
 
 # custom
-tmp/
 .gtm/
 
 # mcc
-bin/lib/mcc/*
+_bin/lib/mcc/*
 
 # dirs for build process
 _build/

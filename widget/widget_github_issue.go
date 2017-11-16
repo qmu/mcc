@@ -1,4 +1,4 @@
-package dashboard
+package widget
 
 import (
 	"fmt"
@@ -7,13 +7,15 @@ import (
 
 	ui "github.com/gizak/termui"
 	"github.com/qmu/mcc/github"
+	"github.com/qmu/mcc/widget/listable"
 	"golang.org/x/text/width"
 )
 
-// GithubIssueWidget is a widget which shows a issue
+// GithubIssueWidget is a stack which shows a issue
 // of the current branch referering its name including issue id
 type GithubIssueWidget struct {
-	renderer   *ListWrapper
+	options    *Option
+	renderer   *listable.ListWrapper
 	active     bool
 	client     *github.Client
 	timezone   string
@@ -24,16 +26,17 @@ type GithubIssueWidget struct {
 }
 
 // NewGithubIssueWidget constructs a New GithubIssueWidget
-func NewGithubIssueWidget(wi Widget, timezone string) (g *GithubIssueWidget, err error) {
+func NewGithubIssueWidget(opt *Option) (g *GithubIssueWidget, err error) {
 	g = new(GithubIssueWidget)
+	g.options = opt
 	g.indent = 9
-	g.timezone = timezone
-	opt := &ListWrapperOption{
-		Title:      wi.Title,
-		RealHeight: wi.RealHeight,
+	g.timezone = g.options.Timezone
+	lopt := &listable.ListWrapperOption{
+		Title:      g.options.GetTitle(),
+		RealHeight: g.options.GetHeight(),
 	}
-	g.issueRegex = wi.IssueRegex
-	g.renderer = NewListWrapper(opt)
+	g.issueRegex = g.options.IssueRegex
+	g.renderer = listable.NewListWrapper(lopt)
 
 	return
 }
@@ -77,8 +80,7 @@ func (g *GithubIssueWidget) Disable() {
 }
 
 // Render renders the issue contents
-func (g *GithubIssueWidget) Render(client *github.Client) (err error) {
-	g.client = client
+func (g *GithubIssueWidget) Render() (err error) {
 
 	body, err := g.buildBody()
 	if err != nil {
@@ -96,9 +98,9 @@ func (g *GithubIssueWidget) Render(client *github.Client) (err error) {
 	return
 }
 
-// GetWidget is the implementation of Widget.Activate
-func (g *GithubIssueWidget) GetWidget() *ui.List {
-	return g.renderer.GetWidget()
+// GetGridBufferers is the implementation of Widget.Activate
+func (g *GithubIssueWidget) GetGridBufferers() []ui.GridBufferer {
+	return []ui.GridBufferer{g.renderer.GetWidget()}
 }
 
 func (g *GithubIssueWidget) buildBody() (body []string, err error) {
@@ -159,8 +161,7 @@ func (g *GithubIssueWidget) buildBody() (body []string, err error) {
 
 func (g *GithubIssueWidget) overflow(text string) (result string) {
 	lines := strings.Split(text, "\n")
-	w := g.GetWidget()
-	splitlen := w.Width - 2 - g.indent
+	splitlen := g.GetWidth() - 2 - g.indent
 	for _, line := range lines {
 		cnt := 0
 		for _, c := range line {
@@ -194,4 +195,19 @@ func (g *GithubIssueWidget) putIndent(text string) (result string) {
 		result += " [" + strings.Repeat(" ", indent) + ": ](fg-blue)" + s + "\n"
 	}
 	return
+}
+
+// GetWidth is the implementation of stack.Render
+func (g *GithubIssueWidget) GetWidth() int {
+	return g.renderer.GetWidth()
+}
+
+// GetHeight is the implementation of stack.Render
+func (g *GithubIssueWidget) GetHeight() int {
+	return g.renderer.GetHeight()
+}
+
+// SetOption is
+func (g *GithubIssueWidget) SetOption(opt *AdditionalWidgetOption) {
+	g.client = opt.GithubClient
 }

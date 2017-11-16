@@ -1,4 +1,4 @@
-package dashboard
+package widget
 
 import (
 	"os"
@@ -6,30 +6,33 @@ import (
 
 	ui "github.com/gizak/termui"
 	"github.com/hpcloud/tail"
+	"github.com/qmu/mcc/widget/listable"
 	// "github.com/k0kubun/pp"
 )
 
 // TailFileWidget is a command launcher
 type TailFileWidget struct {
-	renderer *ListWrapper
+	options  *Option
+	renderer *listable.ListWrapper
 	isReady  bool
 	disabled bool
 	path     string
 }
 
 // NewTailFileWidget constructs a New TailFileWidget
-func NewTailFileWidget(wi Widget, execPath string) (n *TailFileWidget, err error) {
+func NewTailFileWidget(opt *Option) (n *TailFileWidget, err error) {
 	n = new(TailFileWidget)
-	if wi.Path[0:1] == "/" {
-		n.path = wi.Path
+	n.options = opt
+	if n.options.Path[0:1] == "/" {
+		n.path = n.options.Path
 	} else {
-		n.path = "./" + execPath + "/" + wi.Path
+		n.path = "./" + n.options.ExecPath + "/" + n.options.Path
 	}
-	opt := &ListWrapperOption{
-		Title:      wi.Title,
-		RealHeight: wi.RealHeight,
+	lopt := &listable.ListWrapperOption{
+		Title:      n.options.GetTitle(),
+		RealHeight: n.options.GetHeight(),
 	}
-	n.renderer = NewListWrapper(opt)
+	n.renderer = listable.NewListWrapper(lopt)
 	n.isReady = true
 	n.tail()
 
@@ -61,6 +64,7 @@ func (n *TailFileWidget) tail() (err error) {
 			Location: &loc,
 			ReOpen:   true,
 			Follow:   true,
+			Logger:   tail.DiscardingLogger,
 		})
 		if err != nil {
 			return
@@ -114,7 +118,30 @@ func (n *TailFileWidget) GetHighlightenPos() int {
 	return n.renderer.GetCursor()
 }
 
-// GetWidget is the implementation of widget.Activate
-func (n *TailFileWidget) GetWidget() *ui.List {
-	return n.renderer.GetWidget()
+// GetGridBufferers is the implementation of stack.Activate
+func (n *TailFileWidget) GetGridBufferers() []ui.GridBufferer {
+	return []ui.GridBufferer{n.renderer.GetWidget()}
+}
+
+// Render is the implementation of stack.Render
+func (n *TailFileWidget) Render() (err error) {
+	return
+}
+
+// GetWidth is the implementation of stack.Render
+func (n *TailFileWidget) GetWidth() int {
+	return n.renderer.GetWidth()
+}
+
+// GetHeight is the implementation of stack.Render
+func (n *TailFileWidget) GetHeight() int {
+	return n.renderer.GetHeight()
+}
+
+// Disable is
+func (n *TailFileWidget) Disable() {
+}
+
+// SetOption is
+func (n *TailFileWidget) SetOption(opt *AdditionalWidgetOption) {
 }

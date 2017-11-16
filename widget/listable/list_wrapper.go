@@ -1,4 +1,4 @@
-package dashboard
+package listable
 
 import ui "github.com/gizak/termui"
 
@@ -28,6 +28,7 @@ func NewListWrapper(opt *ListWrapperOption) (l *ListWrapper) {
 	w.Height = opt.RealHeight
 	w.Items = []string{"loading..."}
 	w.BorderLabel = opt.Title
+	w.BorderLabelFg = ui.ColorWhite
 	l.widget = w
 
 	ropt := &ListRendererOption{
@@ -110,13 +111,13 @@ func (l *ListWrapper) Render() {
 // ResetRender returns a initial multi-line texts
 func (l *ListWrapper) ResetRender() {
 	l.widget.BorderLabelFg = ui.ColorWhite
-	l.widget.BorderFg = ui.ColorWhite
+	l.widget.BorderFg = ui.ColorBlue
 	l.widget.Items = l.listRenderer.ResetRender()
 	ui.Render(ui.Body)
 }
 
 // GetWidget returns the instance of ui.List
-func (l *ListWrapper) GetWidget() *ui.List {
+func (l *ListWrapper) GetWidget() ui.GridBufferer {
 	return l.widget
 }
 
@@ -150,4 +151,14 @@ func (l *ListWrapper) MmoveCursorWithFocus(direction string) {
 	l.gPressed = false // cancel gg to top
 	l.widget.Items = l.listRenderer.MoveCursorWithFocus(direction)
 	ui.Render(ui.Body)
+}
+
+// GetWidth is the implementation of widget.Render
+func (l *ListWrapper) GetWidth() int {
+	return l.widget.Width
+}
+
+// GetHeight is the implementation of widget.Render
+func (l *ListWrapper) GetHeight() int {
+	return l.widget.Height
 }

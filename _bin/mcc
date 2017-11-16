@@ -6,9 +6,9 @@ projectPath=$(git rev-parse --show-toplevel)
 # get a prefix of container up by docker-compose
 project=$(basename $projectPath |  sed 's/[_|-]//g')
 
-mkdir -p bin/lib/mcc
+mkdir -p _bin/lib/mcc
 
-PATH_TO_BINARY=bin/lib/mcc/mcc
+PATH_TO_BINARY=_bin/lib/mcc/mcc
 BINARY=""
 
 if [ "$1" == "--self-update" ]; then

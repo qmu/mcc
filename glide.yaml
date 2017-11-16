@@ -28,3 +28,7 @@ import:
 - package: github.com/hpcloud/tail
   subpackages:
   - '...'
+- package: github.com/fsouza/go-dockerclient
+  subpackages:
+  - '...'
+- package: github.com/dustin/go-humanize

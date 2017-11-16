@@ -1,5 +1,5 @@
 ---
-schema_version: v1.0.0
+schema_version: v1.1.0
 timezone: Asia/Tokyo
 envs:
   - name: EDITOR
@@ -11,202 +11,302 @@ envs:
   - name: HOGE3
     value: env val 3
 
-rows:
-  - section: row
-    height: 20%
-    cols:
-      - section: col
-        widgets:
-          - type: note
-            title: NOTE WIDGET
-            height: 100%
-            content: |
-              # text text text
-              
-              text text text
-              
-              # text text text
-              
-              text #hogehoge text text
-              
-              ## text text text
-              
-              text text text
+widgets:
+  - id: note
+    type: note
+    title: NOTE WIDGET
+    content: |
+      # text text text
+      
+      text text text
+      
+      # text text text
+      
+      text #hogehoge text text
+      
+      ## text text text
+      
+      text text text
 
-      - section: col
-        widgets:
-          - type: text_file
-            title: TEXT FILE WIDGET
-            height: 100%
-            path: ./example.md
+  - id: text_file
+    type: text_file
+    title: TEXT FILE WIDGET
+    path: ./example.md
 
-      - section: col
-        widgets:
-          - type: git_status
-            title: GIT STATUS WIDGET
-            height: 100%
+  - id: git_status
+    type: git_status
+    title: GIT STATUS WIDGET
 
-  - section: row
-    height: 60%
-    cols:
-      - section: col
-        widgets:
-          - type: menu
-            title: MENU WIDGET 1
-            height: 40%
-            content:
-              - category: Category1
-                name: Menu1
-                description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-                command: |
-                  echo $HOGE1
-                  echo $HOGE2
-                  echo $HOGE3
-              - category: Category1
-                name: Menu2
-                description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-                command: echo "hogeeeeeeeeeeeee"
-              - category: Category1
-                name: Menu3
-                description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-                command: echo "hogeeeeeeeeeeeee"
-              - category: Category1
-                name: Menu4
-                description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-                command: echo "hogeeeeeeeeeeeee"
-              - category: Category1
-                name: Menu5
-                description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-                command: echo "hogeeeeeeeeeeeee"
-              - category: Category1
-                name: Menu6
-                description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-                command: echo "hogeeeeeeeeeeeee"
-              - category: Category1
-                name: Menu7
-                description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-                command: echo "hogeeeeeeeeeeeee"
-              - category: Category2
-                name: Menu8
-                description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-                command: echo "hogeeeeeeeeeeeee"
-              - category: Category2
-                name: Menu9
-                description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-                command: echo "hogeeeeeeeeeeeee"
-              - category: Category2
-                name: Menu10
-                description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-                command: echo "hogeeeeeeeeeeeee"
-              - category: Category2
-                name: Menu11
-                description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-                command: echo "hogeeeeeeeeeeeee"
-              - category: Category2
-                name: Menu12
-                description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-                command: echo "hogeeeeeeeeeeeee"
+  - id: docker_status
+    type: docker_status
+    title: DOCKER STATUS WIDGET
+    content:
+      - metrics: cpu
+        name: Web Server
+        container: sample_cakephp_1
+      - metrics: memory
+        name: Web Server
+        container: sample_cakephp_1
+      - metrics: memory
+        name: DB Server
+        container: sample_mysql_1
 
-          - type: menu
-            title: MENU WIDGET 2
-            height: 30%
-            content:
-              - category: Category3
-                name: Menu1
-                description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-                command: echo "hogeeeeeeeeeeeee"
-              - category: Category3
-                name: Menu2
-                description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-                command: echo "hogeeeeeeeeeeeee"
-              - category: Category3
-                name: Menu3
-                description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-                command: echo "hogeeeeeeeeeeeee"
-              - category: Category3
-                name: Menu4
-                description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-                command: echo "hogeeeeeeeeeeeee"
-              - category: Category3
-                name: Menu5
-                description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-                command: echo "hogeeeeeeeeeeeee"
-              - category: Category3
-                name: Menu6
-                description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-                command: echo "hogeeeeeeeeeeeee"
+  - id: menu1
+    type: menu
+    title: MENU WIDGET 1
+    content:
+      - category: Category1
+        name: Menu1
+        description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+        command: |
+          echo $HOGE1
+          echo $HOGE2
+          echo $HOGE3
+      - category: Category1
+        name: Menu2
+        description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+        command: echo "hogeeeeeeeeeeeee"
+      - category: Category1
+        name: Menu3
+        description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+        command: echo "hogeeeeeeeeeeeee"
+      - category: Category1
+        name: Menu4
+        description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+        command: echo "hogeeeeeeeeeeeee"
+      - category: Category1
+        name: Menu5
+        description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+        command: echo "hogeeeeeeeeeeeee"
+      - category: Category1
+        name: Menu6
+        description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+        command: echo "hogeeeeeeeeeeeee"
+      - category: Category1
+        name: Menu7
+        description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+        command: echo "hogeeeeeeeeeeeee"
+      - category: Category2
+        name: Menu8
+        description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+        command: echo "hogeeeeeeeeeeeee"
+      - category: Category2
+        name: Menu9
+        description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+        command: echo "hogeeeeeeeeeeeee"
+      - category: Category2
+        name: Menu10
+        description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+        command: echo "hogeeeeeeeeeeeee"
+      - category: Category2
+        name: Menu11
+        description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+        command: echo "hogeeeeeeeeeeeee"
+      - category: Category2
+        name: Menu12
+        description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+        command: echo "hogeeeeeeeeeeeee"
 
-          - type: menu
-            title: MENU WIDGET 3
-            height: 30%
-            content:
-              - category: Category4
-                name: Menu1
-                description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-                command: echo "hogeeeeeeeeeeeee"
-              - category: Category4
-                name: Menu2
-                description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-                command: echo "hogeeeeeeeeeeeee"
-              - category: Category4
-                name: Menu3
-                description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-                command: echo "hogeeeeeeeeeeeee"
-              - category: Category4
-                name: Menu4
-                description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-                command: echo "hogeeeeeeeeeeeee"
-              - category: Category5
-                name: Menu5
-                description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-                command: echo "hogeeeeeeeeeeeee"
-              - category: Category5
-                name: Menu6
-                description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-                command: echo "hogeeeeeeeeeeeee"
-              - category: Category5
-                name: Menu7
-                description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-                command: echo "hogeeeeeeeeeeeee"
-              - category: Category5
-                name: Menu8
-                description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-                command: echo "hogeeeeeeeeeeeee"
-              - category: Category5
-                name: Menu9
-                description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-                command: echo "hogeeeeeeeeeeeee"
 
-      - section: col
-        widgets:
-          - type: github_issue
-            title: GITHUB ISSUE WIDGET
-            height: 80%
-            issue_regex: "i([0-9]*).*"
+  - id: menu2
+    type: menu
+    title: MENU WIDGET 2
+    content:
+      - category: Category3
+        name: Menu1
+        description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+        command: echo "hogeeeeeeeeeeeee"
+      - category: Category3
+        name: Menu2
+        description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+        command: echo "hogeeeeeeeeeeeee"
+      - category: Category3
+        name: Menu3
+        description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+        command: echo "hogeeeeeeeeeeeee"
+      - category: Category3
+        name: Menu4
+        description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+        command: echo "hogeeeeeeeeeeeee"
+      - category: Category3
+        name: Menu5
+        description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+        command: echo "hogeeeeeeeeeeeee"
+      - category: Category3
+        name: Menu6
+        description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+        command: echo "hogeeeeeeeeeeeee"
 
-          - type: note
-            title: INFORMATION
-            height: 20%
-            content: |
-              # text text text
-              
-              text text text
-              
-              # text text text
-              
-              text #hogehoge text text
-              
-              ## text text text
-              
-              text text text
+  - id: menu3
+    type: menu
+    title: MENU WIDGET 3
+    content:
+      - category: Category4
+        name: Menu1
+        description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+        command: echo "hogeeeeeeeeeeeee"
+      - category: Category4
+        name: Menu2
+        description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+        command: echo "hogeeeeeeeeeeeee"
+      - category: Category4
+        name: Menu3
+        description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+        command: echo "hogeeeeeeeeeeeee"
+      - category: Category4
+        name: Menu4
+        description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+        command: echo "hogeeeeeeeeeeeee"
+      - category: Category5
+        name: Menu5
+        description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+        command: echo "hogeeeeeeeeeeeee"
+      - category: Category5
+        name: Menu6
+        description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+        command: echo "hogeeeeeeeeeeeee"
+      - category: Category5
+        name: Menu7
+        description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+        command: echo "hogeeeeeeeeeeeee"
+      - category: Category5
+        name: Menu8
+        description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+        command: echo "hogeeeeeeeeeeeee"
+      - category: Category5
+        name: Menu9
+        description: description aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+        command: echo "hogeeeeeeeeeeeee"
 
-  - section: row
-    height: 20%
-    cols:
-      - section: col
-        widgets:
-          - type: tail_file
-            title: TAIL FILE WIDGET
-            height: 100%
-            path: ./example.log
-            
+  - id: github_issue
+    type: github_issue
+    title: GITHUB ISSUE WIDGET
+    issue_regex: "i([0-9]*).*"
+
+  - id: tail_file
+    type: tail_file
+    title: TAIL FILE WIDGET
+    path: ./example.log
+
+
+layout:
+  - name: LAYOUT EXAMPLE
+    rows:
+      - height: 70%
+        cols:
+          - width: 4
+            stacks:
+              - id: menu1
+                height: 50% 
+              - id: menu2
+                height: 25% 
+              - id: menu3
+                height: 25% 
+          - width: 5
+            stacks:
+              - id: github_issue
+                height: 80% 
+              - id: git_status
+                height: 20% 
+          - width: 3
+            stacks:
+              - id: note
+                height: 100% 
+      - height: 30%
+        cols:
+          - width: 3
+            stacks:
+              - id: docker_status
+                height: 100% 
+          - width: 9
+            stacks:
+              - id: tail_file
+                height: 100% 
+
+
+  - name: COMPLEX GRID 
+    rows:
+      - height: 30%
+        cols:
+          - width: 5
+            stacks:
+              - id: note
+                height: 33% 
+              - id: note
+                height: 33% 
+              - id: note
+                height: 33% 
+          - width: 2
+            stacks:
+              - id: text_file
+                height: 100% 
+          - width: 5
+            stacks:
+              - id: text_file
+                height: 40% 
+              - id: text_file
+                height: 60% 
+      - height: 10%
+        cols:
+          - width: 3
+            stacks:
+              - id: note
+                height: 100% 
+          - width: 2
+            stacks:
+              - id: text_file
+                height: 100% 
+          - width: 1
+            stacks:
+              - id: text_file
+                height: 100% 
+          - width: 2
+            stacks:
+              - id: text_file
+                height: 100% 
+          - width: 2
+            stacks:
+              - id: text_file
+                height: 100% 
+          - width: 2
+            stacks:
+              - id: text_file
+                height: 100% 
+      - height: 20%
+        cols:
+          - stacks:
+              - id: note
+                height: 100% 
+      - height: 20%
+        cols:
+          - width: 8
+            stacks:
+              - id: note
+                height: 100% 
+          - width: 4
+            stacks:
+              - id: note
+                height: 100% 
+      - height: 20%
+        cols:
+          - width: 3
+            stacks:
+              - id: note
+                height: 100% 
+          - width: 1
+            stacks:
+              - id: text_file
+                height: 100% 
+          - width: 8
+            stacks:
+              - id: note
+                height: 100% 
+
+
+  - name: ONE OTHER TAB
+    rows:
+      - height: 20%
+        cols:
+          - stacks:
+              - id: note
+                height: 100% 
