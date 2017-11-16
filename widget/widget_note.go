@@ -33,11 +33,11 @@ func NewNoteWidget(opt *Option) (n *NoteWidget, err error) {
 			path = "./" + n.options.ExecPath + "/" + n.options.Path
 		}
 		b, err := ioutil.ReadFile(path)
-
 		if err != nil {
-			return n, err
+			note = path + " does not exist"
+		} else {
+			note = string(b)
 		}
-		note = string(b)
 	} else {
 		// for Note Widget
 		if err := m2s.Decode(n.options.Content, &note); err != nil {
