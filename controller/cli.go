@@ -36,7 +36,8 @@ func Run() (err error) {
 					os.Exit(1)
 				}
 			}
-			if err := NewController(Version, ConfigSchemaVersion, config); err != nil {
+
+			if err := NewController(Version, ConfigSchemaVersion, config, false); err != nil {
 				log.Panicln(err)
 				os.Exit(1)
 			}

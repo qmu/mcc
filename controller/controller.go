@@ -17,7 +17,7 @@ type Controller struct {
 }
 
 // NewController constructs a new Controller
-func NewController(appVersion string, configSchemaVersion string, configPath string) (err error) {
+func NewController(appVersion string, configSchemaVersion string, configPath string, debug bool) (err error) {
 	d := new(Controller)
 	d.execPath = filepath.Dir(configPath)
 
@@ -54,7 +54,9 @@ func NewController(appVersion string, configSchemaVersion string, configPath str
 			}
 		}()
 	}
-
+	if debug {
+		return
+	}
 	ui.Loop()
 	return
 }
