@@ -2,7 +2,6 @@ package widget
 
 import (
 	"os"
-	"regexp"
 
 	ui "github.com/gizak/termui"
 	"github.com/hpcloud/tail"
@@ -40,56 +39,51 @@ func NewTailFileWidget(opt *Option) (n *TailFileWidget, err error) {
 }
 
 func (n *TailFileWidget) tail() (err error) {
-	go func() {
-		f, _ := os.Open(n.path)
-		defer f.Close()
-		// check if the file exists
-		var fi os.FileInfo
-		if fi, err = f.Stat(); err != nil {
-			n.renderer.AddBody(n.path + " does not exists")
-			n.renderer.Render()
-			return
+	go n.tailActually()
+	return
+}
+
+func (n *TailFileWidget) tailActually() (err error) {
+	f, _ := os.Open(n.path)
+	defer f.Close()
+	// check if the file exists
+	var fi os.FileInfo
+	if fi, err = f.Stat(); err != nil {
+		n.renderer.AddBody(n.path + " does not exists")
+		n.renderer.Render()
+		return
+	}
+	// check the file size, if it's above 3KB
+	// use Location option
+	var loc tail.SeekInfo
+	if fi.Size() > 3000 {
+		loc = tail.SeekInfo{
+			Offset: -500,
+			Whence: 2,
 		}
-		// check the file size, if it's above 3KB
-		// use Location option
-		var loc tail.SeekInfo
-		if fi.Size() > 3000 {
-			loc = tail.SeekInfo{
-				Offset: -2500,
-				Whence: 2,
-			}
+	}
+
+	t, err := tail.TailFile(n.path, tail.Config{
+		Location: &loc,
+		Follow:   true,
+		Logger:   tail.DiscardingLogger,
+	})
+	if err != nil {
+		return
+	}
+	first := true
+	for line := range t.Lines {
+		// if the Location option is enable
+		// cut the first line
+		if fi.Size() > 3000 && first == true {
+			first = false
+			continue
 		}
 
-		t, err := tail.TailFile(n.path, tail.Config{
-			Location: &loc,
-			ReOpen:   true,
-			Follow:   true,
-			Logger:   tail.DiscardingLogger,
-		})
-		if err != nil {
-			return
-		}
-		first := true
-		for line := range t.Lines {
-			// if the Location option is enable
-			// cut the first line
-			if fi.Size() > 3000 && first == true {
-				first = false
-				continue
-			}
-
-			l := line.Text
-			rep := regexp.MustCompile(`(error|Error|ERROR)`)
-			l = rep.ReplaceAllString(l, "[$1](fg-red)")
-			rep = regexp.MustCompile(`(\d{4}[/|-]\d{1,2}[/|-]\d{1,2})`)
-			l = rep.ReplaceAllString(l, "[$1](fg-blue)")
-			rep = regexp.MustCompile(`(\d{1,2}:\d{1,2}:\d{1,2})`)
-			l = rep.ReplaceAllString(l, "[$1](fg-blue)")
-
-			n.renderer.AddBody(" " + l)
-			n.renderer.MoveCursor("bottom")
-		}
-	}()
+		l := line.Text
+		n.renderer.AddBody(" " + l)
+		n.renderer.MoveCursor("bottom")
+	}
 	return
 }
 
