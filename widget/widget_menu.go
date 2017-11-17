@@ -1,9 +1,7 @@
 package widget
 
 import (
-	"bufio"
 	"fmt"
-	"io"
 	"os"
 	"os/exec"
 	"strconv"
@@ -11,7 +9,6 @@ import (
 	"unicode/utf8"
 
 	ui "github.com/gizak/termui"
-	"github.com/kr/pty"
 	m2s "github.com/mitchellh/mapstructure"
 	"github.com/qmu/mcc/widget/listable"
 	// "github.com/k0kubun/pp"
@@ -111,26 +108,11 @@ func (m *MenuWidget) setKeyBindings() error {
 			cmd.Env = append(cmd.Env, env["name"]+"="+env["value"])
 		}
 
-		tty, err := pty.Start(cmd)
+		cmd.Stdin = os.Stdin
+		cmd.Stdout = os.Stdout
+		cmd.Stderr = os.Stderr
+		err := cmd.Run()
 		if err != nil {
-			fmt.Printf("%s", err)
-			os.Exit(1)
-		}
-		defer tty.Close()
-
-		go func() {
-			scanner := bufio.NewScanner(tty)
-			for scanner.Scan() {
-				fmt.Println(scanner.Text())
-			}
-		}()
-		go func() {
-			io.Copy(tty, os.Stdin)
-		}()
-
-		err = cmd.Wait()
-		if err != nil {
-			fmt.Printf("%s", err)
 			os.Exit(1)
 		}
 		os.Exit(0)
