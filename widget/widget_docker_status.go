@@ -17,7 +17,7 @@ import (
 // DockerStatusWidget is a command launcher
 type DockerStatusWidget struct {
 	options    *Option
-	gauges     []gaugeModel
+	gauges     []*gaugeModel
 	isReady    bool
 	disabled   bool
 	containers []Container
@@ -74,11 +74,16 @@ func (n *DockerStatusWidget) Init() (err error) {
 
 func (n *DockerStatusWidget) buildGauges() (err error) {
 	l := len(n.containers)
-	for _, v := range n.containers {
+	maxH := n.options.GetHeight()
+	for i, v := range n.containers {
 		g := ui.NewGauge()
 		g.Percent = 0
 		g.Width = n.options.GetWidth()
-		g.Height = n.options.GetHeight() / l
+		if i == l-1 {
+			g.Height = maxH - (maxH/l)*(l-1)
+		} else {
+			g.Height = maxH / l
+		}
 		g.BorderFg = ui.ColorBlue
 		g.BorderLabelFg = ui.ColorWhite
 		var metrics string
@@ -99,7 +104,7 @@ func (n *DockerStatusWidget) buildGauges() (err error) {
 		}
 		g.Label = "fetching... "
 		g.LabelAlign = ui.AlignRight
-		n.gauges = append(n.gauges, gaugeModel{
+		n.gauges = append(n.gauges, &gaugeModel{
 			gauge:     g,
 			metrics:   v.Metrics,
 			name:      v.Name,
@@ -135,7 +140,7 @@ func (n *DockerStatusWidget) Activate() {
 	go func() {
 		for _, g := range n.gauges {
 			if !g.active {
-				continue
+				return
 			}
 			if g.metrics == "cpu" {
 				r, err := n.readCPU(g)
@@ -154,8 +159,8 @@ func (n *DockerStatusWidget) Activate() {
 				lim := humanize.Comma(l / 1000 / 1000)
 				g.gauge.Label = "{{percent}}% (" + lim + "MBs) "
 			}
+			ui.Render(ui.Body)
 		}
-		ui.Render(ui.Body)
 	}()
 	return
 }
@@ -188,7 +193,7 @@ func (n *DockerStatusWidget) GetGridBufferers() []ui.GridBufferer {
 	return gauges
 }
 
-func (n *DockerStatusWidget) readCPU(g gaugeModel) (cpuPercent float64, err error) {
+func (n *DockerStatusWidget) readCPU(g *gaugeModel) (cpuPercent float64, err error) {
 	stats, err := n.getStats(g.id)
 	if err != nil {
 		return
