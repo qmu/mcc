@@ -64,5 +64,5 @@ type Widgetter interface {
 	IsReady() bool
 	GetGridBufferers() []ui.GridBufferer
 	GetHighlightenPos() int
-	Render() error
+	Init() error
 }

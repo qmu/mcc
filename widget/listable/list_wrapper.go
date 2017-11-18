@@ -26,7 +26,6 @@ func NewListWrapper(opt *ListWrapperOption) (l *ListWrapper) {
 
 	w := ui.NewList()
 	w.Height = opt.RealHeight
-	w.Items = []string{"loading..."}
 	w.BorderLabel = opt.Title
 	w.BorderLabelFg = ui.ColorWhite
 	l.widget = w
@@ -39,6 +38,7 @@ func NewListWrapper(opt *ListWrapperOption) (l *ListWrapper) {
 	}
 	l.listRenderer = NewListRenderer(ropt)
 	l.stepsByJump = 10
+	l.ResetRender()
 
 	return
 }
@@ -99,11 +99,24 @@ func (l *ListWrapper) setKeyBindings() error {
 	return nil
 }
 
-// Render display current *ui.List.Items
-func (l *ListWrapper) Render() {
+// Activate display current *ui.List.Items
+func (l *ListWrapper) Activate() {
 	l.setKeyBindings()
 	l.widget.BorderLabelFg = ui.ColorGreen
 	l.widget.BorderFg = ui.ColorGreen
+	l.Render()
+}
+
+// Deactivate deactivates widget
+func (l *ListWrapper) Deactivate() {
+	l.widget.BorderLabelFg = ui.ColorWhite
+	l.widget.BorderFg = ui.ColorBlue
+	l.widget.Items = l.listRenderer.Deactivate()
+	ui.Render(ui.Body)
+}
+
+// Render renders widgets
+func (l *ListWrapper) Render() {
 	l.widget.Items = l.listRenderer.RenderActually()
 	ui.Render(ui.Body)
 }
@@ -112,7 +125,12 @@ func (l *ListWrapper) Render() {
 func (l *ListWrapper) ResetRender() {
 	l.widget.BorderLabelFg = ui.ColorWhite
 	l.widget.BorderFg = ui.ColorBlue
-	l.widget.Items = l.listRenderer.ResetRender()
+	r := l.listRenderer.ResetRender()
+	if len(r) > 0 {
+		l.widget.Items = r
+	} else {
+		l.widget.Items = []string{"loading..."}
+	}
 	ui.Render(ui.Body)
 }
 
@@ -153,12 +171,12 @@ func (l *ListWrapper) MmoveCursorWithFocus(direction string) {
 	ui.Render(ui.Body)
 }
 
-// GetWidth is the implementation of widget.Render
+// GetWidth is the implementation of widget.Activate
 func (l *ListWrapper) GetWidth() int {
 	return l.widget.Width
 }
 
-// GetHeight is the implementation of widget.Render
+// GetHeight is the implementation of widget.Activate
 func (l *ListWrapper) GetHeight() int {
 	return l.widget.Height
 }

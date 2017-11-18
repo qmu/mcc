@@ -13,6 +13,7 @@ type ListRenderer struct {
 	lineHighLight bool
 	cursor        int
 	unfocused     bool
+	items         []string
 }
 
 // ListRendererOption is the option argument for NewListWrapper
@@ -71,11 +72,7 @@ func (l *ListRenderer) RenderActually() []string {
 		}
 		if k == l.cursor {
 			if l.lineHighLight {
-				v = strings.Replace(v, "[", "", -1)
-				v = strings.Replace(v, "]", "", -1)
-				v = strings.Replace(v, "(fg-blue)", "", -1)
-				v = strings.Replace(v, "(fg-green)", "", -1)
-				v = strings.Replace(v, "(fg-red)", "", -1)
+				v = l.unHighlighten(v)
 				v = "[" + v + "](fg-black,bg-green)"
 			} else {
 				v2 := ""
@@ -92,11 +89,32 @@ func (l *ListRenderer) RenderActually() []string {
 		items[lH+cidx] = v
 		cidx++
 	}
+	l.items = items
 	return items
+}
+
+func (l *ListRenderer) unHighlighten(v string) string {
+	v = strings.Replace(v, "[", "", -1)
+	v = strings.Replace(v, "]", "", -1)
+	v = strings.Replace(v, "(fg-blue)", "", -1)
+	v = strings.Replace(v, "(fg-green)", "", -1)
+	v = strings.Replace(v, "(bg-green)", "", -1)
+	v = strings.Replace(v, "(fg-red)", "", -1)
+	return v
 }
 
 // ResetRender returns a initial multi-line texts
 func (l *ListRenderer) ResetRender() []string {
+	return l.render()
+}
+
+// Deactivate deactivates
+func (l *ListRenderer) Deactivate() []string {
+	return l.render()
+}
+
+// Deactivate deactivates
+func (l *ListRenderer) render() []string {
 	lH := len(l.header)
 	lB := 0
 	for i := 0; i < len(l.body); i++ {
@@ -110,13 +128,18 @@ func (l *ListRenderer) ResetRender() []string {
 		items[i] = h
 	}
 	cidx := 0
-	for _, v := range l.body {
+	for k, v := range l.body {
 		if l.maxH-2 <= lH+cidx {
 			break
+		}
+		if l.top > k {
+			continue
 		}
 		items[lH+cidx] = v
 		cidx++
 	}
+
+	l.items = items
 	return items
 }
 
@@ -124,6 +147,7 @@ func (l *ListRenderer) ResetRender() []string {
 func (l *ListRenderer) MoveCursor(direction string) (items []string) {
 	l.unfocused = true
 	items = l.MoveCursorWithFocus(direction)
+	l.items = items
 	l.unfocused = false
 	return
 }
@@ -146,6 +170,7 @@ func (l *ListRenderer) MoveCursorWithFocus(direction string) (items []string) {
 			items = l.down()
 		}
 	}
+	l.items = items
 	return
 }
 

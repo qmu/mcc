@@ -22,6 +22,11 @@ type TailFileWidget struct {
 func NewTailFileWidget(opt *Option) (n *TailFileWidget, err error) {
 	n = new(TailFileWidget)
 	n.options = opt
+	return
+}
+
+// Init is the implementation of stack.Init
+func (n *TailFileWidget) Init() (err error) {
 	if n.options.Path[0:1] == "/" {
 		n.path = n.options.Path
 	} else {
@@ -34,7 +39,6 @@ func NewTailFileWidget(opt *Option) (n *TailFileWidget, err error) {
 	n.renderer = listable.NewListWrapper(lopt)
 	n.isReady = true
 	n.tail()
-
 	return
 }
 
@@ -50,7 +54,7 @@ func (n *TailFileWidget) tailActually() (err error) {
 	var fi os.FileInfo
 	if fi, err = f.Stat(); err != nil {
 		n.renderer.AddBody(n.path + " does not exists")
-		n.renderer.Render()
+		n.renderer.Activate()
 		return
 	}
 	// check the file size, if it's above 3KB
@@ -89,12 +93,12 @@ func (n *TailFileWidget) tailActually() (err error) {
 
 // Activate is the implementation of Widget.Activate
 func (n *TailFileWidget) Activate() {
-	n.renderer.Render()
+	n.renderer.Activate()
 }
 
 // Deactivate is the implementation of Widget.Activate
 func (n *TailFileWidget) Deactivate() {
-	n.renderer.ResetRender()
+	n.renderer.Deactivate()
 }
 
 // IsDisabled is the implementation of Widget.IsDisabled
@@ -117,17 +121,12 @@ func (n *TailFileWidget) GetGridBufferers() []ui.GridBufferer {
 	return []ui.GridBufferer{n.renderer.GetWidget()}
 }
 
-// Render is the implementation of stack.Render
-func (n *TailFileWidget) Render() (err error) {
-	return
-}
-
-// GetWidth is the implementation of stack.Render
+// GetWidth is the implementation of stack.Init
 func (n *TailFileWidget) GetWidth() int {
 	return n.renderer.GetWidth()
 }
 
-// GetHeight is the implementation of stack.Render
+// GetHeight is the implementation of stack.Init
 func (n *TailFileWidget) GetHeight() int {
 	return n.renderer.GetHeight()
 }

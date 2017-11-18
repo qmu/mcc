@@ -6,6 +6,7 @@ import (
 	"os"
 	"strconv"
 
+	ui "github.com/gizak/termui"
 	version "github.com/hashicorp/go-version"
 	"github.com/qmu/mcc/utils"
 	"github.com/qmu/mcc/widget"
@@ -24,9 +25,11 @@ type ConfRoot struct {
 
 // tabNode is the schema implements ConfRoot.OriginalWidgets.Section
 type tabNode struct {
-	Index int
-	Name  string
-	Rows  []*rowNode
+	Index         int
+	Name          string
+	Rows          []*rowNode
+	initialized   bool
+	renderedCells []*ui.Row
 }
 
 // rowNode is the schema implements ConfRoot.OriginalWidgets.Section

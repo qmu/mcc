@@ -11,7 +11,6 @@ import (
 	ui "github.com/gizak/termui"
 	m2s "github.com/mitchellh/mapstructure"
 	"github.com/qmu/mcc/widget/listable"
-	// "github.com/k0kubun/pp"
 )
 
 // MenuWidget is a command launcher
@@ -29,8 +28,13 @@ type MenuWidget struct {
 func NewMenuWidget(opt *Option) (m *MenuWidget, err error) {
 	m = new(MenuWidget)
 	m.options = opt
-	if err := m2s.Decode(opt.Content, &m.menus); err != nil {
-		return nil, err
+	return
+}
+
+// Init is the implementation of stack.Init
+func (m *MenuWidget) Init() (err error) {
+	if err = m2s.Decode(m.options.Content, &m.menus); err != nil {
+		return
 	}
 	h := m.buildHeader()
 	m.headerHeight = len(h)
@@ -44,19 +48,18 @@ func NewMenuWidget(opt *Option) (m *MenuWidget, err error) {
 	}
 	m.renderer = listable.NewListWrapper(lopt)
 	m.isReady = true
-
 	return
 }
 
 // Activate is the implementation of Widget.Activate
 func (m *MenuWidget) Activate() {
 	m.setKeyBindings()
-	m.renderer.Render()
+	m.renderer.Activate()
 }
 
 // Deactivate is the implementation of Widget.Activate
 func (m *MenuWidget) Deactivate() {
-	m.renderer.ResetRender()
+	m.renderer.Deactivate()
 }
 
 // IsDisabled is the implementation of Widget.IsDisabled
@@ -180,17 +183,12 @@ func (m *MenuWidget) getLongest() (n1 int, n2 int, n3 int) {
 	return n1, n2, n3
 }
 
-// Render is the implementation of stack.Render
-func (m *MenuWidget) Render() (err error) {
-	return
-}
-
-// GetWidth is the implementation of stack.Render
+// GetWidth is the implementation of stack.Init
 func (m *MenuWidget) GetWidth() int {
 	return m.renderer.GetWidth()
 }
 
-// GetHeight is the implementation of stack.Render
+// GetHeight is the implementation of stack.Init
 func (m *MenuWidget) GetHeight() int {
 	return m.renderer.GetHeight()
 }

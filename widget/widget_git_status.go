@@ -24,53 +24,15 @@ type GitStatusWidget struct {
 	statusItems StatusItems
 }
 
-// StatusItem is a struct which stores each file status of git status
-type StatusItem struct {
-	Staged   bool
-	StatusNo int
-	Stage    string
-	Status   string
-	Path     string
-}
-
-// StatusItems is a collection of StatusItem, and implements sorting
-type StatusItems []StatusItem
-
-// Len is interface method of sort
-func (s StatusItems) Len() int {
-	return len(s)
-}
-
-// Swap is interface method of sort
-func (s StatusItems) Swap(i, j int) {
-	s[i], s[j] = s[j], s[i]
-}
-
-// ByStage is a struct for sorting StatusItems
-type ByStage struct {
-	StatusItems
-}
-
-// Less is interface method of sort
-func (s ByStage) Less(i, j int) bool {
-	return len(s.StatusItems[i].Stage) < len(s.StatusItems[j].Stage)
-}
-
-// ByPath is a struct for sorting StatusItems
-type ByPath struct {
-	StatusItems
-}
-
-// Less is interface method of sort
-func (b ByPath) Less(i, j int) bool {
-	return b.StatusItems[i].Path < b.StatusItems[j].Path
-}
-
 // NewGitStatusWidget constructs a New GitStatusWidget
 func NewGitStatusWidget(opt *Option) (g *GitStatusWidget, err error) {
 	g = new(GitStatusWidget)
 	g.options = opt
+	return
+}
 
+// Init is the implementation of widget.Init
+func (g *GitStatusWidget) Init() (err error) {
 	header := g.buildHeader()
 
 	lopt := &listable.ListWrapperOption{
@@ -81,6 +43,20 @@ func NewGitStatusWidget(opt *Option) (g *GitStatusWidget, err error) {
 	}
 	g.renderer = listable.NewListWrapper(lopt)
 	g.isReady = true
+
+	go func() {
+		body, err := g.buildBody(g.options.ExecPath)
+		if err != nil {
+			return
+		}
+		if body == nil {
+			body = []string{
+				"Worktree is clean",
+			}
+		}
+		g.renderer.SetBody(body)
+		g.renderer.ResetRender()
+	}()
 
 	return
 }
@@ -226,12 +202,12 @@ func (g *GitStatusWidget) getLongest() (n1 int, n2 int, n3 int) {
 // Activate is the implementation of Widget.Activate
 func (g *GitStatusWidget) Activate() {
 	g.setKeyBindings()
-	g.renderer.Render()
+	g.renderer.Activate()
 }
 
 // Deactivate is the implementation of Widget.Activate
 func (g *GitStatusWidget) Deactivate() {
-	g.renderer.ResetRender()
+	g.renderer.Deactivate()
 }
 
 // IsDisabled is the implementation of Widget.IsDisabled
@@ -296,30 +272,12 @@ func (g *GitStatusWidget) setKeyBindings() error {
 	return nil
 }
 
-// Render is the implementation of widget.Render
-func (g *GitStatusWidget) Render() (err error) {
-	body, err := g.buildBody(g.options.ExecPath)
-	if err != nil {
-		return
-	}
-	if body == nil {
-		body = []string{
-			"Worktree is clean",
-		}
-	}
-
-	g.renderer.SetBody(body)
-	g.renderer.ResetRender()
-
-	return
-}
-
-// GetWidth is the implementation of widget.Render
+// GetWidth is the implementation of widget.Init
 func (g *GitStatusWidget) GetWidth() int {
 	return g.renderer.GetWidth()
 }
 
-// GetHeight is the implementation of widget.Render
+// GetHeight is the implementation of widget.Init
 func (g *GitStatusWidget) GetHeight() int {
 	return g.renderer.GetHeight()
 }
@@ -330,4 +288,46 @@ func (g *GitStatusWidget) Disable() {
 
 // SetOption is
 func (g *GitStatusWidget) SetOption(opt *AdditionalWidgetOption) {
+}
+
+// StatusItem is a struct which stores each file status of git status
+type StatusItem struct {
+	Staged   bool
+	StatusNo int
+	Stage    string
+	Status   string
+	Path     string
+}
+
+// StatusItems is a collection of StatusItem, and implements sorting
+type StatusItems []StatusItem
+
+// Len is interface method of sort
+func (s StatusItems) Len() int {
+	return len(s)
+}
+
+// Swap is interface method of sort
+func (s StatusItems) Swap(i, j int) {
+	s[i], s[j] = s[j], s[i]
+}
+
+// ByStage is a struct for sorting StatusItems
+type ByStage struct {
+	StatusItems
+}
+
+// Less is interface method of sort
+func (s ByStage) Less(i, j int) bool {
+	return len(s.StatusItems[i].Stage) < len(s.StatusItems[j].Stage)
+}
+
+// ByPath is a struct for sorting StatusItems
+type ByPath struct {
+	StatusItems
+}
+
+// Less is interface method of sort
+func (b ByPath) Less(i, j int) bool {
+	return b.StatusItems[i].Path < b.StatusItems[j].Path
 }
