@@ -11,7 +11,7 @@ func BenchmarkNewTailFileWidget(b *testing.B) {
 		if err != nil {
 			return
 		}
-		w, err := NewTailFileWidget(&Option{
+		_, err = NewTailFileWidget(&Option{
 			ExecPath: d,
 			Height:   100,
 			Width:    100,
@@ -22,7 +22,6 @@ func BenchmarkNewTailFileWidget(b *testing.B) {
 		if err != nil {
 			return
 		}
-		w.tail()
 	}
 }
 
@@ -31,7 +30,7 @@ func TestNewTailFileWidget(t *testing.T) {
 	if err != nil {
 		return
 	}
-	w, err := NewTailFileWidget(&Option{
+	_, err = NewTailFileWidget(&Option{
 		ExecPath: d,
 		Height:   100,
 		Width:    100,
@@ -42,5 +41,4 @@ func TestNewTailFileWidget(t *testing.T) {
 	if err != nil {
 		return
 	}
-	w.tail()
 }
