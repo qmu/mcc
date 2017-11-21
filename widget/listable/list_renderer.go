@@ -1,6 +1,6 @@
 package listable
 
-import "regexp"
+import "strings"
 
 // ListRenderer make a List widget which includes
 // multi-line texts look like scrolled
@@ -13,6 +13,7 @@ type ListRenderer struct {
 	lineHighLight bool
 	cursor        int
 	unfocused     bool
+	items         []string
 }
 
 // ListRendererOption is the option argument for NewListWrapper
@@ -46,12 +47,24 @@ func NewListRenderer(opt *ListRendererOption) (l *ListRenderer) {
 
 // RenderActually renders list
 func (l *ListRenderer) RenderActually() []string {
-	var items []string
-	for _, h := range l.header {
-		items = append(items, h)
+	lH := len(l.header)
+	lB := 0
+	for k := range l.body {
+		if l.maxH-2 <= lH+lB {
+			break
+		}
+		if l.top > k {
+			continue
+		}
+		lB++
 	}
+	items := make([]string, lH+lB)
+	for i, h := range l.header {
+		items[i] = h
+	}
+	cidx := 0
 	for k, v := range l.body {
-		if l.maxH-2 <= len(items) {
+		if l.maxH-2 <= lH+cidx {
 			break
 		}
 		if l.top > k {
@@ -59,8 +72,7 @@ func (l *ListRenderer) RenderActually() []string {
 		}
 		if k == l.cursor {
 			if l.lineHighLight {
-				rep := regexp.MustCompile(`\[([^\[\]\(\)]*)\]\([^\[\]\(\)]*\)`)
-				v = rep.ReplaceAllString(v, "$1")
+				v = l.unHighlighten(v)
 				v = "[" + v + "](fg-black,bg-green)"
 			} else {
 				v2 := ""
@@ -74,29 +86,63 @@ func (l *ListRenderer) RenderActually() []string {
 				v = v2
 			}
 		}
-		items = append(items, v)
+		items[lH+cidx] = v
+		cidx++
 	}
+	l.items = items
 	return items
 }
 
-// ResetRender returns a initial multi-line texts
-func (l *ListRenderer) ResetRender() (items []string) {
-	for _, h := range l.header {
-		items = append(items, h)
-	}
-	for _, v := range l.body {
-		if l.maxH-2 <= len(items) {
+func (l *ListRenderer) unHighlighten(v string) string {
+	v = strings.Replace(v, "[", "", -1)
+	v = strings.Replace(v, "]", "", -1)
+	v = strings.Replace(v, "(fg-blue)", "", -1)
+	v = strings.Replace(v, "(fg-green)", "", -1)
+	v = strings.Replace(v, "(bg-green)", "", -1)
+	v = strings.Replace(v, "(fg-red)", "", -1)
+	return v
+}
+
+// Deactivate deactivates
+func (l *ListRenderer) Deactivate() []string {
+	return l.render()
+}
+
+// Deactivate deactivates
+func (l *ListRenderer) render() []string {
+	lH := len(l.header)
+	lB := 0
+	for i := 0; i < len(l.body); i++ {
+		if l.maxH-2 <= lH+lB {
 			break
 		}
-		items = append(items, v)
+		lB++
 	}
-	return
+	var items = make([]string, lH+lB)
+	for i, h := range l.header {
+		items[i] = h
+	}
+	cidx := 0
+	for k, v := range l.body {
+		if l.maxH-2 <= lH+cidx {
+			break
+		}
+		if l.top > k {
+			continue
+		}
+		items[lH+cidx] = v
+		cidx++
+	}
+
+	l.items = items
+	return items
 }
 
 // MoveCursor moves cursor position to "direction" with no focuse
 func (l *ListRenderer) MoveCursor(direction string) (items []string) {
 	l.unfocused = true
 	items = l.MoveCursorWithFocus(direction)
+	l.items = items
 	l.unfocused = false
 	return
 }
@@ -119,6 +165,7 @@ func (l *ListRenderer) MoveCursorWithFocus(direction string) (items []string) {
 			items = l.down()
 		}
 	}
+	l.items = items
 	return
 }
 

@@ -17,7 +17,7 @@ import (
 // DockerStatusWidget is a command launcher
 type DockerStatusWidget struct {
 	options    *Option
-	gauges     []gaugeModel
+	gauges     []*gaugeModel
 	isReady    bool
 	disabled   bool
 	containers []Container
@@ -37,27 +37,53 @@ type gaugeModel struct {
 func NewDockerStatusWidget(opt *Option) (n *DockerStatusWidget, err error) {
 	n = new(DockerStatusWidget)
 	n.options = opt
-	if err := m2s.Decode(n.options.Content, &n.containers); err != nil {
-		return nil, err
-	}
-	endpoint := "unix:///var/run/docker.sock"
-	n.client, err = docker.NewClient(endpoint)
-	if err != nil {
-		return nil, err
+	return
+}
+
+// Init is the implementation of widget.Init
+func (n *DockerStatusWidget) Init() (err error) {
+	if err = m2s.Decode(n.options.Content, &n.containers); err != nil {
+		return err
 	}
 	if err = n.buildGauges(); err != nil {
-		return nil, err
+		return
 	}
+	go func() {
+		endpoint := "unix:///var/run/docker.sock"
+		n.client, err = docker.NewClient(endpoint)
+		if err != nil {
+			return
+		}
+		for _, g := range n.gauges {
+			var id string
+			id, err = n.getContainerIDByName(g.container)
+			if err != nil {
+				return
+			}
+			active := true
+			if id == "" {
+				active = false
+				g.gauge.Label = "'" + g.container + "' is not running "
+			}
+			g.id = id
+			g.active = active
+		}
+	}()
 	return
 }
 
 func (n *DockerStatusWidget) buildGauges() (err error) {
 	l := len(n.containers)
-	for _, v := range n.containers {
+	maxH := n.options.GetHeight()
+	for i, v := range n.containers {
 		g := ui.NewGauge()
 		g.Percent = 0
 		g.Width = n.options.GetWidth()
-		g.Height = n.options.GetHeight() / l
+		if i == l-1 {
+			g.Height = maxH - (maxH/l)*(l-1)
+		} else {
+			g.Height = maxH / l
+		}
 		g.BorderFg = ui.ColorBlue
 		g.BorderLabelFg = ui.ColorWhite
 		var metrics string
@@ -78,24 +104,11 @@ func (n *DockerStatusWidget) buildGauges() (err error) {
 		}
 		g.Label = "fetching... "
 		g.LabelAlign = ui.AlignRight
-
-		var id string
-		id, err = n.getContainerIDByName(v.Container)
-		if err != nil {
-			return
-		}
-		active := true
-		if id == "" {
-			active = false
-			g.Label = "'" + v.Container + "' is not running "
-		}
-		n.gauges = append(n.gauges, gaugeModel{
+		n.gauges = append(n.gauges, &gaugeModel{
 			gauge:     g,
 			metrics:   v.Metrics,
-			id:        id,
 			name:      v.Name,
 			container: v.Container,
-			active:    active,
 		})
 	}
 	return
@@ -124,6 +137,32 @@ func (n *DockerStatusWidget) getContainerIDByName(name string) (id string, err e
 
 // Activate is the implementation of Widget.Activate
 func (n *DockerStatusWidget) Activate() {
+	go func() {
+		for _, g := range n.gauges {
+			if !g.active {
+				return
+			}
+			if g.metrics == "cpu" {
+				r, err := n.readCPU(g)
+				if err != nil {
+					panic(err)
+				}
+				per := strconv.FormatFloat(r, 'f', 2, 64)
+				g.gauge.Percent = int(r)
+				g.gauge.Label = per + "% "
+			} else if g.metrics == "memory" {
+				m, l, err := n.readMemory(g.id)
+				if err != nil {
+					panic(err)
+				}
+				g.gauge.Percent = m
+				lim := humanize.Comma(l / 1000 / 1000)
+				g.gauge.Label = "{{percent}}% (" + lim + "MBs) "
+			}
+			ui.Render(ui.Body)
+		}
+	}()
+	return
 }
 
 // Deactivate is the implementation of Widget.Activate
@@ -154,37 +193,7 @@ func (n *DockerStatusWidget) GetGridBufferers() []ui.GridBufferer {
 	return gauges
 }
 
-// Render is the implementation of widget.Render
-func (n *DockerStatusWidget) Render() (err error) {
-	go func() {
-		for _, g := range n.gauges {
-			if !g.active {
-				continue
-			}
-			if g.metrics == "cpu" {
-				r, err := n.readCPU(g)
-				if err != nil {
-					panic(err)
-				}
-				per := strconv.FormatFloat(r, 'f', 2, 64)
-				g.gauge.Percent = int(r)
-				g.gauge.Label = per + "% "
-			} else if g.metrics == "memory" {
-				m, l, err := n.readMemory(g.id)
-				if err != nil {
-					panic(err)
-				}
-				g.gauge.Percent = m
-				lim := humanize.Comma(l / 1000 / 1000)
-				g.gauge.Label = "{{percent}}% (" + lim + "MBs) "
-			}
-		}
-	}()
-	ui.Render(ui.Body)
-	return
-}
-
-func (n *DockerStatusWidget) readCPU(g gaugeModel) (cpuPercent float64, err error) {
+func (n *DockerStatusWidget) readCPU(g *gaugeModel) (cpuPercent float64, err error) {
 	stats, err := n.getStats(g.id)
 	if err != nil {
 		return
@@ -242,12 +251,12 @@ func (n *DockerStatusWidget) getStats(id string) (s *docker.Stats, err error) {
 	return s, nil
 }
 
-// GetWidth is the implementation of widget.Render
+// GetWidth is the implementation of widget.Init
 func (n *DockerStatusWidget) GetWidth() int {
 	return n.options.GetWidth()
 }
 
-// GetHeight is the implementation of widget.Render
+// GetHeight is the implementation of widget.Init
 func (n *DockerStatusWidget) GetHeight() int {
 	return n.options.GetHeight()
 }

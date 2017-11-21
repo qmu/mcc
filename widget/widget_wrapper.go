@@ -9,19 +9,20 @@ import (
 
 // WrapperWidget is
 type WrapperWidget struct {
-	Index      int
-	WidgetType string
-	Tab        int
-	Title      string
-	Rectangle  *vector.Rectangle
-	Envs       []map[string]string
-	ExecPath   string
-	Timezone   string
-	Content    interface{}
-	IssueRegex string
-	Type       string
-	Path       string
-	widgetter  Widgetter
+	Index       int
+	WidgetType  string
+	Tab         int
+	Title       string
+	Rectangle   *vector.Rectangle
+	Envs        []map[string]string
+	ExecPath    string
+	Timezone    string
+	Content     interface{}
+	IssueRegex  string
+	Type        string
+	Path        string
+	widgetter   Widgetter
+	initialized bool
 }
 
 // Activate is
@@ -59,9 +60,14 @@ func (w *WrapperWidget) GetHighlightenPos() int {
 	return w.widgetter.GetHighlightenPos()
 }
 
-// Render is
-func (w *WrapperWidget) Render() error {
-	return w.widgetter.Render()
+// Init is
+func (w *WrapperWidget) Init() (err error) {
+	if !w.initialized {
+		err = w.widgetter.Init()
+	} else {
+		w.initialized = true
+	}
+	return
 }
 
 // SetOption is

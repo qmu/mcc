@@ -46,14 +46,6 @@ func NewController(appVersion string, configSchemaVersion string, configPath str
 		go d.renderGitHubIssueWidgets()
 	}
 
-	// init asynchronously
-	if d.viewManager.HasWidget("git_status") {
-		go func() {
-			for _, aw := range d.viewManager.GetActiveWidgetsOf("git_status") {
-				aw.Render()
-			}
-		}()
-	}
 	if debug {
 		return
 	}
@@ -116,8 +108,8 @@ func (d *Controller) setKeyBindings() error {
 	if d.viewManager.HasWidget("docker_status") {
 		ui.Handle("/timer/1s", func(e ui.Event) {
 			err := d.viewManager.MapWidgets(func(w *widget.WrapperWidget) (err error) {
-				if w.Is("docker_status") && !w.IsDisabled() {
-					w.Render()
+				if w.Is("docker_status") {
+					w.Activate()
 				}
 				return
 			})
@@ -155,9 +147,6 @@ func (d *Controller) renderGitHubIssueWidgets() {
 			w.SetOption(&widget.AdditionalWidgetOption{
 				GithubClient: d.client,
 			})
-			w.Activate()
-			w.Render()
-			w.Deactivate()
 		}
 		return
 	})

@@ -29,6 +29,11 @@ type GithubIssueWidget struct {
 func NewGithubIssueWidget(opt *Option) (g *GithubIssueWidget, err error) {
 	g = new(GithubIssueWidget)
 	g.options = opt
+	return
+}
+
+// Init renders the issue contents
+func (g *GithubIssueWidget) Init() (err error) {
 	g.indent = 9
 	g.timezone = g.options.Timezone
 	lopt := &listable.ListWrapperOption{
@@ -37,7 +42,6 @@ func NewGithubIssueWidget(opt *Option) (g *GithubIssueWidget, err error) {
 	}
 	g.issueRegex = g.options.IssueRegex
 	g.renderer = listable.NewListWrapper(lopt)
-
 	return
 }
 
@@ -45,7 +49,7 @@ func NewGithubIssueWidget(opt *Option) (g *GithubIssueWidget, err error) {
 func (g *GithubIssueWidget) Activate() {
 	g.active = true
 	if g.isReady {
-		g.renderer.Render()
+		g.renderer.Activate()
 	}
 }
 
@@ -53,7 +57,7 @@ func (g *GithubIssueWidget) Activate() {
 func (g *GithubIssueWidget) Deactivate() {
 	g.active = false
 	if g.isReady {
-		g.renderer.ResetRender()
+		g.renderer.Deactivate()
 	}
 }
 
@@ -77,25 +81,6 @@ func (g *GithubIssueWidget) Disable() {
 	g.disabled = true
 	g.renderer.SetBody([]string{"Could not load issue number from branch name..."})
 	ui.Render(ui.Body)
-}
-
-// Render renders the issue contents
-func (g *GithubIssueWidget) Render() (err error) {
-
-	body, err := g.buildBody()
-	if err != nil {
-		return
-	}
-
-	g.renderer.SetBody(body)
-	g.isReady = true
-
-	if g.active {
-		g.renderer.Render()
-	} else {
-		g.renderer.ResetRender()
-	}
-	return
 }
 
 // GetGridBufferers is the implementation of Widget.Activate
@@ -197,12 +182,12 @@ func (g *GithubIssueWidget) putIndent(text string) (result string) {
 	return
 }
 
-// GetWidth is the implementation of stack.Render
+// GetWidth is the implementation of stack.Init
 func (g *GithubIssueWidget) GetWidth() int {
 	return g.renderer.GetWidth()
 }
 
-// GetHeight is the implementation of stack.Render
+// GetHeight is the implementation of stack.Init
 func (g *GithubIssueWidget) GetHeight() int {
 	return g.renderer.GetHeight()
 }
@@ -210,4 +195,16 @@ func (g *GithubIssueWidget) GetHeight() int {
 // SetOption is
 func (g *GithubIssueWidget) SetOption(opt *AdditionalWidgetOption) {
 	g.client = opt.GithubClient
+	if g.client == nil {
+		return
+	}
+	go func() {
+		body, err := g.buildBody()
+		if err != nil {
+			return
+		}
+		g.renderer.SetBody(body)
+		g.isReady = true
+		g.renderer.ResetRender()
+	}()
 }

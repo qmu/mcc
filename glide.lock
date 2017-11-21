@@ -1,5 +1,5 @@
-hash: 971c16120a5c27d722b24bba2531f729d76194b76ee1a08b744c9e87771aab58
-updated: 2017-10-31T13:06:19.624202926+09:00
+hash: e801645d586f757ee0b7dbdebdc2264a9cf050c683e8da44c94fb805cbd856ba
+updated: 2017-11-18T03:55:58.237063063+09:00
 imports:
 - name: github.com/Azure/go-ansiterm
   version: d6e3b3328b783f23731bc4d058875b0371ff8109
@@ -90,8 +90,6 @@ imports:
   - io
 - name: github.com/k0kubun/pp
   version: e057ee7a28277be4d2af303443b6da377768181f
-- name: github.com/kr/pty
-  version: 95d05c1eef33a45bd58676b6ce28d105839b8d0b
 - name: github.com/maruel/panicparse
   version: f6ee1e454807f72b84277a84fc06437081340a1b
   subpackages:

@@ -23,6 +23,11 @@ type NoteWidget struct {
 func NewNoteWidget(opt *Option) (n *NoteWidget, err error) {
 	n = new(NoteWidget)
 	n.options = opt
+	return
+}
+
+// Init is the implementation of stack.Init
+func (n *NoteWidget) Init() (err error) {
 	var note string
 	if n.options.Type == "text_file" {
 		// for TextFile Widget
@@ -40,8 +45,8 @@ func NewNoteWidget(opt *Option) (n *NoteWidget, err error) {
 		}
 	} else {
 		// for Note Widget
-		if err := m2s.Decode(n.options.Content, &note); err != nil {
-			return nil, err
+		if err = m2s.Decode(n.options.Content, &note); err != nil {
+			return
 		}
 	}
 
@@ -65,12 +70,12 @@ func NewNoteWidget(opt *Option) (n *NoteWidget, err error) {
 
 // Activate is the implementation of Widget.Activate
 func (n *NoteWidget) Activate() {
-	n.renderer.Render()
+	n.renderer.Activate()
 }
 
 // Deactivate is the implementation of Widget.Activate
 func (n *NoteWidget) Deactivate() {
-	n.renderer.ResetRender()
+	n.renderer.Deactivate()
 }
 
 // IsDisabled is the implementation of Widget.IsDisabled
@@ -93,17 +98,12 @@ func (n *NoteWidget) GetGridBufferers() []ui.GridBufferer {
 	return []ui.GridBufferer{n.renderer.GetWidget()}
 }
 
-// Render is the implementation of stack.Render
-func (n *NoteWidget) Render() (err error) {
-	return
-}
-
-// GetWidth is the implementation of stack.Render
+// GetWidth is the implementation of stack.Init
 func (n *NoteWidget) GetWidth() int {
 	return n.renderer.GetWidth()
 }
 
-// GetHeight is the implementation of stack.Render
+// GetHeight is the implementation of stack.Init
 func (n *NoteWidget) GetHeight() int {
 	return n.renderer.GetHeight()
 }

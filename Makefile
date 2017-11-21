@@ -1,5 +1,5 @@
 NAME := mcc
-VERSION := v0.9.5
+VERSION := v0.9.6
 CONFIG_SCHEMA_VERSION := v1.1.0
 SRCS      := $(shell find . -name '*.go' -type f)
 LDFLAGS   := -ldflags "-X github.com/qmu/mcc/controller.Version=$(VERSION) -X github.com/qmu/mcc/controller.ConfigSchemaVersion=$(CONFIG_SCHEMA_VERSION)"
@@ -31,7 +31,7 @@ clean:
 build:
 	glide install
 	mkdir -p _build
-	gox $(LDFLAGS) -osarch="linux/amd64 darwin/amd64 linux/386 darwin/386" -output="_build/${NAME}_${VERSION}_{{.OS}}_{{.Arch}}/{{.Dir}}"
+	CGO_ENABLED="1" gox $(LDFLAGS) -osarch="windows/amd64 windows/386 linux/amd64 darwin/amd64 linux/386 darwin/386" -output="_build/${NAME}_${VERSION}_{{.OS}}_{{.Arch}}/{{.Dir}}"
 
 # test > textfile > cat > rm... this is necessary because screen would be flush during tests
 .PHONY: test
@@ -58,7 +58,6 @@ lines:
 
 .PHONY: release
 release:
-	rm release
 	@make clean
 	@make build
 	mkdir release

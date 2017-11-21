@@ -105,14 +105,13 @@ func (c *ViewManager) buildCollection() (err error) {
 
 	idx = 0
 	for i1, tab := range c.config.Layout {
-		for i2, row := range tab.Rows {
-			for i3, col := range row.Cols {
+		for _, row := range tab.Rows {
+			for _, col := range row.Cols {
 				for _, stack := range col.Stacks {
 					wi, err := c.getWidgetByID(stack.ID)
 					if err != nil {
 						return err
 					}
-
 					ew := &widget.WrapperWidget{
 						Index:      idx,
 						WidgetType: wi.Type,
@@ -130,7 +129,7 @@ func (c *ViewManager) buildCollection() (err error) {
 					if err != nil {
 						return err
 					}
-					c.config.Layout[i1].Rows[i2].Cols[i3].Widgets = append(c.config.Layout[i1].Rows[i2].Cols[i3].Widgets, ew)
+					col.Widgets = append(col.Widgets, ew)
 					idx++
 				}
 			}
@@ -179,10 +178,20 @@ func (c *ViewManager) activateFirstWidgetOnTab(idx int) {
 }
 
 func (c *ViewManager) renderTabPane(tab *tabNode) (err error) {
+	// clear buffer
 	ui.Clear()
 	ui.Body.Rows = ui.Body.Rows[:0]
 
-	tabs := []*ui.Row{}
+	if tab.initialized {
+		ui.Body.AddRows(tab.renderedCells...)
+		ui.Body.Align()
+		ui.Render(ui.Body)
+		return
+	}
+	tab.initialized = true
+
+	screen := []*ui.Row{}
+	tabs := make([]*ui.Row, len(c.config.Layout))
 	for i, t := range c.config.Layout {
 		tabP := ui.NewList()
 		color := "(fg-white,bg-default)"
@@ -194,34 +203,33 @@ func (c *ViewManager) renderTabPane(tab *tabNode) (err error) {
 		tabP.Height = 3
 		tabP.Border = true
 		tabP.BorderFg = ui.ColorBlue
-		tabs = append(tabs, ui.NewCol(2, 0, tabP))
+		tabs[i] = ui.NewCol(2, 0, tabP)
 	}
-
-	ui.Body.AddRows(
-		ui.NewRow(tabs...))
+	screen = append(screen, ui.NewRow(tabs...))
 
 	// body
-	cnt := 0
-	var newRows []*ui.Row
-	for _, row := range tab.Rows {
-		var newCols []*ui.Row
-		for _, col := range row.Cols {
+	newRows := make([]*ui.Row, len(tab.Rows))
+	for i, row := range tab.Rows {
+		newCols := make([]*ui.Row, len(row.Cols))
+		for j, col := range row.Cols {
 			var cols []ui.GridBufferer
 			for _, w := range col.Widgets {
+				w.Init()
 				gw := w.GetGridBufferers()
 				cols = append(cols, gw...)
-				cnt++
 			}
 			colWidth := 12 / len(row.Cols)
 			if col.Width > 0 {
 				colWidth = col.Width
 			}
-			newCols = append(newCols, ui.NewCol(colWidth, 0, cols...))
+			newCols[j] = ui.NewCol(colWidth, 0, cols...)
 		}
-		newRows = append(newRows, ui.NewRow(newCols...))
+		newRows[i] = ui.NewRow(newCols...)
 	}
+	screen = append(screen, newRows...)
+	tab.renderedCells = screen
 
-	ui.Body.AddRows(newRows...)
+	ui.Body.AddRows(screen...)
 	ui.Body.Align()
 	ui.Render(ui.Body)
 
@@ -239,15 +247,13 @@ func (c *ViewManager) SwitchTab(tabIdx int) {
 			if err := c.renderTabPane(tab); err != nil {
 				panic(err)
 			}
+			break
 		}
 	}
-	// deactivate all, and activate first widget
-	c.MapWidgets(func(w *widget.WrapperWidget) (err error) {
-		if w.Tab == tabIdx {
-			w.Deactivate()
-		}
-		return
-	})
+	from := c.getWidgetByIndex(c.activeWidgetIndex)
+	if from != nil {
+		from.Deactivate()
+	}
 
 	c.activateFirstWidgetOnTab(tabIdx)
 	c.activeTabIndex = tabIdx
