@@ -125,7 +125,7 @@ func (l *ListWrapper) Render() {
 func (l *ListWrapper) ResetRender() {
 	l.widget.BorderLabelFg = ui.ColorWhite
 	l.widget.BorderFg = ui.ColorBlue
-	r := l.listRenderer.ResetRender()
+	r := l.listRenderer.Deactivate()
 	if len(r) > 0 {
 		l.widget.Items = r
 	} else {

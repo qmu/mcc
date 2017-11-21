@@ -14,7 +14,7 @@ func BenchmarkRender(b *testing.B) {
 		listRenderer.RenderActually()
 		listRenderer.MoveCursorWithFocus("bottom")
 		listRenderer.MoveCursorWithFocus("up")
-		listRenderer.ResetRender()
+		listRenderer.Deactivate()
 	}
 }
 
@@ -55,8 +55,8 @@ func TestRender(t *testing.T) {
 		t.Fatalf("invalid list display %v", items[len(items)-1])
 	}
 	listRenderer.MoveCursorWithFocus("bottom")
-	items = listRenderer.ResetRender()
-	if items[len(items)-1] != "row4" {
+	items = listRenderer.Deactivate()
+	if items[len(items)-1] != "row9" {
 		t.Fatalf("invalid list display %v", items[len(items)-1])
 	}
 }

@@ -103,11 +103,6 @@ func (l *ListRenderer) unHighlighten(v string) string {
 	return v
 }
 
-// ResetRender returns a initial multi-line texts
-func (l *ListRenderer) ResetRender() []string {
-	return l.render()
-}
-
 // Deactivate deactivates
 func (l *ListRenderer) Deactivate() []string {
 	return l.render()
