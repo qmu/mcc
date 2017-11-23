@@ -54,6 +54,7 @@ func (c *ViewManager) buildCollection() (err error) {
 	tabSelHeight := 0
 	if len(c.config.Layout) > 1 {
 		c.hasMaltiTabs = true
+		tabSelHeight = 3
 	}
 
 	windowH := ui.TermHeight() - 1
