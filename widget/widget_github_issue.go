@@ -6,6 +6,7 @@ import (
 	"time"
 
 	ui "github.com/gizak/termui"
+	go_github "github.com/google/go-github/github"
 	"github.com/qmu/mcc/github"
 	"github.com/qmu/mcc/widget/listable"
 	"golang.org/x/text/width"
@@ -70,11 +71,7 @@ func (g *GithubIssueWidget) GetGridBufferers() []ui.GridBufferer {
 	return []ui.GridBufferer{g.renderer.GetWidget()}
 }
 
-func (g *GithubIssueWidget) buildBody() (body []string, err error) {
-	issue, comments, err := g.client.GetIssue(g.issueRegex)
-	if err != nil {
-		return
-	}
+func (g *GithubIssueWidget) buildIssueBody(issue *go_github.Issue, comments []*go_github.IssueComment) (body []string, err error) {
 	desc := g.overflow(issue.GetBody())
 	desc = g.putIndent(desc)
 
@@ -93,6 +90,50 @@ func (g *GithubIssueWidget) buildBody() (body []string, err error) {
 	if lbls != "" {
 		text += " [LABEL :](fg-blue) " + lbls + "\n"
 	}
+	if milestone != "" {
+		text += " [MILE  :](fg-blue) " + milestone + "\n"
+	}
+	text += " [" + strings.Repeat("-", 300) + "](fg-blue) \n"
+	text += " [DESC  :](fg-blue) " + desc
+	text += " [" + strings.Repeat("-", 300) + "](fg-blue)"
+
+	if len(comments) > 0 {
+		commentText := "\n"
+		for i, c := range comments {
+			t := c.GetCreatedAt()
+			loc, err := time.LoadLocation(g.timezone)
+			if err != nil {
+				return body, nil
+			}
+			if i > 0 {
+				commentText += "[" + strings.Repeat(". ", 150) + "](fg-blue) \n\n"
+			}
+			commentText += "[COMMENTED BY ](fg-blue)" + c.User.GetLogin() + " [ON " + fmt.Sprint(t.In(loc)) + "](fg-blue)" + "\n"
+			b := c.GetBody()
+			commentText += g.overflow(b) + "\n"
+			commentText += "\n"
+		}
+
+		commentText = g.putIndent(commentText)
+		text += " [      :](fg-blue) " + commentText
+	}
+
+	body = strings.Split(text, "\n")
+
+	return
+}
+
+func (g *GithubIssueWidget) buildPrBody(pr *go_github.PullRequest, comments []*go_github.IssueComment) (body []string, err error) {
+	desc := g.overflow(pr.GetBody())
+	desc = g.putIndent(desc)
+
+	// milestone
+	milestone := pr.Milestone.GetTitle()
+	//
+	text := " [TITLE :](fg-blue) " + pr.GetTitle() + "\n"
+	text += " [NO    :](fg-blue) " + "#" + fmt.Sprint(pr.GetNumber()) + "\n"
+	text += " [BY    :](fg-blue) " + pr.User.GetLogin() + "\n"
+	text += " [URL   :](fg-blue) " + pr.GetHTMLURL() + "\n"
 	if milestone != "" {
 		text += " [MILE  :](fg-blue) " + milestone + "\n"
 	}
@@ -171,12 +212,36 @@ func (g *GithubIssueWidget) SetOption(opt *AdditionalWidgetOption) {
 		return
 	}
 	go func() {
-		body, err := g.buildBody()
+		err := g.client.SetIssueNoRegex(g.issueRegex)
 		if err != nil {
 			return
 		}
+		body := []string{}
+		if g.options.Type == "github_issue" {
+			issue, comments, err := g.client.GetIssue(g.client.IssueID)
+			if err != nil {
+				return
+			}
+			body, err = g.buildIssueBody(issue, comments)
+			if err != nil {
+				return
+			}
+		} else if g.options.Type == "github_pr" {
+			pr, comments, err := g.client.GetPR(g.client.IssueID)
+			if err != nil {
+				return
+			}
+			body, err = g.buildPrBody(pr, comments)
+			if err != nil {
+				return
+			}
+		} else {
+			// TODO: should return error
+			return
+		}
 		g.renderer.SetBody(body)
-		g.isReady = true
 		g.renderer.ResetRender()
+		g.isReady = true
+		opt.done <- true
 	}()
 }

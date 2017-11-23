@@ -112,7 +112,7 @@ func (w *WrapperWidget) Vary() (err error) {
 		wi, err = NewMenuWidget(opt)
 	case "note":
 		wi, err = NewNoteWidget(opt)
-	case "github_issue":
+	case "github_issue", "github_pr":
 		wi, err = NewGithubIssueWidget(opt)
 	case "text_file":
 		wi, err = NewNoteWidget(opt)

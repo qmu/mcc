@@ -51,6 +51,7 @@ type Container struct {
 
 // AdditionalWidgetOption is
 type AdditionalWidgetOption struct {
+	done         chan bool
 	GithubClient *github.Client
 }
 
