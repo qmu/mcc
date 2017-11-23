@@ -14,7 +14,6 @@ type TailFileWidget struct {
 	options  *Option
 	renderer *listable.ListWrapper
 	isReady  bool
-	disabled bool
 	path     string
 }
 
@@ -101,11 +100,6 @@ func (n *TailFileWidget) Deactivate() {
 	n.renderer.Deactivate()
 }
 
-// IsDisabled is the implementation of Widget.IsDisabled
-func (n *TailFileWidget) IsDisabled() bool {
-	return n.disabled
-}
-
 // IsReady is the implementation of Widget.IsReady
 func (n *TailFileWidget) IsReady() bool {
 	return n.isReady
@@ -114,10 +108,6 @@ func (n *TailFileWidget) IsReady() bool {
 // GetGridBufferers is the implementation of stack.Activate
 func (n *TailFileWidget) GetGridBufferers() []ui.GridBufferer {
 	return []ui.GridBufferer{n.renderer.GetWidget()}
-}
-
-// Disable is
-func (n *TailFileWidget) Disable() {
 }
 
 // SetOption is

@@ -21,7 +21,6 @@ type GithubIssueWidget struct {
 	timezone   string
 	indent     int
 	isReady    bool
-	disabled   bool
 	issueRegex string
 }
 
@@ -61,21 +60,9 @@ func (g *GithubIssueWidget) Deactivate() {
 	}
 }
 
-// IsDisabled is the implementation of Widget.IsDisabled
-func (g *GithubIssueWidget) IsDisabled() bool {
-	return g.disabled
-}
-
 // IsReady is the implementation of Widget.IsReady
 func (g *GithubIssueWidget) IsReady() bool {
 	return g.isReady
-}
-
-// Disable sets a GithubIssueWidget instance as disabled
-func (g *GithubIssueWidget) Disable() {
-	g.disabled = true
-	g.renderer.SetBody([]string{"Could not load issue number from branch name..."})
-	ui.Render(ui.Body)
 }
 
 // GetGridBufferers is the implementation of Widget.Activate

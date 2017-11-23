@@ -58,9 +58,7 @@ type AdditionalWidgetOption struct {
 type Widgetter interface {
 	Activate()
 	Deactivate()
-	Disable()
 	SetOption(opt *AdditionalWidgetOption)
-	IsDisabled() bool
 	IsReady() bool
 	GetGridBufferers() []ui.GridBufferer
 	Init() error

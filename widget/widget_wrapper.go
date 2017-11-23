@@ -23,6 +23,7 @@ type WrapperWidget struct {
 	Path        string
 	widgetter   Widgetter
 	initialized bool
+	disabled    bool
 }
 
 // Activate is
@@ -37,12 +38,12 @@ func (w *WrapperWidget) Deactivate() {
 
 // Disable is
 func (w *WrapperWidget) Disable() {
-	w.widgetter.Disable()
+	w.disabled = true
 }
 
 // IsDisabled is
 func (w *WrapperWidget) IsDisabled() bool {
-	return w.widgetter.IsDisabled()
+	return w.disabled
 }
 
 // IsReady is

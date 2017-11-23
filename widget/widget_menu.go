@@ -20,7 +20,6 @@ type MenuWidget struct {
 	menus        []Menu
 	headerHeight int
 	isReady      bool
-	disabled     bool
 	envs         []map[string]string
 }
 
@@ -60,11 +59,6 @@ func (m *MenuWidget) Activate() {
 // Deactivate is the implementation of Widget.Activate
 func (m *MenuWidget) Deactivate() {
 	m.renderer.Deactivate()
-}
-
-// IsDisabled is the implementation of Widget.IsDisabled
-func (m *MenuWidget) IsDisabled() bool {
-	return m.disabled
 }
 
 // IsReady is the implementation of Widget.IsReady
@@ -176,10 +170,6 @@ func (m *MenuWidget) getLongest() (n1 int, n2 int, n3 int) {
 		}
 	}
 	return n1, n2, n3
-}
-
-// Disable is
-func (m *MenuWidget) Disable() {
 }
 
 // SetOption is

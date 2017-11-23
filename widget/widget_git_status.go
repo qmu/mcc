@@ -20,7 +20,6 @@ type GitStatusWidget struct {
 	options     *Option
 	renderer    *listable.ListWrapper
 	isReady     bool
-	disabled    bool
 	statusItems StatusItems
 }
 
@@ -208,11 +207,6 @@ func (g *GitStatusWidget) Activate() {
 // Deactivate is the implementation of Widget.Activate
 func (g *GitStatusWidget) Deactivate() {
 	g.renderer.Deactivate()
-}
-
-// IsDisabled is the implementation of Widget.IsDisabled
-func (g *GitStatusWidget) IsDisabled() bool {
-	return g.disabled
 }
 
 // IsReady is the implementation of Widget.IsReady
