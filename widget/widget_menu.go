@@ -183,16 +183,6 @@ func (m *MenuWidget) getLongest() (n1 int, n2 int, n3 int) {
 	return n1, n2, n3
 }
 
-// GetWidth is the implementation of stack.Init
-func (m *MenuWidget) GetWidth() int {
-	return m.renderer.GetWidth()
-}
-
-// GetHeight is the implementation of stack.Init
-func (m *MenuWidget) GetHeight() int {
-	return m.renderer.GetHeight()
-}
-
 // Disable is
 func (m *MenuWidget) Disable() {
 }

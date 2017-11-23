@@ -98,16 +98,6 @@ func (n *NoteWidget) GetGridBufferers() []ui.GridBufferer {
 	return []ui.GridBufferer{n.renderer.GetWidget()}
 }
 
-// GetWidth is the implementation of stack.Init
-func (n *NoteWidget) GetWidth() int {
-	return n.renderer.GetWidth()
-}
-
-// GetHeight is the implementation of stack.Init
-func (n *NoteWidget) GetHeight() int {
-	return n.renderer.GetHeight()
-}
-
 // Disable is
 func (n *NoteWidget) Disable() {
 }

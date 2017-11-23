@@ -272,16 +272,6 @@ func (g *GitStatusWidget) setKeyBindings() error {
 	return nil
 }
 
-// GetWidth is the implementation of widget.Init
-func (g *GitStatusWidget) GetWidth() int {
-	return g.renderer.GetWidth()
-}
-
-// GetHeight is the implementation of widget.Init
-func (g *GitStatusWidget) GetHeight() int {
-	return g.renderer.GetHeight()
-}
-
 // Disable is
 func (g *GitStatusWidget) Disable() {
 }

@@ -251,16 +251,6 @@ func (n *DockerStatusWidget) getStats(id string) (s *docker.Stats, err error) {
 	return s, nil
 }
 
-// GetWidth is the implementation of widget.Init
-func (n *DockerStatusWidget) GetWidth() int {
-	return n.options.GetWidth()
-}
-
-// GetHeight is the implementation of widget.Init
-func (n *DockerStatusWidget) GetHeight() int {
-	return n.options.GetHeight()
-}
-
 // Disable is
 func (n *DockerStatusWidget) Disable() {
 }
