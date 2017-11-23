@@ -111,11 +111,6 @@ func (n *TailFileWidget) IsReady() bool {
 	return n.isReady
 }
 
-// GetHighlightenPos is the implementation of Widget.GetHighlightenPos
-func (n *TailFileWidget) GetHighlightenPos() int {
-	return n.renderer.GetCursor()
-}
-
 // GetGridBufferers is the implementation of stack.Activate
 func (n *TailFileWidget) GetGridBufferers() []ui.GridBufferer {
 	return []ui.GridBufferer{n.renderer.GetWidget()}

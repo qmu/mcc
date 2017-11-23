@@ -72,11 +72,6 @@ func (m *MenuWidget) IsReady() bool {
 	return m.isReady
 }
 
-// GetHighlightenPos is the implementation of Widget.GetHighlightenPos
-func (m *MenuWidget) GetHighlightenPos() int {
-	return m.renderer.GetCursor() + m.headerHeight
-}
-
 // GetGridBufferers is the implementation of stack.Activate
 func (m *MenuWidget) GetGridBufferers() []ui.GridBufferer {
 	return []ui.GridBufferer{m.renderer.GetWidget()}

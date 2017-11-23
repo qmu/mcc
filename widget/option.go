@@ -63,6 +63,5 @@ type Widgetter interface {
 	IsDisabled() bool
 	IsReady() bool
 	GetGridBufferers() []ui.GridBufferer
-	GetHighlightenPos() int
 	Init() error
 }

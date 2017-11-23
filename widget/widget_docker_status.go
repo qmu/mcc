@@ -179,11 +179,6 @@ func (n *DockerStatusWidget) IsReady() bool {
 	return n.isReady
 }
 
-// GetHighlightenPos is the implementation of Widget.GetHighlightenPos
-func (n *DockerStatusWidget) GetHighlightenPos() int {
-	return 100
-}
-
 // GetGridBufferers is the implementation of widget.Activate
 func (n *DockerStatusWidget) GetGridBufferers() []ui.GridBufferer {
 	var gauges []ui.GridBufferer

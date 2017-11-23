@@ -88,11 +88,6 @@ func (n *NoteWidget) IsReady() bool {
 	return n.isReady
 }
 
-// GetHighlightenPos is the implementation of Widget.GetHighlightenPos
-func (n *NoteWidget) GetHighlightenPos() int {
-	return n.renderer.GetCursor()
-}
-
 // GetGridBufferers is the implementation of stack.Activate
 func (n *NoteWidget) GetGridBufferers() []ui.GridBufferer {
 	return []ui.GridBufferer{n.renderer.GetWidget()}

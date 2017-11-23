@@ -71,11 +71,6 @@ func (g *GithubIssueWidget) IsReady() bool {
 	return g.isReady
 }
 
-// GetHighlightenPos is the implementation of Widget.GetHighlightenPos
-func (g *GithubIssueWidget) GetHighlightenPos() int {
-	return g.renderer.GetCursor()
-}
-
 // Disable sets a GithubIssueWidget instance as disabled
 func (g *GithubIssueWidget) Disable() {
 	g.disabled = true

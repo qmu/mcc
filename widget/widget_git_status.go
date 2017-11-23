@@ -220,11 +220,6 @@ func (g *GitStatusWidget) IsReady() bool {
 	return g.isReady
 }
 
-// GetHighlightenPos is the implementation of Widget.GetHighlightenPos
-func (g *GitStatusWidget) GetHighlightenPos() int {
-	return g.renderer.GetCursor()
-}
-
 // GetGridBufferers is the implementation of widget.Activate
 func (g *GitStatusWidget) GetGridBufferers() []ui.GridBufferer {
 	return []ui.GridBufferer{g.renderer.GetWidget()}

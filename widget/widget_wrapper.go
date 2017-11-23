@@ -55,11 +55,6 @@ func (w *WrapperWidget) GetGridBufferers() []ui.GridBufferer {
 	return w.widgetter.GetGridBufferers()
 }
 
-// GetHighlightenPos is
-func (w *WrapperWidget) GetHighlightenPos() int {
-	return w.widgetter.GetHighlightenPos()
-}
-
 // Init is
 func (w *WrapperWidget) Init() (err error) {
 	if !w.initialized {
