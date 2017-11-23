@@ -31,7 +31,7 @@ clean:
 build:
 	glide install
 	mkdir -p _build
-	CGO_ENABLED="1" gox $(LDFLAGS) -osarch="windows/amd64 windows/386 linux/amd64 darwin/amd64 linux/386 darwin/386" -output="_build/${NAME}_${VERSION}_{{.OS}}_{{.Arch}}/{{.Dir}}"
+	CGO_ENABLED="1" gox $(LDFLAGS) -osarch="linux/amd64 darwin/amd64" -output="_build/${NAME}_${VERSION}_{{.OS}}_{{.Arch}}/{{.Dir}}"
 
 # test > textfile > cat > rm... this is necessary because screen would be flush during tests
 .PHONY: test
@@ -70,9 +70,7 @@ release:
 		--name $(VERSION)
 
 	cd release/ \
-		&& $(GH_UPLOAD) --name darwin_386_mcc --file ${NAME}_${VERSION}_darwin_386/mcc \
 		&& $(GH_UPLOAD) --name darwin_amd64_mcc --file ${NAME}_${VERSION}_darwin_amd64/mcc \
-		&& $(GH_UPLOAD) --name linux_386_mcc --file ${NAME}_${VERSION}_linux_386/mcc \
 		&& $(GH_UPLOAD) --name linux_amd64_mcc --file ${NAME}_${VERSION}_linux_amd64/mcc \
 		&& tar czvf ${NAME}_${VERSION}_darwin_amd64.tar.gz ${NAME}_${VERSION}_darwin_amd64/ \
 		&& $(GH_UPLOAD) --name ${NAME}_${VERSION}_darwin_amd64.tar.gz --file ${NAME}_${VERSION}_darwin_amd64.tar.gz \

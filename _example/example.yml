@@ -186,7 +186,6 @@ widgets:
   - id: github_pr
     type: github_pr
     title: GITHUB PULL REQUEST WIDGET
-    issue_regex: "i([0-9]*).*"
 
   - id: tail_file
     type: tail_file

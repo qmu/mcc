@@ -108,7 +108,7 @@ func (g *GithubIssueWidget) buildIssueBody(issue *go_github.Issue, comments []*g
 			if i > 0 {
 				commentText += "[" + strings.Repeat(". ", 150) + "](fg-blue) \n\n"
 			}
-			commentText += "[COMMENTED BY ](fg-blue)" + c.User.GetLogin() + " [ON " + fmt.Sprint(t.In(loc)) + "](fg-blue)" + "\n"
+			commentText += "@" + c.User.GetLogin() + " [COMMENTED ON " + fmt.Sprint(t.In(loc)) + "](fg-blue)" + "\n\n"
 			b := c.GetBody()
 			commentText += g.overflow(b) + "\n"
 			commentText += "\n"
@@ -152,7 +152,7 @@ func (g *GithubIssueWidget) buildPrBody(pr *go_github.PullRequest, comments []*g
 			if i > 0 {
 				commentText += "[" + strings.Repeat(". ", 150) + "](fg-blue) \n\n"
 			}
-			commentText += "[COMMENTED BY ](fg-blue)" + c.User.GetLogin() + " [ON " + fmt.Sprint(t.In(loc)) + "](fg-blue)" + "\n"
+			commentText += "@" + c.User.GetLogin() + " [COMMENTED ON " + fmt.Sprint(t.In(loc)) + "](fg-blue)" + "\n\n"
 			b := c.GetBody()
 			commentText += g.overflow(b) + "\n"
 			commentText += "\n"
@@ -212,12 +212,12 @@ func (g *GithubIssueWidget) SetOption(opt *AdditionalWidgetOption) {
 		return
 	}
 	go func() {
-		err := g.client.SetIssueNoRegex(g.issueRegex)
-		if err != nil {
-			return
-		}
 		body := []string{}
 		if g.options.Type == "github_issue" {
+			err := g.client.SetIssueNoRegex(g.issueRegex)
+			if err != nil {
+				return
+			}
 			issue, comments, err := g.client.GetIssue(g.client.IssueID)
 			if err != nil {
 				return

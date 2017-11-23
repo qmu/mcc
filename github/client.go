@@ -99,20 +99,20 @@ func (g *Client) GetPR(issueID int) (pr *go_github.PullRequest, comments []*go_g
 	if err != nil {
 		return
 	}
+
 	prs, _, err := g.client.PullRequests.List(ctx, g.repoOwner, g.repoName, &go_github.PullRequestListOptions{
 		Head: br.Commit.GetSHA(),
 	})
 	if err != nil {
 		return
 	}
-	if len(prs) == 0 || len(prs) > 1 {
+	if len(prs) == 0 {
 		return nil, nil, errors.New("Fetched not only one pull request")
 	}
 	pr = prs[0]
 	opt := new(go_github.IssueListCommentsOptions)
 	ctx = context.Background()
 	comments, _, err = g.client.Issues.ListComments(ctx, g.repoOwner, g.repoName, pr.GetNumber(), opt)
-
 	return
 }
 
