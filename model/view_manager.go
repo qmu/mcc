@@ -4,6 +4,7 @@ import (
 	"errors"
 	"strconv"
 	"strings"
+	"sync"
 
 	ui "github.com/gizak/termui"
 	"github.com/qmu/mcc/model/vector"
@@ -144,10 +145,26 @@ func (c *ViewManager) buildCollection() (err error) {
 			}
 		}
 	}
-	c.MapWidgets(func(wi *widget.WrapperWidget) (err error) {
-		err = wi.Vary()
-		return
-	})
+
+	wis := make([]*widget.WrapperWidget, 0, idx)
+	for _, tab := range c.config.Layout {
+		for _, row := range tab.Rows {
+			for _, col := range row.Cols {
+				for _, wi := range col.Widgets {
+					wis = append(wis, wi)
+				}
+			}
+		}
+	}
+	var wg sync.WaitGroup
+	for _, w := range wis {
+		wg.Add(1)
+		go func(w *widget.WrapperWidget) {
+			defer wg.Done()
+			w.Vary()
+		}(w)
+	}
+	wg.Wait()
 
 	return
 }

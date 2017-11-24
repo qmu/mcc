@@ -1,5 +1,7 @@
 package vector
 
+import "sync"
+
 // RectangleCollection is
 type RectangleCollection struct {
 	rects []*Rectangle
@@ -62,68 +64,75 @@ func (r *RectangleCollection) CalcDistances() {
 			}
 		}
 	}
+	var wg sync.WaitGroup
 	for i, f := range r.rects {
-		var nearestTop *distance
-		var nearestBottom *distance
-		var nearestLeft *distance
-		var nearestRight *distance
-		for _, d := range distances {
-			if f.index == d.toIndex || f.index != d.fromIndex || d.value < 0 {
-				continue
+		wg.Add(1)
+		go func(i int, f *Rectangle) {
+			defer wg.Done()
+			var nearestTop *distance
+			var nearestBottom *distance
+			var nearestLeft *distance
+			var nearestRight *distance
+
+			for _, d := range distances {
+				if f.index == d.toIndex || f.index != d.fromIndex || d.value < 0 {
+					continue
+				}
+				// if the distance is almost same
+				// first widget should be primary
+				if d.direction == "top" && !f.edge.top && (!f.firstStack || f.rowIndex-1 == d.to.rowIndex) {
+					if nearestTop == nil || nearestTop.value > d.value {
+						if f.firstStack && f.colIndex == 0 && d.to.colIndex == 0 && d.to.lastStack {
+							d.value = d.value / 2
+						}
+						nearestTop = d
+					}
+				} else if d.direction == "right" && !f.edge.right && f.rowIndex == d.to.rowIndex && f.colIndex != d.to.colIndex {
+					if nearestRight == nil || nearestRight.value > d.value {
+						if f.firstStack && d.to.firstStack && f.colIndex+1 == d.to.colIndex {
+							d.value = d.value / 2
+						}
+						nearestRight = d
+					}
+				} else if d.direction == "bottom" && !f.edge.bottom && (!f.lastStack || f.rowIndex+1 == d.to.rowIndex) {
+					if nearestBottom == nil || nearestBottom.value > d.value {
+						if f.lastStack && f.colIndex == 0 && d.to.colIndex == 0 && d.to.firstStack {
+							d.value = d.value / 2
+						}
+						nearestBottom = d
+					}
+				} else if d.direction == "left" && !f.edge.left && f.rowIndex == d.to.rowIndex && f.colIndex != d.to.colIndex {
+					if nearestLeft == nil || nearestLeft.value > d.value {
+						if f.firstStack && d.to.firstStack && f.colIndex-1 == d.to.colIndex {
+							d.value = d.value / 2
+						}
+						nearestLeft = d
+					}
+				}
 			}
-			// if the distance is almost same
-			// first widget should be primary
-			if d.direction == "top" && !f.edge.top && (!f.firstStack || f.rowIndex-1 == d.to.rowIndex) {
-				if nearestTop == nil || nearestTop.value > d.value {
-					if f.firstStack && f.colIndex == 0 && d.to.colIndex == 0 && d.to.lastStack {
-						d.value = d.value / 2
-					}
-					nearestTop = d
-				}
-			} else if d.direction == "right" && !f.edge.right && f.rowIndex == d.to.rowIndex && f.colIndex != d.to.colIndex {
-				if nearestRight == nil || nearestRight.value > d.value {
-					if f.firstStack && d.to.firstStack && f.colIndex+1 == d.to.colIndex {
-						d.value = d.value / 2
-					}
-					nearestRight = d
-				}
-			} else if d.direction == "bottom" && !f.edge.bottom && (!f.lastStack || f.rowIndex+1 == d.to.rowIndex) {
-				if nearestBottom == nil || nearestBottom.value > d.value {
-					if f.lastStack && f.colIndex == 0 && d.to.colIndex == 0 && d.to.firstStack {
-						d.value = d.value / 2
-					}
-					nearestBottom = d
-				}
-			} else if d.direction == "left" && !f.edge.left && f.rowIndex == d.to.rowIndex && f.colIndex != d.to.colIndex {
-				if nearestLeft == nil || nearestLeft.value > d.value {
-					if f.firstStack && d.to.firstStack && f.colIndex-1 == d.to.colIndex {
-						d.value = d.value / 2
-					}
-					nearestLeft = d
-				}
+			if nearestTop != nil {
+				r.rects[i].TopWidgetIndex = nearestTop.to.index
+			} else {
+				r.rects[i].TopWidgetIndex = -1
 			}
-		}
-		if nearestTop != nil {
-			r.rects[i].TopWidgetIndex = nearestTop.to.index
-		} else {
-			r.rects[i].TopWidgetIndex = -1
-		}
-		if nearestBottom != nil {
-			r.rects[i].BottomWidgetIndex = nearestBottom.to.index
-		} else {
-			r.rects[i].BottomWidgetIndex = -1
-		}
-		if nearestLeft != nil {
-			r.rects[i].LeftWidgetIndex = nearestLeft.to.index
-		} else {
-			r.rects[i].LeftWidgetIndex = -1
-		}
-		if nearestRight != nil {
-			r.rects[i].RightWidgetIndex = nearestRight.to.index
-		} else {
-			r.rects[i].RightWidgetIndex = -1
-		}
+			if nearestBottom != nil {
+				r.rects[i].BottomWidgetIndex = nearestBottom.to.index
+			} else {
+				r.rects[i].BottomWidgetIndex = -1
+			}
+			if nearestLeft != nil {
+				r.rects[i].LeftWidgetIndex = nearestLeft.to.index
+			} else {
+				r.rects[i].LeftWidgetIndex = -1
+			}
+			if nearestRight != nil {
+				r.rects[i].RightWidgetIndex = nearestRight.to.index
+			} else {
+				r.rects[i].RightWidgetIndex = -1
+			}
+		}(i, f)
 	}
+	wg.Wait()
 	// prevent moving on incorrect widget if the cursor is on the edge widget.
 	// this works if the layout is not filled with widgets.
 	for i, r1 := range r.rects {
