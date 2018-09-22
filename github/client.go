@@ -2,6 +2,7 @@ package github
 
 import (
 	"context"
+	"errors"
 	"regexp"
 	"strconv"
 
@@ -19,7 +20,7 @@ type Client struct {
 	repoOwner  string
 	repoName   string
 	branch     string
-	issueID    int
+	IssueID    int
 	auth       *AuthService
 }
 
@@ -77,22 +78,51 @@ func (g *Client) Init() (err error) {
 	return
 }
 
-// GetIssue requests an issue and comments by refering current branch name which includes issueID
-func (g *Client) GetIssue(issueNoRegex string) (issue *go_github.Issue, comments []*go_github.IssueComment, err error) {
-	rep0 := regexp.MustCompile(issueNoRegex)
-	g.branch = rep0.ReplaceAllString(g.branch, "$1")
-	g.issueID, err = strconv.Atoi(g.branch)
-	if err != nil {
-		return
-	}
+// GetIssue requests an issue and comments by refering current branch name which includes IssueID
+func (g *Client) GetIssue(issueID int) (issue *go_github.Issue, comments []*go_github.IssueComment, err error) {
 	// get a issue
 	ctx := context.Background()
-	issue, _, err = g.client.Issues.Get(ctx, g.repoOwner, g.repoName, g.issueID)
+	issue, _, err = g.client.Issues.Get(ctx, g.repoOwner, g.repoName, issueID)
 	if err != nil {
 		return
 	}
 	opt := new(go_github.IssueListCommentsOptions)
-	comments, _, err = g.client.Issues.ListComments(ctx, g.repoOwner, g.repoName, g.issueID, opt)
+	comments, _, err = g.client.Issues.ListComments(ctx, g.repoOwner, g.repoName, issueID, opt)
 
+	return
+}
+
+// GetPR is
+func (g *Client) GetPR(issueID int) (pr *go_github.PullRequest, comments []*go_github.IssueComment, err error) {
+	ctx := context.Background()
+	br, _, err := g.client.Repositories.GetBranch(ctx, g.repoOwner, g.repoName, g.branch)
+	if err != nil {
+		return
+	}
+
+	prs, _, err := g.client.PullRequests.List(ctx, g.repoOwner, g.repoName, &go_github.PullRequestListOptions{
+		Head: br.Commit.GetSHA(),
+	})
+	if err != nil {
+		return
+	}
+	if len(prs) == 0 {
+		return nil, nil, errors.New("Fetched not only one pull request")
+	}
+	pr = prs[0]
+	opt := new(go_github.IssueListCommentsOptions)
+	ctx = context.Background()
+	comments, _, err = g.client.Issues.ListComments(ctx, g.repoOwner, g.repoName, pr.GetNumber(), opt)
+	return
+}
+
+// SetIssueNoRegex sets
+func (g *Client) SetIssueNoRegex(issueNoRegex string) (err error) {
+	rep0 := regexp.MustCompile(issueNoRegex)
+	issueID := rep0.ReplaceAllString(g.branch, "$1")
+	g.IssueID, err = strconv.Atoi(issueID)
+	if err != nil {
+		return
+	}
 	return
 }

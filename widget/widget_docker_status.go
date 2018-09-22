@@ -19,7 +19,6 @@ type DockerStatusWidget struct {
 	options    *Option
 	gauges     []*gaugeModel
 	isReady    bool
-	disabled   bool
 	containers []Container
 	client     *docker.Client
 }
@@ -169,19 +168,9 @@ func (n *DockerStatusWidget) Activate() {
 func (n *DockerStatusWidget) Deactivate() {
 }
 
-// IsDisabled is the implementation of Widget.IsDisabled
-func (n *DockerStatusWidget) IsDisabled() bool {
-	return true
-}
-
 // IsReady is the implementation of Widget.IsReady
 func (n *DockerStatusWidget) IsReady() bool {
 	return n.isReady
-}
-
-// GetHighlightenPos is the implementation of Widget.GetHighlightenPos
-func (n *DockerStatusWidget) GetHighlightenPos() int {
-	return 100
 }
 
 // GetGridBufferers is the implementation of widget.Activate
@@ -249,20 +238,6 @@ func (n *DockerStatusWidget) getStats(id string) (s *docker.Stats, err error) {
 		return s, err
 	}
 	return s, nil
-}
-
-// GetWidth is the implementation of widget.Init
-func (n *DockerStatusWidget) GetWidth() int {
-	return n.options.GetWidth()
-}
-
-// GetHeight is the implementation of widget.Init
-func (n *DockerStatusWidget) GetHeight() int {
-	return n.options.GetHeight()
-}
-
-// Disable is
-func (n *DockerStatusWidget) Disable() {
 }
 
 // SetOption is

@@ -4,6 +4,7 @@ import (
 	"errors"
 	"strconv"
 	"strings"
+	"sync"
 
 	ui "github.com/gizak/termui"
 	"github.com/qmu/mcc/model/vector"
@@ -23,6 +24,7 @@ type ViewManager struct {
 	// remember widget walk
 	lastWidget    *widget.WrapperWidget
 	lastDirection string
+	hasMaltiTabs  bool
 }
 
 // NewViewManager constructs a ViewManager
@@ -48,6 +50,14 @@ func (c *ViewManager) buildCollection() (err error) {
 	if err != nil {
 		return
 	}
+
+	// check 1 or more tabs has been defined
+	tabSelHeight := 0
+	if len(c.config.Layout) > 1 {
+		c.hasMaltiTabs = true
+		tabSelHeight = 3
+	}
+
 	windowH := ui.TermHeight() - 1
 	windowW := ui.TermWidth() - 1
 	idx := 0
@@ -69,7 +79,7 @@ func (c *ViewManager) buildCollection() (err error) {
 					if i4 == len(col.Stacks)-1 {
 						// at the last row
 						if i2 == len(tab.Rows)-1 {
-							realHeight = windowH - rowHTotal - 3
+							realHeight = windowH - rowHTotal - tabSelHeight
 						} else {
 							realHeight = rowH - stackHTotal
 						}
@@ -135,10 +145,26 @@ func (c *ViewManager) buildCollection() (err error) {
 			}
 		}
 	}
-	c.MapWidgets(func(wi *widget.WrapperWidget) (err error) {
-		err = wi.Vary()
-		return
-	})
+
+	wis := make([]*widget.WrapperWidget, 0, idx)
+	for _, tab := range c.config.Layout {
+		for _, row := range tab.Rows {
+			for _, col := range row.Cols {
+				for _, wi := range col.Widgets {
+					wis = append(wis, wi)
+				}
+			}
+		}
+	}
+	var wg sync.WaitGroup
+	for _, w := range wis {
+		wg.Add(1)
+		go func(w *widget.WrapperWidget) {
+			defer wg.Done()
+			w.Vary()
+		}(w)
+	}
+	wg.Wait()
 
 	return
 }
@@ -191,21 +217,24 @@ func (c *ViewManager) renderTabPane(tab *tabNode) (err error) {
 	tab.initialized = true
 
 	screen := []*ui.Row{}
-	tabs := make([]*ui.Row, len(c.config.Layout))
-	for i, t := range c.config.Layout {
-		tabP := ui.NewList()
-		color := "(fg-white,bg-default)"
-		if tab.Index == t.Index {
-			color = "(fg-white,bg-blue)"
+
+	if c.hasMaltiTabs {
+		tabs := make([]*ui.Row, len(c.config.Layout))
+		for i, t := range c.config.Layout {
+			tabP := ui.NewList()
+			color := "(fg-white,bg-default)"
+			if tab.Index == t.Index {
+				color = "(fg-white,bg-blue)"
+			}
+			space := strings.Repeat(" ", 500)
+			tabP.Items = []string{"[ " + strconv.Itoa(i+1) + "." + t.Name + space + "]" + color}
+			tabP.Height = 3
+			tabP.Border = true
+			tabP.BorderFg = ui.ColorBlue
+			tabs[i] = ui.NewCol(2, 0, tabP)
 		}
-		space := strings.Repeat(" ", 500)
-		tabP.Items = []string{"[ " + strconv.Itoa(i+1) + "." + t.Name + space + "]" + color}
-		tabP.Height = 3
-		tabP.Border = true
-		tabP.BorderFg = ui.ColorBlue
-		tabs[i] = ui.NewCol(2, 0, tabP)
+		screen = append(screen, ui.NewRow(tabs...))
 	}
-	screen = append(screen, ui.NewRow(tabs...))
 
 	// body
 	newRows := make([]*ui.Row, len(tab.Rows))

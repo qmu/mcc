@@ -51,6 +51,7 @@ type Container struct {
 
 // AdditionalWidgetOption is
 type AdditionalWidgetOption struct {
+	done         chan bool
 	GithubClient *github.Client
 }
 
@@ -58,11 +59,8 @@ type AdditionalWidgetOption struct {
 type Widgetter interface {
 	Activate()
 	Deactivate()
-	Disable()
 	SetOption(opt *AdditionalWidgetOption)
-	IsDisabled() bool
 	IsReady() bool
 	GetGridBufferers() []ui.GridBufferer
-	GetHighlightenPos() int
 	Init() error
 }

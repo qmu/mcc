@@ -6,6 +6,7 @@ import (
 	"time"
 
 	ui "github.com/gizak/termui"
+	go_github "github.com/google/go-github/github"
 	"github.com/qmu/mcc/github"
 	"github.com/qmu/mcc/widget/listable"
 	"golang.org/x/text/width"
@@ -21,7 +22,6 @@ type GithubIssueWidget struct {
 	timezone   string
 	indent     int
 	isReady    bool
-	disabled   bool
 	issueRegex string
 }
 
@@ -61,26 +61,9 @@ func (g *GithubIssueWidget) Deactivate() {
 	}
 }
 
-// IsDisabled is the implementation of Widget.IsDisabled
-func (g *GithubIssueWidget) IsDisabled() bool {
-	return g.disabled
-}
-
 // IsReady is the implementation of Widget.IsReady
 func (g *GithubIssueWidget) IsReady() bool {
 	return g.isReady
-}
-
-// GetHighlightenPos is the implementation of Widget.GetHighlightenPos
-func (g *GithubIssueWidget) GetHighlightenPos() int {
-	return g.renderer.GetCursor()
-}
-
-// Disable sets a GithubIssueWidget instance as disabled
-func (g *GithubIssueWidget) Disable() {
-	g.disabled = true
-	g.renderer.SetBody([]string{"Could not load issue number from branch name..."})
-	ui.Render(ui.Body)
 }
 
 // GetGridBufferers is the implementation of Widget.Activate
@@ -88,11 +71,7 @@ func (g *GithubIssueWidget) GetGridBufferers() []ui.GridBufferer {
 	return []ui.GridBufferer{g.renderer.GetWidget()}
 }
 
-func (g *GithubIssueWidget) buildBody() (body []string, err error) {
-	issue, comments, err := g.client.GetIssue(g.issueRegex)
-	if err != nil {
-		return
-	}
+func (g *GithubIssueWidget) buildIssueBody(issue *go_github.Issue, comments []*go_github.IssueComment) (body []string, err error) {
 	desc := g.overflow(issue.GetBody())
 	desc = g.putIndent(desc)
 
@@ -129,7 +108,51 @@ func (g *GithubIssueWidget) buildBody() (body []string, err error) {
 			if i > 0 {
 				commentText += "[" + strings.Repeat(". ", 150) + "](fg-blue) \n\n"
 			}
-			commentText += "[COMMENTED BY ](fg-blue)" + c.User.GetLogin() + " [ON " + fmt.Sprint(t.In(loc)) + "](fg-blue)" + "\n"
+			commentText += "@" + c.User.GetLogin() + " [COMMENTED ON " + fmt.Sprint(t.In(loc)) + "](fg-blue)" + "\n\n"
+			b := c.GetBody()
+			commentText += g.overflow(b) + "\n"
+			commentText += "\n"
+		}
+
+		commentText = g.putIndent(commentText)
+		text += " [      :](fg-blue) " + commentText
+	}
+
+	body = strings.Split(text, "\n")
+
+	return
+}
+
+func (g *GithubIssueWidget) buildPrBody(pr *go_github.PullRequest, comments []*go_github.IssueComment) (body []string, err error) {
+	desc := g.overflow(pr.GetBody())
+	desc = g.putIndent(desc)
+
+	// milestone
+	milestone := pr.Milestone.GetTitle()
+	//
+	text := " [TITLE :](fg-blue) " + pr.GetTitle() + "\n"
+	text += " [NO    :](fg-blue) " + "#" + fmt.Sprint(pr.GetNumber()) + "\n"
+	text += " [BY    :](fg-blue) " + pr.User.GetLogin() + "\n"
+	text += " [URL   :](fg-blue) " + pr.GetHTMLURL() + "\n"
+	if milestone != "" {
+		text += " [MILE  :](fg-blue) " + milestone + "\n"
+	}
+	text += " [" + strings.Repeat("-", 300) + "](fg-blue) \n"
+	text += " [DESC  :](fg-blue) " + desc
+	text += " [" + strings.Repeat("-", 300) + "](fg-blue)"
+
+	if len(comments) > 0 {
+		commentText := "\n"
+		for i, c := range comments {
+			t := c.GetCreatedAt()
+			loc, err := time.LoadLocation(g.timezone)
+			if err != nil {
+				return body, nil
+			}
+			if i > 0 {
+				commentText += "[" + strings.Repeat(". ", 150) + "](fg-blue) \n\n"
+			}
+			commentText += "@" + c.User.GetLogin() + " [COMMENTED ON " + fmt.Sprint(t.In(loc)) + "](fg-blue)" + "\n\n"
 			b := c.GetBody()
 			commentText += g.overflow(b) + "\n"
 			commentText += "\n"
@@ -146,7 +169,7 @@ func (g *GithubIssueWidget) buildBody() (body []string, err error) {
 
 func (g *GithubIssueWidget) overflow(text string) (result string) {
 	lines := strings.Split(text, "\n")
-	splitlen := g.GetWidth() - 2 - g.indent
+	splitlen := g.renderer.GetWidth() - 2 - g.indent
 	for _, line := range lines {
 		cnt := 0
 		for _, c := range line {
@@ -182,16 +205,6 @@ func (g *GithubIssueWidget) putIndent(text string) (result string) {
 	return
 }
 
-// GetWidth is the implementation of stack.Init
-func (g *GithubIssueWidget) GetWidth() int {
-	return g.renderer.GetWidth()
-}
-
-// GetHeight is the implementation of stack.Init
-func (g *GithubIssueWidget) GetHeight() int {
-	return g.renderer.GetHeight()
-}
-
 // SetOption is
 func (g *GithubIssueWidget) SetOption(opt *AdditionalWidgetOption) {
 	g.client = opt.GithubClient
@@ -199,12 +212,36 @@ func (g *GithubIssueWidget) SetOption(opt *AdditionalWidgetOption) {
 		return
 	}
 	go func() {
-		body, err := g.buildBody()
-		if err != nil {
+		body := []string{}
+		if g.options.Type == "github_issue" {
+			err := g.client.SetIssueNoRegex(g.issueRegex)
+			if err != nil {
+				return
+			}
+			issue, comments, err := g.client.GetIssue(g.client.IssueID)
+			if err != nil {
+				return
+			}
+			body, err = g.buildIssueBody(issue, comments)
+			if err != nil {
+				return
+			}
+		} else if g.options.Type == "github_pr" {
+			pr, comments, err := g.client.GetPR(g.client.IssueID)
+			if err != nil {
+				return
+			}
+			body, err = g.buildPrBody(pr, comments)
+			if err != nil {
+				return
+			}
+		} else {
+			// TODO: should return error
 			return
 		}
 		g.renderer.SetBody(body)
-		g.isReady = true
 		g.renderer.ResetRender()
+		g.isReady = true
+		opt.done <- true
 	}()
 }

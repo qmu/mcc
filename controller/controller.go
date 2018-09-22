@@ -42,7 +42,7 @@ func NewController(appVersion string, configSchemaVersion string, configPath str
 	d.setKeyBindings()
 
 	// init asynchronously
-	if d.viewManager.HasWidget("github_issue") {
+	if d.viewManager.HasWidget("github_issue") || d.viewManager.HasWidget("github_pr") {
 		go d.renderGitHubIssueWidgets()
 	}
 
@@ -131,7 +131,7 @@ func (d *Controller) renderGitHubIssueWidgets() {
 	c, err := github.NewClient(d.execPath, host)
 	if err != nil {
 		err = d.viewManager.MapWidgets(func(w *widget.WrapperWidget) (err error) {
-			if w.Is("github_issue") {
+			if w.Is("github_issue") || w.Is("github_pr") {
 				w.Disable()
 			}
 			return
@@ -143,7 +143,7 @@ func (d *Controller) renderGitHubIssueWidgets() {
 		d.client = c
 	}
 	err = d.viewManager.MapWidgets(func(w *widget.WrapperWidget) (err error) {
-		if w.Is("github_issue") && !w.IsDisabled() {
+		if (w.Is("github_issue") || w.Is("github_pr")) && !w.IsDisabled() {
 			w.SetOption(&widget.AdditionalWidgetOption{
 				GithubClient: d.client,
 			})

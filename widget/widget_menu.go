@@ -20,7 +20,6 @@ type MenuWidget struct {
 	menus        []Menu
 	headerHeight int
 	isReady      bool
-	disabled     bool
 	envs         []map[string]string
 }
 
@@ -62,19 +61,9 @@ func (m *MenuWidget) Deactivate() {
 	m.renderer.Deactivate()
 }
 
-// IsDisabled is the implementation of Widget.IsDisabled
-func (m *MenuWidget) IsDisabled() bool {
-	return m.disabled
-}
-
 // IsReady is the implementation of Widget.IsReady
 func (m *MenuWidget) IsReady() bool {
 	return m.isReady
-}
-
-// GetHighlightenPos is the implementation of Widget.GetHighlightenPos
-func (m *MenuWidget) GetHighlightenPos() int {
-	return m.renderer.GetCursor() + m.headerHeight
 }
 
 // GetGridBufferers is the implementation of stack.Activate
@@ -181,20 +170,6 @@ func (m *MenuWidget) getLongest() (n1 int, n2 int, n3 int) {
 		}
 	}
 	return n1, n2, n3
-}
-
-// GetWidth is the implementation of stack.Init
-func (m *MenuWidget) GetWidth() int {
-	return m.renderer.GetWidth()
-}
-
-// GetHeight is the implementation of stack.Init
-func (m *MenuWidget) GetHeight() int {
-	return m.renderer.GetHeight()
-}
-
-// Disable is
-func (m *MenuWidget) Disable() {
 }
 
 // SetOption is

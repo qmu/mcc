@@ -16,7 +16,6 @@ type NoteWidget struct {
 	options  *Option
 	renderer *listable.ListWrapper
 	isReady  bool
-	disabled bool
 }
 
 // NewNoteWidget constructs a New NoteWidget
@@ -78,38 +77,14 @@ func (n *NoteWidget) Deactivate() {
 	n.renderer.Deactivate()
 }
 
-// IsDisabled is the implementation of Widget.IsDisabled
-func (n *NoteWidget) IsDisabled() bool {
-	return n.disabled
-}
-
 // IsReady is the implementation of Widget.IsReady
 func (n *NoteWidget) IsReady() bool {
 	return n.isReady
 }
 
-// GetHighlightenPos is the implementation of Widget.GetHighlightenPos
-func (n *NoteWidget) GetHighlightenPos() int {
-	return n.renderer.GetCursor()
-}
-
 // GetGridBufferers is the implementation of stack.Activate
 func (n *NoteWidget) GetGridBufferers() []ui.GridBufferer {
 	return []ui.GridBufferer{n.renderer.GetWidget()}
-}
-
-// GetWidth is the implementation of stack.Init
-func (n *NoteWidget) GetWidth() int {
-	return n.renderer.GetWidth()
-}
-
-// GetHeight is the implementation of stack.Init
-func (n *NoteWidget) GetHeight() int {
-	return n.renderer.GetHeight()
-}
-
-// Disable is
-func (n *NoteWidget) Disable() {
 }
 
 // SetOption is

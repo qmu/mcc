@@ -20,7 +20,6 @@ type GitStatusWidget struct {
 	options     *Option
 	renderer    *listable.ListWrapper
 	isReady     bool
-	disabled    bool
 	statusItems StatusItems
 }
 
@@ -210,19 +209,9 @@ func (g *GitStatusWidget) Deactivate() {
 	g.renderer.Deactivate()
 }
 
-// IsDisabled is the implementation of Widget.IsDisabled
-func (g *GitStatusWidget) IsDisabled() bool {
-	return g.disabled
-}
-
 // IsReady is the implementation of Widget.IsReady
 func (g *GitStatusWidget) IsReady() bool {
 	return g.isReady
-}
-
-// GetHighlightenPos is the implementation of Widget.GetHighlightenPos
-func (g *GitStatusWidget) GetHighlightenPos() int {
-	return g.renderer.GetCursor()
 }
 
 // GetGridBufferers is the implementation of widget.Activate
@@ -270,16 +259,6 @@ func (g *GitStatusWidget) setKeyBindings() error {
 		}
 	})
 	return nil
-}
-
-// GetWidth is the implementation of widget.Init
-func (g *GitStatusWidget) GetWidth() int {
-	return g.renderer.GetWidth()
-}
-
-// GetHeight is the implementation of widget.Init
-func (g *GitStatusWidget) GetHeight() int {
-	return g.renderer.GetHeight()
 }
 
 // Disable is

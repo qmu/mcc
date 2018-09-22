@@ -116,9 +116,10 @@ func (l *ListWrapper) Deactivate() {
 }
 
 // Render renders widgets
-func (l *ListWrapper) Render() {
+func (l *ListWrapper) Render() []string {
 	l.widget.Items = l.listRenderer.RenderActually()
 	ui.Render(ui.Body)
+	return l.widget.Items
 }
 
 // ResetRender returns a initial multi-line texts

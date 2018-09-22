@@ -23,6 +23,7 @@ type WrapperWidget struct {
 	Path        string
 	widgetter   Widgetter
 	initialized bool
+	disabled    bool
 }
 
 // Activate is
@@ -37,12 +38,12 @@ func (w *WrapperWidget) Deactivate() {
 
 // Disable is
 func (w *WrapperWidget) Disable() {
-	w.widgetter.Disable()
+	w.disabled = true
 }
 
 // IsDisabled is
 func (w *WrapperWidget) IsDisabled() bool {
-	return w.widgetter.IsDisabled()
+	return w.disabled
 }
 
 // IsReady is
@@ -53,11 +54,6 @@ func (w *WrapperWidget) IsReady() bool {
 // GetGridBufferers is
 func (w *WrapperWidget) GetGridBufferers() []ui.GridBufferer {
 	return w.widgetter.GetGridBufferers()
-}
-
-// GetHighlightenPos is
-func (w *WrapperWidget) GetHighlightenPos() int {
-	return w.widgetter.GetHighlightenPos()
 }
 
 // Init is
@@ -116,7 +112,7 @@ func (w *WrapperWidget) Vary() (err error) {
 		wi, err = NewMenuWidget(opt)
 	case "note":
 		wi, err = NewNoteWidget(opt)
-	case "github_issue":
+	case "github_issue", "github_pr":
 		wi, err = NewGithubIssueWidget(opt)
 	case "text_file":
 		wi, err = NewNoteWidget(opt)
